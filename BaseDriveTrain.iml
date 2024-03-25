@@ -2,6 +2,8 @@
 <module version="4">
   <component name="AdditionalModuleElements">
     <content url="file://$MODULE_DIR$" dumb="true">
+      <sourceFolder url="file://$MODULE_DIR$/bin/generated-sources" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated" isTestSource="false" generated="true" />
       <excludeFolder url="file://$MODULE_DIR$/.idea/copilot/chatSessions" />
     </content>
   </component>

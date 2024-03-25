@@ -4,8 +4,6 @@
 
 package frc.robot.subsystems.DriveTrain;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.littletonrobotics.junction.AutoLog;
@@ -18,7 +16,6 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.ReplanningConfig;
 
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -65,13 +62,10 @@ public class DriveBase extends SubsystemBase {
   Rotation2d targetRotation; //the target rotation of the robot
 
   HolonomicPathFollowerConfig pathFollowerConfig; //the config for path following a path
-  ReplanningConfig replanConfig; //the config for when to replan a path
+  ReplanningConfig replanConfig; //the config for when to re-plan a path
   PathConstraints pathConstraints; //the constraints for pathPlanner
-
-  List<Pair<Translation2d, Translation2d>> deadZoneList = new ArrayList<Pair<Translation2d, Translation2d>>();
-  //A list containg boxes of dead zone for path Planner
-
-  DriveBaseInputsAutoLogged inputs; //an object represnting the logger class
+  
+  DriveBaseInputsAutoLogged inputs; //an object representing the logger class
 
   Field2d field; //the field object for the smart dashboard
 
@@ -79,21 +73,21 @@ public class DriveBase extends SubsystemBase {
 
   @AutoLog
   public static class DriveBaseInputs{
-    double XspeedInput = 0; //the X speed input
-    double YspeedInput = 0; //the Y speed input
+    protected double XspeedInput = 0; //the X speed input
+    protected double YspeedInput = 0; //the Y speed input
 
-    double rotationSpeedInputBeforePID = 0; //the rotation speed input before PID
-    double rotationSpeedInputAfterPID = 0; //the rotation speed input after PID
+    protected double rotationSpeedInputBeforePID = 0; //the rotation speed input before PID
+    protected double rotationSpeedInputAfterPID = 0; //the rotation speed input after PID
 
-    Pose2d currentPose = new Pose2d(); //the current pose of the robot
-    Rotation2d targetRotation = new Rotation2d(); //the target rotation of the robot (in radians)
+    protected Pose2d currentPose = new Pose2d(); //the current pose of the robot
+    protected Rotation2d targetRotation = new Rotation2d(); //the target rotation of the robot (in radians)
 
-    Rotation2d chassisAngle = new Rotation2d(); //the angle of the robot
+    protected Rotation2d chassisAngle = new Rotation2d(); //the angle of the robot
 
-    SwerveModuleState[] currentStates = new SwerveModuleState[4]; //the current states of the modules
-    SwerveModuleState[] targetStates = new SwerveModuleState[4]; //the target states of the modules
+    protected SwerveModuleState[] currentStates = new SwerveModuleState[4]; //the current states of the modules
+    protected SwerveModuleState[] targetStates = new SwerveModuleState[4]; //the target states of the modules
 
-    boolean isControlled;
+    protected boolean isControlled;
   }
 
 
@@ -105,9 +99,10 @@ public class DriveBase extends SubsystemBase {
     modules[3] = new SwerveModule(Constants.DriveTrain.back_right); //the back right module
 
     for(int i = 0; i < 4; i++){
-      currentStates[i] = new SwerveModuleState(); //creates the zerod states
+      currentStates[i] = new SwerveModuleState(); //creates the zeroed states
       targetStates = currentStates; //copies it
-      currentPostions[i] = new SwerveModulePosition(); //creates the zerod postions
+      currentPostions[i] = new SwerveModulePosition(); //creates the zeroed positions
+      modules[i].resetDriveEncoder();
     }
 
     Navx = new AHRS();
@@ -178,8 +173,7 @@ public class DriveBase extends SubsystemBase {
 
 
   /**
-   * resets the robot to a new pose
-   * @param newPose the new pose the robot should be in
+   * resets the robot to 0, 0 and a rotation of 0 (towards red alliance)
    */
   public void resetOnlyDirection(){
     if(DriverStation.getAlliance().isPresent()) if(DriverStation.getAlliance().get() == Alliance.Blue) currentPose = new Pose2d(currentPose.getX(), currentPose.getY(), new Rotation2d());
@@ -661,7 +655,7 @@ public class DriveBase extends SubsystemBase {
 
     @Override
     public void initialize(){ 
-      for(int i = 0; i < 4; i++) RobotContainer.driveBase.modules[i].goToXPostion();
+      for(int i = 0; i < 4; i++) RobotContainer.driveBase.modules[i].goToXPosition();
     }
 
     public static Command getInstance(){

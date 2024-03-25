@@ -32,50 +32,52 @@ public class SwerveModule{
   Constants.DriveTrain.SwerveModule moduleConstants; //the constants of this module
 
   private SwerveModuleState targetState; //the target state of this module
-  private SwerveModuleState currentState; //the current state of this module
-  private SwerveModulePosition modulePostion; //the current postion of this module (no need for target postion)
+  private final SwerveModuleState currentState; //the current state of this module
+  private final SwerveModulePosition modulePosition; //the current position of this module (no need for target position)
 
   private Supplier<Double> driveMotorVelocity; //a supplier of the drive motor velocity
-  private Supplier<Double> driveMotorPostion; //a supplier of the drive motor postion
+  private Supplier<Double> driveMotorPosition; //a supplier of the drive motor position
   private Supplier<Double> driveMotorCurrent; //a supplier of the drive motor output current
   private Supplier<Double> driveMotorVoltage; //a supplier of the drive motor output voltage
 
-  private Supplier<Double> steerMotorPostion; //a supplier of the steer motor output postion
+  private Supplier<Double> steerMotorPosition; //a supplier of the steer motor output position
   private Supplier<Double> steerMotorCurrent; //a supplier of the steer motor output current
   private Supplier<Double> steerMotorVoltage; //a supplier of the steer motor output voltage
 
-  private Consumer<Double> steerMotorPostionInput; //a consumer for the new target of the steer motor postion loop (including the gear ratio)
-  private Consumer<Double> driveMotorVelocityInput; //a consumer for the new speed target of the drive motor velocity loop (including the gear ratio and circufrance)
+  private Consumer<Double> steerMotorPositionInput; //a consumer for the new target of the steer motor position loop (including the gear ratio)
+  private Consumer<Double> driveMotorVelocityInput; //a consumer for the new speed target of the drive motor velocity loop (including the gear ratio and circumstance)
   
 
-  private TalonFX driveMotor; //the drive motor
-  private TalonFXConfiguration driveMotorConfig; //the config of the drive motor (used to set the neutral mode of the motor)
-
-  // private CANcoder absEncoder; //the absolute encoder
-  private DutyCycleEncoder absEncoder; //the absolute encoder
-  private CANSparkMax steerMotor; //the steer motor
+  private final TalonFX driveMotor; //the drive motor
+  private final TalonFXConfiguration driveMotorConfig; //the config of the drive motor (used to set the neutral mode of the motor)
+  private final DutyCycleEncoder absEncoder; //the absolute encoder
+  private final CANSparkMax steerMotor; //the steer motor
   private RelativeEncoder steerEncoder;
 
-  private SwerveModuleInputsAutoLogged inputs;
+  private final SwerveModuleInputsAutoLogged inputs;
+
 
   @AutoLog
   public static class SwerveModuleInputs{
-    double driveMotorInput;
-    double steerMotorInput;
+    protected boolean isModuleAtPosition;
+    protected boolean isModuleAtSpeed;
 
-    double driveMotorCurrent;
-    double driveMotorVoltage;
-    double driveMotorPostion;
-    double driveMotorVelocity;
-    double driveMotorTempture;
+    protected double driveMotorInput;
+    protected double steerMotorInput;
 
-    double steerMotorCurrent;
-    double steerMotorVoltage;
-    double steerMotorPosition;
-    double steerMotorTempture;
+    protected double driveMotorCurrent;
+    protected double driveMotorVoltage;
+    protected double driveMotorPosition;
+    protected double driveMotorVelocity;
+    protected double driveMotorTemperature;
 
-    double absEncoderAbsPostion;
-    double absEncoderPosition;
+    protected double steerMotorCurrent;
+    protected double steerMotorVoltage;
+    protected double steerMotorPosition;
+    protected double steerMotorTemperature;
+
+    protected double absEncoderAbsPosition;
+    protected double absEncoderPosition;
   }
 
   /**
@@ -87,7 +89,7 @@ public class SwerveModule{
 
     targetState = new SwerveModuleState(0, new Rotation2d());
     currentState = targetState;
-    modulePostion = new SwerveModulePosition(0, new Rotation2d());
+    modulePosition = new SwerveModulePosition(0, new Rotation2d());
 
     absEncoder = configDutyCycleEncoder();
 
@@ -96,24 +98,30 @@ public class SwerveModule{
 
     steerMotor = configCanSparkMax(true);
 
-    inputs = new SwerveModuleInputsAutoLogged();
+    inputs = new frc.robot.subsystems.DriveTrain.SwerveModuleInputsAutoLogged();
   }
 
  
   /**
-   * checks if the module is at the requested postion
-   * @return if the module is at the requested postion
+   * checks if the module is at the requested position
+   * @return if the module is at the requested position
    */
-  public boolean isAtRequestedPostion(){
-    return Math.abs(currentState.speedMetersPerSecond - targetState.speedMetersPerSecond) <= Constants.DriveTrain.Drive.driveMotorPID.getTolerance() //checks if the speed is within tolarnce
-    && Math.abs(currentState.angle.getRotations() - targetState.angle.getRotations()) <= Constants.DriveTrain.Steer.steerMotorPID.getTolerance(); //checks if the rotation is within tolarnce
-  } 
+  public boolean isAtRequestedPosition(){
+    return Math.abs(currentState.angle.getRotations() - targetState.angle.getRotations()) <= Constants.DriveTrain.Steer.steerMotorPID.getTolerance(); //checks if the rotation is within tolerance
+  }
+
+    /**
+     * checks if the module is at the requested speed
+     * @return if the module is at the requested speed
+     */
+  public boolean isAtRequestedSpeed(){
+    return Math.abs(currentState.speedMetersPerSecond - targetState.speedMetersPerSecond) <= Constants.DriveTrain.Drive.driveMotorPID.getTolerance();
+  }
 
   /**
    * sets the module to point to the center of the robot
-   * @return the new state of the module
    */
-  public SwerveModuleState goToXPostion(){
+  public void goToXPosition(){
     driveMotorVelocityInput.accept(0.0); //stops the drive motor
     targetState.speedMetersPerSecond = 0;
 
@@ -135,31 +143,22 @@ public class SwerveModule{
     }
     targetState = SwerveModuleState.optimize(targetState, currentState.angle);
     setModuleState(targetState);
-    return targetState;
   }
 
   /**
    * gets the current state of the module
-   * @return the current satate of the module
+   * @return the current state of the module
    */
   public SwerveModuleState getCurrentState(){
     return currentState;
   }
 
   /**
-   * get the target state of the module
-   * @return the target state of the module
-   */
-  public SwerveModuleState getTargetState(){
-    return targetState;
-  }
-
-  /**
-   * get the current postion of the module
-   * @return the postion of the module
+   * get the current position of the module
+   * @return the position of the module
    */
   public SwerveModulePosition getModulePosition(){
-    return modulePostion;
+    return modulePosition;
   }
 
   /**
@@ -172,12 +171,12 @@ public class SwerveModule{
     this.targetState.angle = Rotation2d.fromDegrees(minChangeInSteerAngle(this.targetState.angle.getDegrees()));
 
     driveMotorVelocityInput.accept(this.targetState.speedMetersPerSecond);//gives the drive motor the new input
-    steerMotorPostionInput.accept(this.targetState.angle.getRotations()); //sets the new angle for the steer motor
+    steerMotorPositionInput.accept(this.targetState.angle.getRotations()); //sets the new angle for the steer motor
 
     inputs.driveMotorInput = this.targetState.speedMetersPerSecond; //updates the input given (for logger)
-    inputs.steerMotorInput = this.targetState.angle.getRotations(); //udpats the input given (for logger)
+    inputs.steerMotorInput = this.targetState.angle.getRotations(); //updates the input given (for logger)
 
-    Logger.processInputs(moduleConstants.moduleName.name(), inputs); //updaes logger
+    Logger.processInputs(moduleConstants.moduleName.name(), inputs); //updates logger
   }
 
   private double minChangeInSteerAngle(double angle) {
@@ -194,36 +193,38 @@ public class SwerveModule{
   }
 
   /**
-   * this updates the module state and the module postion, run this function peridocaly
-   * @return the updated state of the module
+   * this updates the module state and the module position, run this function periodically
    */
   public void update(){
-    currentState.angle = Rotation2d.fromRotations(steerMotorPostion.get());
+    currentState.angle = Rotation2d.fromRotations(steerMotorPosition.get());
     currentState.speedMetersPerSecond = driveMotorVelocity.get();
 
-    modulePostion.angle = Rotation2d.fromRotations(steerMotorPostion.get());
-    modulePostion.distanceMeters = driveMotorPostion.get();
+    modulePosition.angle = Rotation2d.fromRotations(steerMotorPosition.get());
+    modulePosition.distanceMeters = driveMotorPosition.get();
 
-    inputs.driveMotorPostion = driveMotorPostion.get(); //updates the postion of the drive motor
+    inputs.driveMotorPosition = driveMotorPosition.get(); //updates the position of the drive motor
     inputs.driveMotorCurrent = driveMotorCurrent.get(); //updates the current output of the drive motor
     inputs.driveMotorVoltage = driveMotorVoltage.get(); //updates the voltage output of the drive motor
     inputs.driveMotorVelocity = driveMotorVelocity.get();
-    inputs.driveMotorTempture = driveMotor.getDeviceTemp().getValueAsDouble();
+    inputs.driveMotorTemperature = driveMotor.getDeviceTemp().getValueAsDouble();
 
 
     inputs.steerMotorCurrent = steerMotorCurrent.get(); //updates the current output of the steer motor
     inputs.steerMotorVoltage = steerMotorVoltage.get(); //updates the voltage output of the steer motor
-    inputs.steerMotorTempture = steerMotor.getMotorTemperature();
+    inputs.steerMotorTemperature = steerMotor.getMotorTemperature();
 
     if(steerEncoder != null){
       inputs.steerMotorPosition = steerMotor.getEncoder().getPosition() / Constants.DriveTrain.Steer.steerGearRatio;
     }
     else{
-      inputs.steerMotorPosition = steerMotorPostion.get();
+      inputs.steerMotorPosition = steerMotorPosition.get();
     }
 
-    inputs.absEncoderAbsPostion = (absEncoder.getAbsolutePosition() - absEncoder.getPositionOffset()) * 360;
-    inputs.absEncoderPosition = steerMotorPostion.get();
+    inputs.absEncoderAbsPosition = (absEncoder.getAbsolutePosition() - absEncoder.getPositionOffset()) * 360;
+    inputs.absEncoderPosition = steerMotorPosition.get();
+
+    inputs.isModuleAtPosition = isAtRequestedPosition(); //updates if the module is at the requested position
+    inputs.isModuleAtSpeed = isAtRequestedSpeed(); //updates if the module is at the requested speed
 
     Logger.processInputs(moduleConstants.moduleName.name(), inputs); //updates the logger
   }
@@ -251,14 +252,6 @@ public class SwerveModule{
     driveMotor.setPosition(0);
   }
 
-  /**
-   * gets the absolute postion of the cancoder
-   * @return the absolute postion of the cancoder in rotations
-   */
-  public double getAbsolutePosition(){
-    return absEncoder.get() ;
-  }
-
   private DutyCycleEncoder configDutyCycleEncoder(){
     DutyCycleEncoder encoder = new DutyCycleEncoder(moduleConstants.absoluteEncoderID);
     encoder.setPositionOffset(moduleConstants.absoluteEncoderZeroOffset / 360);
@@ -272,9 +265,9 @@ public class SwerveModule{
   private TalonFX configTalonFX(TalonFXConfiguration config){
     TalonFX talonFX = new TalonFX(moduleConstants.driveMotorID); //creates a new talon fx
 
-    talonFX.getConfigurator().apply(config); //applys the given config
+    talonFX.getConfigurator().apply(config); //apply the given config
 
-    talonFX.getPosition().setUpdateFrequency(50); //postion is needed more for odemtry
+    talonFX.getPosition().setUpdateFrequency(50); //position is needed more for destroy
 
     talonFX.getVelocity().setUpdateFrequency(50); //sets as default
     talonFX.getMotorVoltage().setUpdateFrequency(50); //sets as default
@@ -282,9 +275,9 @@ public class SwerveModule{
     talonFX.getDeviceTemp().setUpdateFrequency(50);
 
     driveMotorVelocity = talonFX.getVelocity().asSupplier(); //sets the new velocity supplier
-    driveMotorPostion = talonFX.getPosition().asSupplier(); //sets the new postion supplier
-    driveMotorCurrent = talonFX.getSupplyCurrent().asSupplier(); //sets a supplior of the applied current of the motor for logging
-    driveMotorVoltage = talonFX.getMotorVoltage().asSupplier(); //sets a supplior of the applied voltage of the motor for logging
+    driveMotorPosition = talonFX.getPosition().asSupplier(); //sets the new position supplier
+    driveMotorCurrent = talonFX.getSupplyCurrent().asSupplier(); //sets a supplier of the applied current of the motor for logging
+    driveMotorVoltage = talonFX.getMotorVoltage().asSupplier(); //sets a supplier of the applied voltage of the motor for logging
 
     VelocityDutyCycle velocityDutyCycle = new VelocityDutyCycle(0);
     velocityDutyCycle.EnableFOC = false;
@@ -300,7 +293,7 @@ public class SwerveModule{
 
   /**
    * creates a config for the talonFX
-   * @return
+   * @return the new config
    */
   private TalonFXConfiguration getTalonFXConfiguration(){
     TalonFXConfiguration config = new TalonFXConfiguration(); //creates a new talonFX config
@@ -327,7 +320,7 @@ public class SwerveModule{
     config.MotionMagic.MotionMagicJerk = Constants.DriveTrain.Drive.driveMotorMaxJerk; //sets the max Jerk for motion magic
 
     config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor; //just in case sets the built-in sensor
-    config.Feedback.SensorToMechanismRatio = Constants.DriveTrain.Drive.driveGearRatio / Constants.DriveTrain.Drive.wheelCircumferenceMeters; //chnages the units to m/s
+    config.Feedback.SensorToMechanismRatio = Constants.DriveTrain.Drive.driveGearRatio / Constants.DriveTrain.Drive.wheelCircumferenceMeters; //changes the units to m/s
 
     return config; //returns the new config
   }
@@ -357,15 +350,13 @@ public class SwerveModule{
 
     sparkMax.getEncoder().setPositionConversionFactor(1); //sets the gear ratio for the module
 
-    // sparkMax.getEncoder().setPosition(absEncoder.getAbsolutePosition().getValueAsDouble() * Constants.DriveTrain.Steer.steerGearRatio); //place holder, place getabsencoder postion
-    // sparkMax.getEncoder().setPosition(0);
-    steerMotorCurrent = () -> sparkMax.getOutputCurrent();
+    steerMotorCurrent = sparkMax::getOutputCurrent;
     steerMotorVoltage = () -> sparkMax.getAppliedOutput() * sparkMax.getBusVoltage();
 
     if(!isUsingRleativeEncoder){
       sparkMax.getEncoder().setPosition(absEncoder.get() * Constants.DriveTrain.Steer.steerGearRatio);
 
-      steerMotorPostion = () -> sparkMax.getEncoder().getPosition() / Constants.DriveTrain.Steer.steerGearRatio;
+      steerMotorPosition = () -> sparkMax.getEncoder().getPosition() / Constants.DriveTrain.Steer.steerGearRatio;
     }
     else{
       steerEncoder = sparkMax.getAlternateEncoder(8192);
@@ -374,10 +365,10 @@ public class SwerveModule{
 
       sparkMax.getPIDController().setFeedbackDevice(steerEncoder);
 
-      steerMotorPostion = () -> steerEncoder.getPosition() / Constants.DriveTrain.Steer.steerGearRatio;
+      steerMotorPosition = () -> steerEncoder.getPosition() / Constants.DriveTrain.Steer.steerGearRatio;
     }
 
-    steerMotorPostionInput = position -> sparkMax.getPIDController().setReference(position * Constants.DriveTrain.Steer.steerGearRatio, ControlType.kPosition);
+    steerMotorPositionInput = position -> sparkMax.getPIDController().setReference(position * Constants.DriveTrain.Steer.steerGearRatio, ControlType.kPosition);
 
     sparkMax.setSmartCurrentLimit(35); //sets the current limit of the motor (thanks noga for reminding m)
     sparkMax.setSecondaryCurrentLimit(60); 
