@@ -152,7 +152,7 @@ public class SwerveModule{
   public void setModuleState(SwerveModuleState targetState){
     this.inputs.targetState = targetState;
 
-    this.inputs.targetState.angle = Rotation2d.fromDegrees(minChangeInSteerAngle(this.inputs.targetState.angle.getDegrees()));
+    this.inputs.targetState.angle = Rotation2d.fromDegrees(this.inputs.targetState.angle.getDegrees());
 
     driveMotorVelocityInput.accept(this.inputs.targetState.speedMetersPerSecond);//gives the drive motor the new input
     steerMotorPositionInput.accept(this.inputs.targetState.angle.getRotations()); //sets the new angle for the steer motor
@@ -161,19 +161,6 @@ public class SwerveModule{
     inputs.steerMotorInput = this.inputs.targetState.angle.getRotations(); //updates the input given (for logger)
 
     Logger.processInputs(moduleConstants.moduleName.name(), inputs); //updates logger
-  }
-
-  private double minChangeInSteerAngle(double angle) {
-    double full_rotations = (int)inputs.currentState.angle.getRotations();
-    double close_angle = angle + 360.0 * full_rotations;
-    double angle_plus = close_angle + 360;
-    double angle_minus = close_angle - 360;
-
-    double minAngle = close_angle;
-    if(Math.abs(minAngle - inputs.currentState.angle.getDegrees()) > Math.abs(angle_plus - inputs.currentState.angle.getDegrees())) minAngle = angle_plus;
-    if(Math.abs(minAngle - inputs.currentState.angle.getDegrees()) > Math.abs(angle_minus - inputs.currentState.angle.getDegrees())) minAngle = angle_minus;
-
-    return minAngle;
   }
 
   /**
@@ -244,7 +231,7 @@ public class SwerveModule{
   }
   private DutyCycleEncoder configDutyCycleEncoder(){
     DutyCycleEncoder encoder = new DutyCycleEncoder(moduleConstants.AbsEncoderPort);
-    encoder.setPositionOffset(moduleConstants.absoluteEncoderZeroOffset / 360);
+    encoder.setPositionOffset(moduleConstants.absoluteEncoderZeroOffset);
 
     return encoder;
   }
