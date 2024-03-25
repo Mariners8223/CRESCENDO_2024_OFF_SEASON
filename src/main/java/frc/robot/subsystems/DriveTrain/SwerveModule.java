@@ -96,7 +96,7 @@ public class SwerveModule{
     driveMotorConfig = getTalonFXConfiguration();
     driveMotor = configTalonFX(driveMotorConfig);
 
-    steerMotor = configCanSparkMax(true);
+    steerMotor = configCanSparkMax(moduleConstants.isUsingAbsEncoderForRelativePosition);
 
     inputs = new frc.robot.subsystems.DriveTrain.SwerveModuleInputsAutoLogged();
   }
@@ -334,9 +334,9 @@ public class SwerveModule{
     sparkMax.restoreFactoryDefaults();
 
     sparkMax.enableVoltageCompensation(12); //sets voltage compensation to 12V
-    sparkMax.setInverted(moduleConstants.isSteerInverted); //sets wether the motor is inverted or not
+    sparkMax.setInverted(moduleConstants.isSteerInverted); //sets if the motor is inverted or not
 
-    sparkMax.setIdleMode(IdleMode.kCoast); //sets the idle mode to coat (automaticlly goes to brakes once the robot is enabled)
+    sparkMax.setIdleMode(IdleMode.kCoast); //sets the idle mode to coat (automatically goes to brakes once the robot is enabled)
 
     sparkMax.getPIDController().setP(Constants.DriveTrain.Steer.steerMotorPID.getP()); //sets the P for the PID Controller
     sparkMax.getPIDController().setI(Constants.DriveTrain.Steer.steerMotorPID.getI()); //sets the I for the PID Controller
