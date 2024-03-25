@@ -166,28 +166,6 @@ public class DriveBase extends SubsystemBase {
       modules[i].setBrakeMode(isBrake);
     }
   }
-
-
-  /**
-   * resets the robot to a new pose
-   */
-  public void Reset(){
-    Pose2d startingPose2d = new Pose2d();
-
-    poseEstimator.resetPosition(Rotation2d.fromDegrees(getNavxAngle()), currentPositions, startingPose2d); //reset poseEstimator with the new starting postion
-    navxOffset = -(startingPose2d.getRotation().getDegrees() - getNavxAngle());
-    currentPose = poseEstimator.getEstimatedPosition();
-    targetRotation = currentPose.getRotation();
-
-    inputs.currentPose = startingPose2d;
-
-    inputs.targetRotation = startingPose2d.getRotation();
-    
-    inputs.chassisAngle= startingPose2d.getRotation();
-
-    Logger.processInputs(getName(), inputs);
-  }
-
   /**
    * resets the robot to a new pose
    * @param newPose the new pose the robot should be in
@@ -307,22 +285,10 @@ public class DriveBase extends SubsystemBase {
   }
 
   /**
-   * calculates the value to give to the chassis speed
-   * @param setPoint a new target rotation
-   * @return returns the value to give to the chassis speed constructor
-   */
-  public double calculateTheta(Rotation2d setPoint){
-    targetRotation = setPoint;
-    double value = thetaCorrectionController.calculate(getRotation2d().getRadians(), setPoint.getRadians());
-    if(Math.abs(value) < Constants.DriveTrain.Global.chassisSpeedsDeadZone) return 0;
-    return value;
-  }
-
-  /**
    * calculates the theta value to give to the chassis speed using the target rotation
    * @return the value to give to the drive
    */
-  public double calculateTheta(){
+  private double calculateTheta(){
     double value = thetaCorrectionController.calculate(getRotation2d().getRadians(), targetRotation.getRadians());
     if(Math.abs(value) < Constants.DriveTrain.Global.chassisSpeedsDeadZone) return 0;
     return value;
