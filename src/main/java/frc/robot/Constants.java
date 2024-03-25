@@ -60,10 +60,10 @@ public class Constants {
             public static final double minVelocity = 0.1; //the min velocity of the modules steer aspect in module rotation per minute (only used by smart Motion) //TODO find real value
             public static final double maxAcceleration = 1; //the max acceleration of the modules steer aspect in module rotations per minute per second (only used by smart Motion) //TODO find real value
 
-            public static final double front_left_absoluteEncoderZeroOffset = 214.65; // the offset between the absolute encoder reading on the front left module, in degrees
-            public static final double front_right_absoluteEncoderZeroOffset = 337.27; // the offset between the absolute encoder on the front left module, in degrees
-            public static final double back_left_absoluteEncoderZeroOffset = 81.47; // the offset between the absolute encoder on the back left module, in degrees
-            public static final double back_right_absoluteEncoderZeroOffset = 270.1; // the offset between the absolute encoder on the back right module, in degrees
+            public static final double front_left_absoluteEncoderZeroOffset = 0.59625; // the offset between the absolute encoder reading on the front left module, in degrees
+            public static final double front_right_absoluteEncoderZeroOffset = 0.9368611111111111; // the offset between the absolute encoder on the front left module, in degrees
+            public static final double back_left_absoluteEncoderZeroOffset = 0.2263055555555556; // the offset between the absolute encoder on the back left module, in degrees
+            public static final double back_right_absoluteEncoderZeroOffset = 0.7502777777777778; // the offset between the absolute encoder on the back right module, in degrees
 
             // public static final double front_left_absoluteEncoderZeroOffset = 0; // use this to calibrate zero offsets
             // public static final double front_right_absoluteEncoderZeroOffset = 0; // use this to calibrate zero offsets
@@ -83,40 +83,41 @@ public class Constants {
         }
 
         public static class SwerveModule{
-            public static Translation2d[] moduleTranslations = new Translation2d[]
+            public static final Translation2d[] moduleTranslations = new Translation2d[]
                 {new Translation2d(Global.distanceBetweenWheels / 2, Global.distanceBetweenWheels / 2), new Translation2d(Global.distanceBetweenWheels / 2, -Global.distanceBetweenWheels / 2),
                  new Translation2d(-Global.distanceBetweenWheels / 2, Global.distanceBetweenWheels / 2), new Translation2d(-Global.distanceBetweenWheels / 2, -Global.distanceBetweenWheels / 2)};
             //^ places the translation of each module in the array in order of the enum (front left, front right, back left, back right)
 
-            public ModuleName moduleName; //the name of the module (enum)
+            public final ModuleName moduleName; //the name of the module (enum)
 
-            public int driveMotorID; // the CAN ID of the drive motor
-            public int steerMotorID; // the CAN ID of the steer motor
-            public int AbsEncoderPort; // the CAN ID of the absolute encoder (this case CanCoder)
+            public final int driveMotorID; // the CAN ID of the drive motor
+            public final int steerMotorID; // the CAN ID of the steer motor
+            public final int AbsEncoderID; // the CAN ID of the absolute encoder (this case CanCoder)
 
-            public boolean isSteerInverted; // if the steer motor output should be reversed
-            public boolean isDriveInverted; // if the drive motor output should be reversed
-            public boolean isAbsEncoderInverted; // if the reading of the absolute encoder should be inverted
+            public final boolean isSteerInverted; // if the steer motor output should be reversed
+            public final boolean isDriveInverted; // if the drive motor output should be reversed
+            public final boolean isAbsEncoderInverted; // if the reading of the absolute encoder should be inverted
 
-            public double absoluteEncoderZeroOffset; //the offset between the magnets zero and the modules zero in degrees
+            public final boolean shouldSteerMotorBeResetedByAbsEncoder; // if the steer motor should be resete by the absolute encoder
 
-            public boolean isUsingAbsEncoderForRelativePosition; //if the module is using the absolute encoder to calculate the relative position of the module
+            public final double absoluteEncoderZeroOffset; //the offset between the magnets zero and the modules zero in degrees
 
-            public Translation2d moduleTranslation; //the translation of the module relative to the center of the robot
+            public final Translation2d moduleTranslation; //the translation of the module relative to the center of the robot
 
-            public SwerveModule(ModuleName moduleName, int driveMotorID, int steerMotorID, int AbsEncoderPort, double absoluteEncoderZeroOffset, boolean isUsingAbsEncoderForRelativePosition, boolean isSteerInverted, boolean isDriveInverted, boolean isAbsEncoderInverted){
+            public SwerveModule(ModuleName moduleName, int driveMotorID, int steerMotorID, int AbsEncoderID, double absoluteEncoderZeroOffset, boolean shouldSteerMotorBeResetByAbsEncoder, boolean isSteerInverted, boolean isDriveInverted, boolean isAbsEncoderInverted){
                 this.moduleName = moduleName;
 
                 this.driveMotorID = driveMotorID;
                 this.steerMotorID = steerMotorID;
-                this.AbsEncoderPort = AbsEncoderPort;
+                this.AbsEncoderID = AbsEncoderID;
 
                 this.isDriveInverted = isDriveInverted;
                 this.isSteerInverted = isSteerInverted;
                 this.isAbsEncoderInverted = isAbsEncoderInverted;
 
+                this.shouldSteerMotorBeResetedByAbsEncoder = shouldSteerMotorBeResetByAbsEncoder;
+
                 this.absoluteEncoderZeroOffset = absoluteEncoderZeroOffset;
-                this.isUsingAbsEncoderForRelativePosition = isUsingAbsEncoderForRelativePosition;
 
                 this.moduleTranslation = moduleTranslations[moduleName.ordinal()];
             }
@@ -124,11 +125,11 @@ public class Constants {
 
         public static final SwerveModule front_left = new SwerveModule(ModuleName.Front_Left, 2, 3, 3, Steer.front_left_absoluteEncoderZeroOffset, false, false, false, true);
         //^the constants of the front left module
-        public static final SwerveModule front_right = new SwerveModule(ModuleName.Front_Right, 4, 5, 0, Steer.front_right_absoluteEncoderZeroOffset, false, false, false, true);
+        public static final SwerveModule front_right = new SwerveModule(ModuleName.Front_Right, 4, 5, 0, Steer.front_right_absoluteEncoderZeroOffset, false,false, false, true);
         //^the constants of the front right module
         public static final SwerveModule back_left = new SwerveModule(ModuleName.Back_Left, 6, 7, 1, Steer.back_left_absoluteEncoderZeroOffset, false, false, false, true);
         //^the constants of the back left module
-        public static final SwerveModule back_right = new SwerveModule(ModuleName.Back_Right, 8, 9, 2, Steer.back_right_absoluteEncoderZeroOffset,false , false, false, true);
+        public static final SwerveModule back_right = new SwerveModule(ModuleName.Back_Right, 8, 9, 2, Steer.back_right_absoluteEncoderZeroOffset, false, false, false, true);
         //^the constants of the back right module
         
     } 
