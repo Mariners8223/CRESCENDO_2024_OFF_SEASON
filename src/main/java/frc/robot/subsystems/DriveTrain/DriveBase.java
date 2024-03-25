@@ -120,8 +120,8 @@ public class DriveBase extends SubsystemBase {
 
     targetRotation = new Rotation2d(); //creates a new target rotation
 
-    replanConfig = new ReplanningConfig(Constants.DriveTrain.PathPlanner.planPathTostartingPointIfNotAtIt, Constants.DriveTrain.PathPlanner.enableDynamicReplanning, Constants.DriveTrain.PathPlanner.pathErrorTolerance, Constants.DriveTrain.PathPlanner.pathErrorSpikeTolerance);
-    // ^how pathplanner reacts to postion error
+    replanConfig = new ReplanningConfig(Constants.DriveTrain.PathPlanner.planPathToStartingPointIfNotAtIt, Constants.DriveTrain.PathPlanner.enableDynamicRePlanning, Constants.DriveTrain.PathPlanner.pathErrorTolerance, Constants.DriveTrain.PathPlanner.pathErrorSpikeTolerance);
+    // ^how pathplanner reacts to position error
     pathFollowerConfig = new HolonomicPathFollowerConfig(
       Constants.DriveTrain.PathPlanner.XYPID.createPIDConstants(),
       Constants.DriveTrain.PathPlanner.thetaPID.createPIDConstants(),

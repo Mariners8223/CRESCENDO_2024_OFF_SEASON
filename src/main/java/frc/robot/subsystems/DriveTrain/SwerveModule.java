@@ -253,7 +253,7 @@ public class SwerveModule{
   }
 
   private DutyCycleEncoder configDutyCycleEncoder(){
-    DutyCycleEncoder encoder = new DutyCycleEncoder(moduleConstants.absoluteEncoderID);
+    DutyCycleEncoder encoder = new DutyCycleEncoder(moduleConstants.AbsEncoderPort);
     encoder.setPositionOffset(moduleConstants.absoluteEncoderZeroOffset / 360);
 
     return encoder;
@@ -282,7 +282,7 @@ public class SwerveModule{
     VelocityDutyCycle velocityDutyCycle = new VelocityDutyCycle(0);
     velocityDutyCycle.EnableFOC = false;
 
-    driveMotorVelocityInput = velocity -> talonFX.setControl(velocityDutyCycle.withVelocity(velocity *  Constants.DriveTrain.Drive.driveGearRatio * Constants.DriveTrain.Drive.wheelCircumferenceMeters)); //creats a consumer that sets the target velocity for the motor
+    driveMotorVelocityInput = velocity -> talonFX.setControl(velocityDutyCycle.withVelocity(velocity *  Constants.DriveTrain.Drive.driveGearRatio * Constants.DriveTrain.Drive.wheelCircumferenceMeters)); //creates a consumer that sets the target velocity for the motor
 
     talonFX.optimizeBusUtilization(); //optimizes canbus util
 
