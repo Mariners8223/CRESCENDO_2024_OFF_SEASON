@@ -30,7 +30,7 @@ import frc.robot.Constants;
 public class SwerveModule{
   private final Constants.DriveTrain.SwerveModule moduleConstants; //the constants of this module
 
-  private SwerveModulePosition modulePosition = new SwerveModulePosition(0, new Rotation2d());
+  private final SwerveModulePosition modulePosition = new SwerveModulePosition(0, new Rotation2d());
   private Consumer<Double> steerMotorPositionInput; //a consumer for the new target of the steer motor position loop (including the gear ratio)
   private Consumer<Double> driveMotorVelocityInput; //a consumer for the new speed target of the drive motor velocity loop (including the gear ratio and circumstance)
   
