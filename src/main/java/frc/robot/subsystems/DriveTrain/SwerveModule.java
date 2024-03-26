@@ -5,7 +5,6 @@
 package frc.robot.subsystems.DriveTrain;
 
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
@@ -31,6 +30,7 @@ import frc.robot.Constants;
 public class SwerveModule{
   private final Constants.DriveTrain.SwerveModule moduleConstants; //the constants of this module
 
+  private SwerveModulePosition modulePosition = new SwerveModulePosition(0, new Rotation2d());
   private Consumer<Double> steerMotorPositionInput; //a consumer for the new target of the steer motor position loop (including the gear ratio)
   private Consumer<Double> driveMotorVelocityInput; //a consumer for the new speed target of the drive motor velocity loop (including the gear ratio and circumstance)
   
@@ -48,7 +48,6 @@ public class SwerveModule{
 
     protected SwerveModuleState currentState = new SwerveModuleState(0, new Rotation2d());
     protected SwerveModuleState targetState = new SwerveModuleState(0, new Rotation2d());
-    protected SwerveModulePosition modulePosition = new SwerveModulePosition(0, new Rotation2d());
     protected boolean isModuleAtPosition;
     protected boolean isModuleAtSpeed;
 
@@ -142,7 +141,7 @@ public class SwerveModule{
    * @return the position of the module
    */
   public SwerveModulePosition getModulePosition(){
-    return inputs.modulePosition;
+    return modulePosition;
   }
 
   /**
@@ -178,9 +177,9 @@ public class SwerveModule{
       inputs.currentState.angle = Rotation2d.fromRotations(absEncoder.get());
     }
 
-    inputs.modulePosition.angle = inputs.currentState.angle;
+    modulePosition.angle = inputs.currentState.angle;
     inputs.currentState.speedMetersPerSecond = driveMotor.getVelocity().getValueAsDouble();
-    inputs.modulePosition.distanceMeters = driveMotor.getVelocity().getValueAsDouble();
+    modulePosition.distanceMeters = driveMotor.getVelocity().getValueAsDouble();
 
     inputs.driveMotorInputCurrent = driveMotor.getSupplyCurrent().getValueAsDouble(); //updates the current output of the drive motor
     inputs.driveMotorOutPutCurrent = driveMotor.getStatorCurrent().getValueAsDouble(); //updates the current output of the drive motor.
