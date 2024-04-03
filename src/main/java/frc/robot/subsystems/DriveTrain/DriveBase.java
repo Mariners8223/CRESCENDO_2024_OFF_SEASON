@@ -77,6 +77,8 @@ public class DriveBase extends SubsystemBase {
     protected SwerveModuleState[] currentStates = new SwerveModuleState[4]; //the current states of the modules
     protected SwerveModuleState[] targetStates = new SwerveModuleState[4]; //the target states of the modules
 
+    protected String activeCommand; //the active command of the robot
+
     protected boolean isControlled;
   }
 
@@ -482,12 +484,15 @@ public class DriveBase extends SubsystemBase {
 
     inputs.chassisAngle = getRotation2d();
 
+    inputs.activeCommand = this.getCurrentCommand() != null ? this.getCurrentCommand().getName() : "None";
+
     Logger.processInputs(getName(), inputs);
   }
 
   @Override
   public void periodic() {
     update();
+
   }
 
 
