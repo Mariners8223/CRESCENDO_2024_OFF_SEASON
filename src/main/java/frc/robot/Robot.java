@@ -5,10 +5,15 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.pathfinding.Pathfinding;
+import frc.util.LocalADStarAK;
 import org.littletonrobotics.junction.LoggedRobot;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.rlog.RLOGServer;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 public class Robot extends LoggedRobot
 {
@@ -18,7 +23,38 @@ public class Robot extends LoggedRobot
     
     
     @Override
-    public void robotInit() {}
+    public void robotInit() {
+        robotContainer = new RobotContainer();
+
+        Pathfinding.setPathfinder(new LocalADStarAK());
+        Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
+        Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
+        Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
+        Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
+        switch (BuildConstants.DIRTY) {
+            case 0:
+                Logger.recordMetadata("GitDirty", "All changes committed");
+                break;
+            case 1:
+                Logger.recordMetadata("GitDirty", "Uncomitted changes");
+                break;
+            default:
+                Logger.recordMetadata("GitDirty", "Unknown");
+                break;
+        }
+
+        if(isReal()){
+            Logger.addDataReceiver(new RLOGServer());
+            Logger.addDataReceiver(new WPILOGWriter("/U/logs"));
+        }
+        else{
+            Logger.addDataReceiver(new RLOGServer());
+        }
+
+        Logger.start();
+
+
+    }
     
     
     @Override

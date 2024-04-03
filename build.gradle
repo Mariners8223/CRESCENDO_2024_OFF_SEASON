@@ -3,6 +3,7 @@ plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2024.3.2"
     id "idea"
+    id "com.peterabeles.gversion" version "1.10.2"
 }
 
 def javaVersion = JavaVersion.VERSION_17
@@ -111,11 +112,17 @@ repositories {
 configurations.all {
     exclude group: "edu.wpi.first.wpilibj"
 }
+gversion {
+    srcDir       = "src/main/java/"
+    classPackage = "frc.robot"
+    className    = "BuildConstants"
+}
 
-task(checkAkitInstall, dependsOn: "classes", type: JavaExec) {
+    task(checkAkitInstall, dependsOn: "classes", type: JavaExec) {
     mainClass = "org.littletonrobotics.junction.CheckInstall"
     classpath = sourceSets.main.runtimeClasspath
 }
+project.compileJava.dependsOn(createVersionFile)
 compileJava.finalizedBy checkAkitInstall
 
 // Configure jar and deploy tasks
