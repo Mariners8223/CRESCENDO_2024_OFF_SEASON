@@ -31,8 +31,9 @@ public class SwerveModule{
 
   private Consumer<Double> steerMotorPositionInput; //a consumer for the new target of the steer motor position loop (including the gear ratio)
   private Consumer<Double> driveMotorVelocityInput; //a consumer for the new speed target of the drive motor velocity loop (including the gear ratio and circumstance)
-  
 
+
+  private final SwerveModulePosition modulePosition = new SwerveModulePosition();
   private final TalonFX driveMotor; //the drive motor
 
   private final CANcoder absEncoder; //the absolute encoder
@@ -44,9 +45,9 @@ public class SwerveModule{
   @AutoLog
   public static class SwerveModuleInputs{
 
-    protected SwerveModuleState currentState = new SwerveModuleState(0, new Rotation2d());
-    protected SwerveModuleState targetState = new SwerveModuleState(0, new Rotation2d());
-    protected SwerveModulePosition modulePosition = new SwerveModulePosition(0, new Rotation2d());
+    protected SwerveModuleState currentState = new SwerveModuleState();
+    protected SwerveModuleState targetState = new SwerveModuleState();
+
     protected boolean isModuleAtPosition;
     protected boolean isModuleAtSpeed;
 
@@ -55,9 +56,12 @@ public class SwerveModule{
 
     protected double driveMotorOutPutCurrent;
     protected double driveMotorInputCurrent;
+    protected double driveMotorAppliedOutput; // duty cycle
     protected double driveMotorTemperature;
 
     protected double steerMotorOutPutCurrent;
+    protected double steerMotorAppliedOutput; // duty cycle
+    protected double steerMotorInputCurrent;
     protected double steerMotorVelocity;
     protected double steerMotorTemperature;
 
@@ -138,9 +142,7 @@ public class SwerveModule{
    * get the current position of the module
    * @return the position of the module
    */
-  public SwerveModulePosition getModulePosition(){
-    return inputs.modulePosition;
-  }
+  public SwerveModulePosition getModulePosition(){ return modulePosition; }
 
   /**
    * use this to set the module state and target for the motors
@@ -149,7 +151,7 @@ public class SwerveModule{
   public void setModuleState(SwerveModuleState targetState){
     this.inputs.targetState = targetState;
 
-    this.inputs.targetState.angle = Rotation2d.fromDegrees(this.inputs.targetState.angle.getDegrees());
+//    this.inputs.targetState.angle = Rotation2d.fromDegrees(this.inputs.targetState.angle.getDegrees()); // probably for edens calc IDK why is it here
 
     driveMotorVelocityInput.accept(this.inputs.targetState.speedMetersPerSecond);//gives the drive motor the new input
     steerMotorPositionInput.accept(this.inputs.targetState.angle.getRotations()); //sets the new angle for the steer motor
@@ -175,15 +177,18 @@ public class SwerveModule{
       inputs.currentState.angle = Rotation2d.fromRotations(steerMotor.getEncoder().getPosition() / Constants.DriveTrain.Steer.steerGearRatio);
     }
 
-    inputs.modulePosition.angle = inputs.currentState.angle;
+    modulePosition.angle = inputs.currentState.angle;
     inputs.currentState.speedMetersPerSecond = driveMotor.getVelocity().getValueAsDouble();
-    inputs.modulePosition.distanceMeters = driveMotor.getVelocity().getValueAsDouble();
+    modulePosition.distanceMeters = driveMotor.getPosition().getValueAsDouble();
 
     inputs.driveMotorInputCurrent = driveMotor.getSupplyCurrent().getValueAsDouble(); //updates the current output of the drive motor
     inputs.driveMotorOutPutCurrent = driveMotor.getStatorCurrent().getValueAsDouble(); //updates the current output of the drive motor.
+    inputs.driveMotorAppliedOutput = driveMotor.getDutyCycle().getValueAsDouble(); //updates the applied output of the drive motor
     inputs.driveMotorTemperature = driveMotor.getDeviceTemp().getValueAsDouble();
 
     inputs.steerMotorOutPutCurrent = steerMotor.getOutputCurrent(); //updates the current output of the steer motor
+    inputs.steerMotorAppliedOutput = steerMotor.getAppliedOutput(); //updates the applied output of the steer motor
+    inputs.steerMotorInputCurrent = steerMotor.getOutputCurrent() * inputs.steerMotorAppliedOutput; //updates the input current of the steer motor
     inputs.steerMotorVelocity = steerMotor.getEncoder().getVelocity(); //updates the velocity of the steer motor
     inputs.steerMotorTemperature = steerMotor.getMotorTemperature();
 
