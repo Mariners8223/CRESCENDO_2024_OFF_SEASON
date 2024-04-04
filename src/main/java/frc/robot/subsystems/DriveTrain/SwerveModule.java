@@ -53,20 +53,7 @@ public class SwerveModule{
 
     protected double driveMotorInput;
     protected double steerMotorInput;
-
-    protected double driveMotorOutPutCurrent;
-    protected double driveMotorInputCurrent;
-    protected double driveMotorAppliedOutput; // duty cycle
-    protected double driveMotorTemperature;
-
-    protected double steerMotorOutPutCurrent;
-    protected double steerMotorAppliedOutput; // duty cycle
     protected double steerMotorInputCurrent;
-    protected double steerMotorVelocity;
-    protected double steerMotorTemperature;
-
-    protected double absEncoderAbsPosition;
-    protected double absEncoderPosition;
   }
 
   /**
@@ -166,12 +153,10 @@ public class SwerveModule{
    * this updates the module state and the module position, run this function periodically
    */
   public void update(){
-    inputs.absEncoderAbsPosition = absEncoder.getAbsolutePosition().getValueAsDouble();
-    inputs.absEncoderPosition = absEncoder.getPosition().getValueAsDouble();
 
     if(moduleConstants.shouldSteerMotorBeResetedByAbsEncoder){
-      steerMotor.getEncoder().setPosition(absEncoder.getAbsolutePosition().getValueAsDouble() * Constants.DriveTrain.Steer.steerGearRatio);
-      inputs.currentState.angle = Rotation2d.fromRotations(inputs.absEncoderPosition);
+      steerMotor.getEncoder().setPosition(absEncoder.getPosition().getValueAsDouble() * Constants.DriveTrain.Steer.steerGearRatio);
+      inputs.currentState.angle = Rotation2d.fromRotations(absEncoder.getPosition().getValueAsDouble());
     }
     else{
       inputs.currentState.angle = Rotation2d.fromRotations(steerMotor.getEncoder().getPosition() / Constants.DriveTrain.Steer.steerGearRatio);
@@ -181,16 +166,8 @@ public class SwerveModule{
     inputs.currentState.speedMetersPerSecond = driveMotor.getVelocity().getValueAsDouble();
     modulePosition.distanceMeters = driveMotor.getPosition().getValueAsDouble();
 
-    inputs.driveMotorInputCurrent = driveMotor.getSupplyCurrent().getValueAsDouble(); //updates the current output of the drive motor
-    inputs.driveMotorOutPutCurrent = driveMotor.getStatorCurrent().getValueAsDouble(); //updates the current output of the drive motor.
-    inputs.driveMotorAppliedOutput = driveMotor.getDutyCycle().getValueAsDouble(); //updates the applied output of the drive motor
-    inputs.driveMotorTemperature = driveMotor.getDeviceTemp().getValueAsDouble();
 
-    inputs.steerMotorOutPutCurrent = steerMotor.getOutputCurrent(); //updates the current output of the steer motor
-    inputs.steerMotorAppliedOutput = steerMotor.getAppliedOutput(); //updates the applied output of the steer motor
-    inputs.steerMotorInputCurrent = steerMotor.getOutputCurrent() * inputs.steerMotorAppliedOutput; //updates the input current of the steer motor
-    inputs.steerMotorVelocity = steerMotor.getEncoder().getVelocity(); //updates the velocity of the steer motor
-    inputs.steerMotorTemperature = steerMotor.getMotorTemperature();
+    inputs.steerMotorInputCurrent = steerMotor.getOutputCurrent() * steerMotor.getAppliedOutput(); //updates the input current of the steer motor
 
     inputs.isModuleAtPosition = isAtRequestedPosition(); //updates if the module is at the requested position
     inputs.isModuleAtSpeed = isAtRequestedSpeed(); //updates if the module is at the requested speed
