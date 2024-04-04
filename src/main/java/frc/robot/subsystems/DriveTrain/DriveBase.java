@@ -6,6 +6,7 @@ package frc.robot.subsystems.DriveTrain;
 
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.Voltage;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
@@ -202,6 +203,21 @@ public class DriveBase extends SubsystemBase {
     return inputs.isControlled;
   }
 
+  /**
+   * gets the acclartion of the robot in the X direction
+   * @return the acceleration of the robot in the X direction G
+   */
+  public double getXAcceleration(){
+    return Navx.getWorldLinearAccelX();
+  }
+
+  /**
+   * gets the acclartion of the robot in the Y direction
+   * @return the acceleration of the robot in the Y direction G
+   */
+  public double getYAcceleration() {
+    return Navx.getWorldLinearAccelY();
+  }
   /**
    * returns the reported Rotation by the Navx
    * @return Rotation2d reported by the Navx
@@ -556,6 +572,12 @@ public class DriveBase extends SubsystemBase {
   }
 
   private static class SysID{
+    public static enum SysIDType{
+      Steer,
+      Drive,
+      XY,
+      Theta
+    }
     SysIdRoutine steerSysId;
     SysIdRoutine driveSysId;
     SysIdRoutine xySpeedSysId;
@@ -586,6 +608,60 @@ public class DriveBase extends SubsystemBase {
                       driveBase,
                       "driveSysId"
               ));
+
+      xySpeedSysId = new SysIdRoutine(
+              new SysIdRoutine.Config(),
+              new SysIdRoutine.Mechanism(
+                      (voltage) -> {
+                        driveBase.drive(voltage.in(Units.Volts) / 3, 0, 0);
+                      },
+                      (log) -> {
+                        ChassisSpeeds chassisSpeeds = driveBase.getChassisSpeeds();
+                        Pose2d pose = driveBase.getPose();
+                        log.motor("robotX").linearAcceleration(Units.MetersPerSecondPerSecond.of(driveBase.getXAcceleration() * 9.80665)).linearVelocity(Units.MetersPerSecond.of(chassisSpeeds.vxMetersPerSecond)).linearPosition(Units.Meters.of(pose.getX()));
+                        log.motor("robotY").linearAcceleration(Units.MetersPerSecondPerSecond.of(driveBase.getYAcceleration() * 9.80665)).linearVelocity(Units.MetersPerSecond.of(chassisSpeeds.vyMetersPerSecond)).linearPosition(Units.Meters.of(pose.getY()));
+                      },
+                      driveBase,
+                      "xySpeedSysId"
+              ));
+
+      double[] prevAngleVelocity = {0};
+      double[] preAngleVelocityTimeStamp = {0};
+
+      thetaSpeedSysId = new SysIdRoutine(
+              new SysIdRoutine.Config(),
+              new SysIdRoutine.Mechanism(
+                      (voltage) -> {
+                        driveBase.drive(0, 0, voltage.in(Units.Volts));
+                      },
+                      (log) -> {
+                        ChassisSpeeds chassisSpeeds = driveBase.getChassisSpeeds();
+                        Pose2d pose = driveBase.getPose();
+                        double angleAccl = (chassisSpeeds.omegaRadiansPerSecond - prevAngleVelocity[0]) / (Timer.getFPGATimestamp() - preAngleVelocityTimeStamp[0]);
+                        prevAngleVelocity[0] = chassisSpeeds.omegaRadiansPerSecond;
+                        preAngleVelocityTimeStamp[0] = Timer.getFPGATimestamp();
+                        log.motor("robotTheta").angularPosition(Units.Radians.of(pose.getRotation().getRadians())).angularVelocity(Units.RadiansPerSecond.of(chassisSpeeds.omegaRadiansPerSecond)).angularAcceleration(Units.RadiansPerSecond.per(Units.Seconds).of(angleAccl));
+                      },
+                      driveBase,
+                      "thetaSpeedSysId"
+              ));
+    }
+
+    public Command getSysIDCommand(SysIDType type, boolean isDynamic, boolean isForward){
+      return isDynamic ? switch (type) {
+        case Steer -> steerSysId.dynamic(isForward ? SysIdRoutine.Direction.kForward : SysIdRoutine.Direction.kReverse);
+        case Drive -> driveSysId.dynamic(isForward ? SysIdRoutine.Direction.kForward : SysIdRoutine.Direction.kReverse);
+        case XY -> xySpeedSysId.dynamic(isForward ? SysIdRoutine.Direction.kForward : SysIdRoutine.Direction.kReverse);
+        case Theta -> thetaSpeedSysId.dynamic(isForward ? SysIdRoutine.Direction.kForward : SysIdRoutine.Direction.kReverse);
+        default -> null;
+      }
+      : switch (type) {
+        case Steer -> steerSysId.quasistatic(isForward ? SysIdRoutine.Direction.kForward : SysIdRoutine.Direction.kReverse);
+        case Drive -> driveSysId.quasistatic(isForward ? SysIdRoutine.Direction.kForward : SysIdRoutine.Direction.kReverse);
+        case XY -> xySpeedSysId.quasistatic(isForward ? SysIdRoutine.Direction.kForward : SysIdRoutine.Direction.kReverse);
+        case Theta -> thetaSpeedSysId.quasistatic(isForward ? SysIdRoutine.Direction.kForward : SysIdRoutine.Direction.kReverse);
+        default -> null;
+      };
     }
   }
 }
