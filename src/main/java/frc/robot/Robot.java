@@ -5,6 +5,7 @@
 
 package frc.robot;
 
+import com.ctre.phoenix6.SignalLogger;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import frc.util.LocalADStarAK;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -28,19 +29,21 @@ public class Robot extends LoggedRobot
     public void robotInit() {
         robotContainer = new RobotContainer();
         DataLogManager.start("U/logs/dataLogManager");
+        SignalLogger.enableAutoLogging(true);
+        SignalLogger.setPath("U/logs/signalLogger");
 
         Pathfinding.setPathfinder(new LocalADStarAK());
         Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
         Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
         Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
         Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
-        Logger.registerURCL(URCL.startExternal());
+        Logger.registerURCL(URCL.startExternal(Constants.DriveTrain.sparkMaxNames));
         switch (BuildConstants.DIRTY) {
             case 0:
                 Logger.recordMetadata("GitDirty", "All changes committed");
                 break;
             case 1:
-                Logger.recordMetadata("GitDirty", "Uncomitted changes");
+                Logger.recordMetadata("GitDirty", "Uncommitted changes");
                 break;
             default:
                 Logger.recordMetadata("GitDirty", "Unknown");
@@ -49,15 +52,13 @@ public class Robot extends LoggedRobot
 
         if(isReal()){
             Logger.addDataReceiver(new RLOGServer());
-            Logger.addDataReceiver(new WPILOGWriter("/U/logs/AdvantgeKit"));
+            Logger.addDataReceiver(new WPILOGWriter("/U/logs/AdvantageKit"));
         }
         else{
             Logger.addDataReceiver(new RLOGServer());
         }
 
         Logger.start();
-
-
     }
     
     

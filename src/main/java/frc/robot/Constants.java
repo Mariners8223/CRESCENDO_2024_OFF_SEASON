@@ -8,6 +8,8 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.util.PIDFGains;
 
+import java.util.Map;
+
 /** Add your docs here. */
 public class Constants {
     public static final class DriveTrain{
@@ -131,6 +133,13 @@ public class Constants {
         //^the constants of the back left module
         public static final SwerveModule back_right = new SwerveModule(ModuleName.Back_Right, 8, 9, 2, Steer.back_right_absoluteEncoderZeroOffset, false, false, false, true);
         //^the constants of the back right module
+
+        public static final Map<Integer, String> sparkMaxNames = Map.of(
+            front_left.steerMotorID, front_left.moduleName.name(),
+            front_right.steerMotorID, front_right.moduleName.name(),
+            back_left.steerMotorID, back_left.moduleName.name(),
+            back_right.steerMotorID, back_right.moduleName.name()
+        );
         
     } 
 }
