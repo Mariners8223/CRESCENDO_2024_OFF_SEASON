@@ -4,6 +4,9 @@
 
 package frc.robot.subsystems.DriveTrain;
 
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.Voltage;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
@@ -550,5 +553,39 @@ public class DriveBase extends SubsystemBase {
 
     @Override
     public void end(boolean interrupted) { driveBase.drive(0, 0, 0);}
+  }
+
+  private static class SysID{
+    SysIdRoutine steerSysId;
+    SysIdRoutine driveSysId;
+    SysIdRoutine xySpeedSysId;
+    SysIdRoutine thetaSpeedSysId;
+
+    private SysID(DriveBase driveBase){
+      steerSysId = new SysIdRoutine(
+              new SysIdRoutine.Config(),
+              new SysIdRoutine.Mechanism(
+                      (voltage) -> {
+                        for(int i = 0; i < 4; i++) driveBase.modules[i].setSteerMotorVoltage(voltage.in(Units.Volts));
+                      },
+                      null,
+                      driveBase,
+                      "steerSysId"
+              ));
+
+      driveSysId = new SysIdRoutine(
+              new SysIdRoutine.Config(),
+              new SysIdRoutine.Mechanism(
+                      (voltage) -> {
+                        for(int i = 0; i < 4; i++){
+                          driveBase.modules[i].setModuleState(new SwerveModuleState(0, new Rotation2d()));
+                          driveBase.modules[i].setDriveMotorVoltage(voltage.in(Units.Volts));
+                        }
+                      },
+                      null,
+                      driveBase,
+                      "driveSysId"
+              ));
+    }
   }
 }

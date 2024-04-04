@@ -100,7 +100,7 @@ public class Constants {
             public final boolean isDriveInverted; // if the drive motor output should be reversed
             public final boolean isAbsEncoderInverted; // if the reading of the absolute encoder should be inverted
 
-            public final boolean shouldSteerMotorBeResetedByAbsEncoder; // if the steer motor should be resete by the absolute encoder
+            public final boolean shouldSteerMotorBeResetedByAbsEncoder; // if the steer motor should be reseted by the absolute encoder
 
             public final double absoluteEncoderZeroOffset; //the offset between the magnets zero and the modules zero in degrees
 

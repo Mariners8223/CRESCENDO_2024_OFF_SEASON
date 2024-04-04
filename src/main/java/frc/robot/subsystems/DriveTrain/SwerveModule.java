@@ -7,6 +7,7 @@ package frc.robot.subsystems.DriveTrain;
 import java.util.function.Consumer;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.*;
 import org.littletonrobotics.junction.AutoLog;
@@ -147,6 +148,24 @@ public class SwerveModule{
     inputs.steerMotorInput = this.inputs.targetState.angle.getRotations(); //updates the input given (for logger)
 
     Logger.processInputs(moduleConstants.moduleName.name(), inputs); //updates logger
+  }
+
+  /**
+   * sets the steer motor voltage
+   * @param voltage the voltage to set the motor to
+   */
+  public void setSteerMotorVoltage(double voltage){
+    steerMotor.set(voltage / steerMotor.getBusVoltage());
+  }
+
+  /**
+   * sets the drive motor voltage
+   * @param voltage the voltage to set the motor to
+   */
+  public void setDriveMotorVoltage(double voltage){
+    VoltageOut voltageOut = new VoltageOut(voltage);
+    voltageOut.EnableFOC = false;
+    driveMotor.setControl(voltageOut);
   }
 
   /**
