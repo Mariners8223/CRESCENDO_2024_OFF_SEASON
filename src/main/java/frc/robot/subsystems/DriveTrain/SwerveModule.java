@@ -155,7 +155,7 @@ public class SwerveModule{
    * @param voltage the voltage to set the motor to
    */
   public void setSteerMotorVoltage(double voltage){
-    steerMotor.set(voltage / steerMotor.getBusVoltage());
+    steerMotor.getPIDController().setReference(voltage, ControlType.kVoltage);
   }
 
   /**
