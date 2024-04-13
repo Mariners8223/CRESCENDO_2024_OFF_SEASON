@@ -7,6 +7,7 @@ package frc.robot;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.pathplanner.lib.pathfinding.Pathfinding;
+import edu.wpi.first.math.geometry.Twist2d;
 import frc.util.LocalADStarAK;
 import org.littletonrobotics.junction.LoggedRobot;
 
@@ -37,7 +38,6 @@ public class Robot extends LoggedRobot
         Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
         Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
         Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
-        Logger.registerURCL(URCL.startExternal(Constants.DriveTrain.sparkMaxNames));
         switch (BuildConstants.DIRTY) {
             case 0:
                 Logger.recordMetadata("GitDirty", "All changes committed");
@@ -49,6 +49,7 @@ public class Robot extends LoggedRobot
                 Logger.recordMetadata("GitDirty", "Unknown");
                 break;
         }
+        Logger.registerURCL(URCL.startExternal(Constants.DriveTrain.sparkMaxNames));
 
         if(isReal()){
             Logger.addDataReceiver(new RLOGServer());
