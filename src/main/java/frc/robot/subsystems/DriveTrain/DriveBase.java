@@ -8,6 +8,8 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.util.FastGyros.FastGyro;
+import frc.util.FastGyros.FastNavx;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
@@ -53,9 +55,8 @@ public class DriveBase extends SubsystemBase {
 
   private final SwerveDriveKinematics driveTrainKinematics; //the kinematics of the swerve drivetrain
 
-  private final AHRS Navx; //the gyro device
-  
-  private double navxOffset;
+  private final FastGyro gyro; //the navx gyro of the robot
+
   private final SwerveDrivePoseEstimator poseEstimator; //the pose estimator of the drivetrain
 
   private final PIDController thetaCorrectionController; //the pid controller that fixes the angle of the robot
@@ -63,7 +64,7 @@ public class DriveBase extends SubsystemBase {
   private Rotation2d targetRotation; //the target rotation of the robot
 
   private final PathConstraints pathConstraints; //the constraints for pathPlanner
-  
+
   private final DriveBaseInputsAutoLogged inputs; //an object representing the logger class
   @AutoLog
   public static class DriveBaseInputs{
@@ -97,15 +98,14 @@ public class DriveBase extends SubsystemBase {
     for(int i = 0; i < 4; i++) modules[i].resetDriveEncoder();
 
 
-    Navx = new AHRS();
-    Navx.reset(); //resets the gyro at the start 
+    gyro = new FastNavx(); //creates a new navx gyro
+    gyro.reset(new Pose2d());
 
-    SmartDashboard.putData("Navx", Navx);
+    SmartDashboard.putData("Navx", gyro);
 
     driveTrainKinematics = new SwerveDriveKinematics(Constants.DriveTrain.SwerveModule.moduleTranslations);
 
     poseEstimator = new SwerveDrivePoseEstimator(driveTrainKinematics, new Rotation2d(), currentPositions, new Pose2d()); //creates a new pose estimator class with given value
-    navxOffset = 0;
 
     thetaCorrectionController = Constants.DriveTrain.Global.thetaCorrectionPID.createPIDController(); //creates the pid controller of the robots angle
 
@@ -164,7 +164,7 @@ public class DriveBase extends SubsystemBase {
     else currentPose = new Pose2d(currentPose.getX(), currentPose.getY(), new Rotation2d());
     poseEstimator.resetPosition(Rotation2d.fromDegrees(getNavxAngle()), currentPositions, currentPose);
     targetRotation = currentPose.getRotation();
-    navxOffset = -getNavxAngle();
+    gyro.reset(new Pose2d(currentPose.getX(), currentPose.getY(), new Rotation2d()));
   }
 
   public void setModulesBrakeMode(boolean isBrake){
@@ -178,7 +178,7 @@ public class DriveBase extends SubsystemBase {
    */
   public void reset(Pose2d newPose){
     poseEstimator.resetPosition(Rotation2d.fromDegrees(getNavxAngle()), currentPositions, newPose); //reset poseEstimator with the new starting postion
-    navxOffset = -(newPose.getRotation().getDegrees() - getNavxAngle());
+    gyro.reset(newPose); //reset the gyro with the new starting position
     currentPose = poseEstimator.getEstimatedPosition();
     targetRotation = currentPose.getRotation();
 
@@ -208,7 +208,7 @@ public class DriveBase extends SubsystemBase {
    * @return the acceleration of the robot in the X direction G
    */
   public double getXAcceleration(){
-    return Navx.getWorldLinearAccelX();
+    return gyro.getAccelerationX();
   }
 
   /**
@@ -216,7 +216,7 @@ public class DriveBase extends SubsystemBase {
    * @return the acceleration of the robot in the Y direction G
    */
   public double getYAcceleration() {
-    return Navx.getWorldLinearAccelY();
+    return gyro.getAccelerationY();
   }
   /**
    * returns the reported Rotation by the Navx
@@ -239,7 +239,7 @@ public class DriveBase extends SubsystemBase {
    * @return the angle of the navx
    */
   public double getNavxAngle(){
-    return Navx.getAngle();
+    return gyro.getOriginalAngleDegrees();
   }
 
   /**

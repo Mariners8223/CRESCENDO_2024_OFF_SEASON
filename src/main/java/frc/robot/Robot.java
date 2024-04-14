@@ -9,6 +9,8 @@ import com.ctre.phoenix6.SignalLogger;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import edu.wpi.first.math.geometry.Twist2d;
 import frc.util.LocalADStarAK;
+
+import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.LoggedRobot;
 
 import edu.wpi.first.wpilibj.DataLogManager;
