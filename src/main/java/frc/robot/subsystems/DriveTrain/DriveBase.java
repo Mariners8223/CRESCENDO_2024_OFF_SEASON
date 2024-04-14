@@ -77,8 +77,6 @@ public class DriveBase extends SubsystemBase {
     protected Pose2d currentPose = new Pose2d(); //the current pose of the robot
     protected Rotation2d targetRotation = new Rotation2d(); //the target rotation of the robot (in radians)
 
-    protected Rotation2d chassisAngle = new Rotation2d(); //the angle of the robot
-
     protected SwerveModuleState[] currentStates = new SwerveModuleState[4]; //the current states of the modules
     protected SwerveModuleState[] targetStates = new SwerveModuleState[4]; //the target states of the modules
 
@@ -162,7 +160,7 @@ public class DriveBase extends SubsystemBase {
     if(DriverStation.getAlliance().isPresent()) if(DriverStation.getAlliance().get() == Alliance.Blue) currentPose = new Pose2d(currentPose.getX(), currentPose.getY(), new Rotation2d());
     else currentPose = new Pose2d(currentPose.getX(), currentPose.getY(), new Rotation2d(-Math.PI));
     else currentPose = new Pose2d(currentPose.getX(), currentPose.getY(), new Rotation2d());
-    poseEstimator.resetPosition(Rotation2d.fromDegrees(getNavxAngle()), currentPositions, currentPose);
+    poseEstimator.resetPosition(new Rotation2d(), currentPositions, currentPose);
     targetRotation = currentPose.getRotation();
     gyro.reset(new Pose2d(currentPose.getX(), currentPose.getY(), new Rotation2d()));
   }
@@ -177,7 +175,7 @@ public class DriveBase extends SubsystemBase {
    * @param newPose the new pose the robot should be in
    */
   public void reset(Pose2d newPose){
-    poseEstimator.resetPosition(Rotation2d.fromDegrees(getNavxAngle()), currentPositions, newPose); //reset poseEstimator with the new starting postion
+    poseEstimator.resetPosition(newPose.getRotation(), currentPositions, newPose); //reset poseEstimator with the new starting postion
     gyro.reset(newPose); //reset the gyro with the new starting position
     currentPose = poseEstimator.getEstimatedPosition();
     targetRotation = currentPose.getRotation();
@@ -185,8 +183,6 @@ public class DriveBase extends SubsystemBase {
     inputs.currentPose = newPose;
 
     inputs.targetRotation = newPose.getRotation();
-
-    inputs.chassisAngle = getRotation2d();
 
     Logger.processInputs(getName(), inputs);
   }
@@ -223,7 +219,7 @@ public class DriveBase extends SubsystemBase {
    * @return Rotation2d reported by the Navx
    */
   public Rotation2d getRotation2d(){
-    return Rotation2d.fromDegrees(getAngle());
+    return gyro.getRotation2d();
   }
 
   /**
@@ -231,7 +227,7 @@ public class DriveBase extends SubsystemBase {
    * @return the angle of the robot (left is positive) IN DEGREES
    */
   public double getAngle(){
-    return getNavxAngle() + navxOffset;
+    return gyro.getAngleDegrees();
   }
 
   /**
@@ -492,7 +488,7 @@ public class DriveBase extends SubsystemBase {
       currentStates[i] = modules[i].getCurrentState();
       currentPositions[i] = modules[i].getModulePosition();
     }
-    poseEstimator.update(Rotation2d.fromDegrees(getNavxAngle()), currentPositions);
+    poseEstimator.update(getRotation2d(), currentPositions);
     currentPose = poseEstimator.getEstimatedPosition();
     
     RobotContainer.field.setRobotPose(currentPose);
@@ -500,8 +496,6 @@ public class DriveBase extends SubsystemBase {
     inputs.currentPose = currentPose;
 
     inputs.currentStates = currentStates;
-
-    inputs.chassisAngle = getRotation2d();
 
     inputs.activeCommand = this.getCurrentCommand() != null ? this.getCurrentCommand().getName() : "None";
 
