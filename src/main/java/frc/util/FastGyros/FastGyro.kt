@@ -8,7 +8,6 @@ import edu.wpi.first.util.sendable.SendableBuilder
 interface FastGyro : Sendable {
   fun getAngleDegrees(): Double
   fun getRotation2d(): Rotation2d
-  fun getOriginalAngleDegrees(): Double
   fun update(): Unit
   fun getYaw(): Double
   fun getPitch(): Double

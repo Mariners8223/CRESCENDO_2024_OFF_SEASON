@@ -231,14 +231,6 @@ public class DriveBase extends SubsystemBase {
   }
 
   /**
-   * gets the angle of the navx direeclty (only use for pose estimore, for the rest use GetAngle())
-   * @return the angle of the navx
-   */
-  public double getNavxAngle(){
-    return gyro.getOriginalAngleDegrees();
-  }
-
-  /**
    * gets the current chassisSpeeds of the robot
    * @return the current chassis speeds
    */

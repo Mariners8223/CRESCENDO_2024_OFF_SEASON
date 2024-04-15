@@ -37,10 +37,6 @@ class FastNavx : FastGyro{
     return inputs.angle
   }
 
-  override fun getOriginalAngleDegrees(): Double {
-    return inputs.angle.degrees + inputs.rotationOffset.degrees
-  }
-
   override fun update(): Unit {
     inputs.angle = navx.rotation2d.minus(inputs.rotationOffset)
 
