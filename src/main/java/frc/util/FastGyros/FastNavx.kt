@@ -22,6 +22,10 @@ class FastNavx : FastGyro{
   private val inputs: NavxInputs = NavxInputs()
 
 
+  /**
+   * Resets the gyro to the specified pose.
+   * @param newPose The new pose to set the gyro to.
+   */
   override fun reset(newPose: Pose2d): Unit {
     navx.reset()
     inputs.angle = Rotation2d()
@@ -29,14 +33,24 @@ class FastNavx : FastGyro{
     inputs.estimatedPose = newPose
   }
 
+  /**
+   * returns the angle of the gyro in degrees. (in the Rotation2d range)
+   */
   override fun getAngleDegrees(): Double {
     return inputs.angle.degrees
   }
 
+  /**
+   * returns the angle of the gyro in Rotation2d.
+   */
   override fun getRotation2d(): Rotation2d {
     return inputs.angle
   }
 
+  /**
+   * Updates the gyro's inputs.
+   * needs to be called periodically
+   */
   override fun update(): Unit {
     inputs.angle = navx.rotation2d.minus(inputs.rotationOffset)
 
@@ -47,8 +61,8 @@ class FastNavx : FastGyro{
     inputs.velocityX = inputs.angle.cos * navx.velocityX - inputs.angle.sin * navx.velocityY
     inputs.velocityY = inputs.angle.sin * navx.velocityX - inputs.angle.cos * navx.velocityY
 
-    inputs.accelerationX = inputs.angle.cos * navx.worldLinearAccelX - inputs.angle.sin * navx.worldLinearAccelY
-    inputs.accelerationY = inputs.angle.sin * navx.worldLinearAccelX - inputs.angle.cos * navx.worldLinearAccelY
+    inputs.accelerationX = (inputs.angle.cos * navx.worldLinearAccelX - inputs.angle.sin * navx.worldLinearAccelY) * 9.18
+    inputs.accelerationY = (inputs.angle.sin * navx.worldLinearAccelX - inputs.angle.cos * navx.worldLinearAccelY) * 9.18
 
     inputs.estimatedPose = Pose2d((inputs.accelerationX + inputs.prevVelocityX) * (navx.lastSensorTimestamp - inputs.prevTimeStamp) / 2 + inputs.estimatedPose.x,
       (inputs.accelerationY + inputs.prevVelocityY) * (navx.lastSensorTimestamp - inputs.prevTimeStamp) / 2 + inputs.estimatedPose.y,
@@ -61,34 +75,58 @@ class FastNavx : FastGyro{
     Logger.processInputs("FastNavx", inputs)
   }
 
+  /**
+   * gets the yaw of the gyro. (in degrees) not in Rotation2d space
+   */
   override fun getYaw(): Double {
     return inputs.yaw
   }
 
+  /**
+   * gets the pitch of the gyro. (in degrees) not in Rotation2d space
+   */
   override fun getPitch(): Double {
     return inputs.pitch
   }
 
+  /**
+   * gets the roll of the gyro. (in degrees) not in Rotation2d space
+   */
   override fun getRoll(): Double {
     return inputs.roll
   }
 
+  /**
+   * gets the x velocity of the gyro. (in m/s)
+   */
   override fun getVelocityX(): Double {
     return inputs.velocityX
   }
 
+  /**
+   * gets the y velocity of the gyro. (in m/s)
+   */
   override fun getVelocityY(): Double {
     return inputs.velocityY
   }
 
+  /**
+   * gets the x acceleration of the gyro. (in m/s^2)
+   */
   override fun getAccelerationX(): Double {
     return inputs.accelerationX
   }
 
+  /**
+   * gets the y acceleration of the gyro. (in m/s^2)
+   */
   override fun getAccelerationY(): Double {
     return inputs.accelerationY
   }
 
+  /**
+   * Initializes the sendable.
+   */
   override fun initSendable(builder: SendableBuilder?) {
     return navx.initSendable(builder)
   }

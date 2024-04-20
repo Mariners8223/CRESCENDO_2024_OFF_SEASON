@@ -33,6 +33,7 @@ class FastPigeon(canID: Int) : FastGyro {
     inputs.roll = pigeon.roll.valueAsDouble
 
     inputs.accelerationX = inputs.angle.cos * pigeon.accelerationX.valueAsDouble - inputs.angle.sin * pigeon.accelerationY.valueAsDouble
+    inputs.accelerationY = inputs.angle.sin * pigeon.accelerationX.valueAsDouble + inputs.angle.cos * pigeon.accelerationY.valueAsDouble
   }
 
   override fun getYaw(): Double {
