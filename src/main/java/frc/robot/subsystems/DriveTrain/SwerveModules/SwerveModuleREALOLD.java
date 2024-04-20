@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems.DriveTrain;
+package frc.robot.subsystems.DriveTrain.SwerveModules;
 
 import java.util.function.Consumer;
 
@@ -27,7 +27,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.Constants;
 
-public class SwerveModule{
+public class SwerveModuleREALOLD {
   private final Constants.DriveTrain.SwerveModule moduleConstants; //the constants of this module
 
   private Consumer<Double> steerMotorPositionInput; //a consumer for the new target of the steer motor position loop (including the gear ratio)
@@ -40,7 +40,7 @@ public class SwerveModule{
   private final CANcoder absEncoder; //the absolute encoder
   private final CANSparkMax steerMotor; //the steer motor
 
-  private final SwerveModuleInputsAutoLogged inputs;
+  private final SwerveModuleInputsAutoLogged inputs = new SwerveModuleInputsAutoLogged();
 
 
   @AutoLog
@@ -61,7 +61,7 @@ public class SwerveModule{
    * the constructor of the swerve module
    * @param moduleConstants the constants of the module
    */
-  public SwerveModule(Constants.DriveTrain.SwerveModule moduleConstants) {
+  public SwerveModuleREALOLD(Constants.DriveTrain.SwerveModule moduleConstants) {
     this.moduleConstants = moduleConstants;
 
     absEncoder = configCanCoder();
@@ -70,8 +70,6 @@ public class SwerveModule{
     driveMotor = configTalonFX(driveMotorConfig);
 
     steerMotor = configCanSparkMax();
-
-    inputs = new frc.robot.subsystems.DriveTrain.SwerveModuleInputsAutoLogged();
   }
 
  

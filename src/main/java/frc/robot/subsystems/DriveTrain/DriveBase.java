@@ -5,9 +5,9 @@
 package frc.robot.subsystems.DriveTrain;
 
 import edu.wpi.first.units.Units;
-import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleREALOLD;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
@@ -44,7 +44,7 @@ import frc.robot.RobotContainer;
  * It controls the movement and positioning of the robot using swerve drive.
  */
 public class DriveBase extends SubsystemBase {
-  private final SwerveModule[] modules = new SwerveModule[4]; //the array of the modules
+  private final SwerveModuleREALOLD[] modules = new SwerveModuleREALOLD[4]; //the array of the modules
 
   private final SwerveDriveKinematics driveTrainKinematics; //the kinematics of the swerve drivetrain
   private final SwerveModulePosition[] currentPositions = new SwerveModulePosition[]{new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition()}; //the current positions of the modules
@@ -83,10 +83,10 @@ public class DriveBase extends SubsystemBase {
 
   /** Creates a new DriveBase. */
   public DriveBase() {
-    modules[0] = new SwerveModule(Constants.DriveTrain.front_left); //the front left module
-    modules[1] = new SwerveModule(Constants.DriveTrain.front_right); //the front right module
-    modules[2] = new SwerveModule(Constants.DriveTrain.back_left); //the back left module
-    modules[3] = new SwerveModule(Constants.DriveTrain.back_right); //the back right module
+    modules[0] = new SwerveModuleREALOLD(Constants.DriveTrain.front_left); //the front left module
+    modules[1] = new SwerveModuleREALOLD(Constants.DriveTrain.front_right); //the front right module
+    modules[2] = new SwerveModuleREALOLD(Constants.DriveTrain.back_left); //the back left module
+    modules[3] = new SwerveModuleREALOLD(Constants.DriveTrain.back_right); //the back right module
 
     for(int i = 0; i < 4; i++) modules[i].resetDriveEncoder();
 
