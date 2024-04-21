@@ -7,6 +7,8 @@ package frc.robot.subsystems.DriveTrain;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleIO;
+import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleREAL;
 import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleREALOLD;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
@@ -44,7 +46,8 @@ import frc.robot.RobotContainer;
  * It controls the movement and positioning of the robot using swerve drive.
  */
 public class DriveBase extends SubsystemBase {
-  private final SwerveModuleREALOLD[] modules = new SwerveModuleREALOLD[4]; //the array of the modules
+//  private final SwerveModuleREALOLD[] modules = new SwerveModuleREALOLD[4]; //the array of the modules
+  private final SwerveModuleIO[] modules = new SwerveModuleIO[4]; //the array of the modules
 
   private final SwerveDriveKinematics driveTrainKinematics; //the kinematics of the swerve drivetrain
   private final SwerveModulePosition[] currentPositions = new SwerveModulePosition[]{new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition()}; //the current positions of the modules
@@ -83,10 +86,14 @@ public class DriveBase extends SubsystemBase {
 
   /** Creates a new DriveBase. */
   public DriveBase() {
-    modules[0] = new SwerveModuleREALOLD(Constants.DriveTrain.front_left); //the front left module
-    modules[1] = new SwerveModuleREALOLD(Constants.DriveTrain.front_right); //the front right module
-    modules[2] = new SwerveModuleREALOLD(Constants.DriveTrain.back_left); //the back left module
-    modules[3] = new SwerveModuleREALOLD(Constants.DriveTrain.back_right); //the back right module
+//    modules[0] = new SwerveModuleREALOLD(Constants.DriveTrain.front_left); //the front left module
+//    modules[1] = new SwerveModuleREALOLD(Constants.DriveTrain.front_right); //the front right module
+//    modules[2] = new SwerveModuleREALOLD(Constants.DriveTrain.back_left); //the back left module
+//    modules[3] = new SwerveModuleREALOLD(Constants.DriveTrain.back_right); //the back right module
+    modules[0] = new SwerveModuleREAL(Constants.DriveTrain.front_left); //the front left module
+    modules[1] = new SwerveModuleREAL(Constants.DriveTrain.front_right); //the front right module
+    modules[2] = new SwerveModuleREAL(Constants.DriveTrain.back_left); //the back left module
+    modules[3] = new SwerveModuleREAL(Constants.DriveTrain.back_right); //the back right module
 
     for(int i = 0; i < 4; i++) modules[i].resetDriveEncoder();
 
@@ -159,7 +166,7 @@ public class DriveBase extends SubsystemBase {
 
   public void setModulesBrakeMode(boolean isBrake){
     for(int i = 0; i < 4; i++){
-      modules[i].setBrakeMode(isBrake);
+      modules[i].setIdleMode(isBrake);
     }
   }
   /**
@@ -322,8 +329,7 @@ public class DriveBase extends SubsystemBase {
     SwerveDriveKinematics.desaturateWheelSpeeds(inputs.targetStates, Constants.DriveTrain.Drive.freeWheelSpeedMetersPerSec); //desaturates the wheel speeds (to make sure none of the wheel exceed the max speed)
 
     for(int i = 0; i < 4; i++){
-      inputs.targetStates[i] = SwerveModuleState.optimize(inputs.targetStates[i], modules[i].getCurrentState().angle); //optimizes the target states (to make sure the wheels don't rotate more than 90 degrees)
-      modules[i].setModuleState(inputs.targetStates[i]); //sets the module state
+      inputs.targetStates[i] = modules[i].run(inputs.targetStates[i]); //sets the module state
     }
 
     inputs.XspeedInput = Xspeed; //logs the X speed before PID
@@ -348,8 +354,7 @@ public class DriveBase extends SubsystemBase {
     SwerveDriveKinematics.desaturateWheelSpeeds(inputs.currentStates, Constants.DriveTrain.Drive.freeWheelSpeedMetersPerSec);
 
     for(int i = 0; i < 4; i++){
-      inputs.targetStates[i] = SwerveModuleState.optimize(inputs.targetStates[i], inputs.currentStates[i].angle);
-      modules[i].setModuleState(inputs.targetStates[i]);
+      inputs.targetStates[i] = modules[i].run(inputs.targetStates[i]);
     }
 
     inputs.XspeedInput = Xspeed;
@@ -375,8 +380,7 @@ public class DriveBase extends SubsystemBase {
     SwerveDriveKinematics.desaturateWheelSpeeds(inputs.targetStates, Constants.DriveTrain.Drive.freeWheelSpeedMetersPerSec);
 
     for(int i = 0; i < 4; i++){
-      inputs.targetStates[i] = SwerveModuleState.optimize(inputs.targetStates[i], inputs.currentStates[i].angle);
-      modules[i].setModuleState(inputs.targetStates[i]);
+      inputs.targetStates[i] = modules[i].run(inputs.targetStates[i]);
     }
 
     inputs.XspeedInput = chassisSpeeds.vxMetersPerSecond;
@@ -397,8 +401,7 @@ public class DriveBase extends SubsystemBase {
     SwerveDriveKinematics.desaturateWheelSpeeds(inputs.targetStates, Constants.DriveTrain.Drive.freeWheelSpeedMetersPerSec);
 
     for(int i = 0; i < 4; i++){
-      inputs.targetStates[i] = SwerveModuleState.optimize(inputs.targetStates[i], inputs.currentStates[i].angle);
-      modules[i].setModuleState(inputs.targetStates[i]);
+      inputs.targetStates[i] = modules[i].run(inputs.targetStates[i]);
     }
 
     inputs.XspeedInput = Xspeed;
@@ -470,9 +473,9 @@ public class DriveBase extends SubsystemBase {
    */
   public void update(){
     for(int i = 0; i < 4; i++){
-      modules[i].update();
-      inputs.currentStates[i] = modules[i].getCurrentState();
-      currentPositions[i] = modules[i].getModulePosition();
+      modules[i].updateInputs();
+      inputs.currentStates[i] = modules[i].getSwerveModuleState();
+      currentPositions[i] = modules[i].getSwerveModulePosition();
     }
     poseEstimator.update(Rotation2d.fromDegrees(getNavxAngle()), currentPositions);
     inputs.currentPose = poseEstimator.getEstimatedPosition();
@@ -541,8 +544,8 @@ public class DriveBase extends SubsystemBase {
     }
 
     @Override
-    public void initialize(){ 
-      for(int i = 0; i < 4; i++) driveBase.modules[i].goToXPosition();
+    public void initialize(){
+//      for(int i = 0; i < 4; i++) driveBase.modules[i].goToXPosition();
     }
 
     @Override
@@ -566,7 +569,7 @@ public class DriveBase extends SubsystemBase {
               new SysIdRoutine.Config(),
               new SysIdRoutine.Mechanism(
                       (voltage) -> {
-                        for(int i = 0; i < 4; i++) driveBase.modules[i].setSteerMotorVoltage(voltage.in(Units.Volts));
+                        for(int i = 0; i < 4; i++) driveBase.modules[i].runSysID(null, voltage);
                       },
                       null,
                       driveBase,
@@ -578,8 +581,7 @@ public class DriveBase extends SubsystemBase {
               new SysIdRoutine.Mechanism(
                       (voltage) -> {
                         for(int i = 0; i < 4; i++){
-                          driveBase.modules[i].setModuleState(new SwerveModuleState(0, new Rotation2d()));
-                          driveBase.modules[i].setDriveMotorVoltage(voltage.in(Units.Volts));
+                          driveBase.modules[i].runSysID(voltage, null);
                         }
                       },
                       null,

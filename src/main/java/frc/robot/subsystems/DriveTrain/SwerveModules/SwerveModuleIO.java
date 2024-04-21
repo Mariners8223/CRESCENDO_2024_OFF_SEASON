@@ -3,6 +3,8 @@ package frc.robot.subsystems.DriveTrain.SwerveModules;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Voltage;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface SwerveModuleIO {
@@ -17,8 +19,7 @@ public interface SwerveModuleIO {
     public Rotation2d steerMotorInput = new Rotation2d();
     public double driveMotorInput = 0.0;
 
-    public String controlModeDrive = "Velocity";
-    public String controlModeSteer = "Position";
+    public String controlMode = "MotorController-loop";
   }
 
   /**
@@ -27,7 +28,7 @@ public interface SwerveModuleIO {
   public void updateInputs();
 
   /**
-   * sets the active target for the module with position and speed conrol loop
+   * sets the active target for the module with position and speed control loop
    * @param targetState the target state for the module
    * @return the optimized target state
    */
@@ -49,6 +50,13 @@ public interface SwerveModuleIO {
    * gets the position of the module
    */
   public SwerveModulePosition getSwerveModulePosition();
+
+  /**
+   * runs the system identification on the module
+   * @param driveVoltage the voltage to run the drive motor at
+   * @param steerVoltage the voltage to run the steer motor at
+   */
+  public void runSysID(Measure<Voltage> driveVoltage,Measure<Voltage> steerVoltage);
 
   /**
    * sets the idle mode of the module

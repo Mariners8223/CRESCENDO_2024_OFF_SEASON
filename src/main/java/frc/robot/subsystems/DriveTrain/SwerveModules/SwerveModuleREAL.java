@@ -9,13 +9,19 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Voltage;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveTrain.SwerveModule;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.util.AbsEncoders.AbsEncoderIO;
 import frc.util.AbsEncoders.CanCoderIO;
+
+
+import static edu.wpi.first.units.Units.Volt;
 
 public class SwerveModuleREAL implements SwerveModuleIO{
   private final SwerveModuleIOInputsAutoLogged inputs = new SwerveModuleIOInputsAutoLogged();
@@ -26,6 +32,11 @@ public class SwerveModuleREAL implements SwerveModuleIO{
   private final CANSparkMax steerMotor;
   private final TalonFX driveMotor;
 
+  private final VelocityDutyCycle driveMotorInput = new VelocityDutyCycle(0, 0.0, false, 0.0, 0, false, false, false);
+
+  private final PIDController steerMotorVoltageController;
+  private final PIDController driveMotorVoltageController;
+
   private final AbsEncoderIO absEncoder;
 
   public SwerveModuleREAL(SwerveModule constants) {
@@ -35,6 +46,9 @@ public class SwerveModuleREAL implements SwerveModuleIO{
 
     steerMotor = configCanSparkMax();
     driveMotor = configTalonFX(getTalonFXConfiguration());
+
+    steerMotorVoltageController = Constants.DriveTrain.Steer.steerMotorPID.createPIDController();
+    driveMotorVoltageController = Constants.DriveTrain.Drive.driveMotorPID.createPIDController();
   }
 
   @Override
@@ -53,41 +67,78 @@ public class SwerveModuleREAL implements SwerveModuleIO{
 
   @Override
   public SwerveModuleState run(SwerveModuleState targetState) {
-    inputs.controlModeSteer = "Position";
-    inputs.controlModeDrive = "Velocity";
+    inputs.controlMode = "MotorController-loop";
 
     inputs.driveMotorInput = targetState.speedMetersPerSecond;
     inputs.steerMotorInput = targetState.angle;
 
     SwerveModuleState.optimize(targetState, inputs.currentState.angle);
-    
+
+    targetState.speedMetersPerSecond = targetState.speedMetersPerSecond * Math.cos(targetState.angle.getRadians() - inputs.currentState.angle.getRadians());
+
+    this.inputs.targetState = targetState;
+
+    driveMotor.setControl(driveMotorInput.withVelocity(targetState.speedMetersPerSecond * Constants.DriveTrain.Drive.driveGearRatio * Constants.DriveTrain.Drive.wheelCircumferenceMeters));
+    steerMotor.getPIDController().setReference(targetState.angle.getRotations() * Constants.DriveTrain.Steer.steerGearRatio, CANSparkBase.ControlType.kPosition);
 
     return targetState;
   }
 
   @Override
   public SwerveModuleState runVoltage(SwerveModuleState targetState) {
-    return null;
+    inputs.controlMode = "Voltage-loop";
+
+    inputs.driveMotorInput = targetState.speedMetersPerSecond;
+    inputs.steerMotorInput = targetState.angle;
+
+    SwerveModuleState.optimize(targetState, inputs.currentState.angle);
+
+    targetState.speedMetersPerSecond = targetState.speedMetersPerSecond * Math.cos(targetState.angle.getRadians() - inputs.currentState.angle.getRadians());
+
+    this.inputs.targetState = targetState;
+
+    driveMotor.setVoltage(driveMotorVoltageController.calculate(inputs.currentState.speedMetersPerSecond, targetState.speedMetersPerSecond));
+    steerMotor.setVoltage(steerMotorVoltageController.calculate(inputs.currentState.angle.getRadians(), targetState.angle.getRadians()));
+
+    return targetState;
   }
 
   @Override
   public SwerveModuleState getSwerveModuleState() {
-    return null;
+    return inputs.currentState;
   }
 
   @Override
   public SwerveModulePosition getSwerveModulePosition() {
-    return null;
+    return modulePosition;
+  }
+
+  @Override
+  public void runSysID(Measure<Voltage> driveVoltage,Measure<Voltage> steerVoltage) {
+    inputs.controlMode = "SysId";
+
+    if (driveVoltage != null) {
+      driveMotor.setVoltage(driveVoltage.in(Volt));
+    } else {
+      driveMotor.setVoltage(0);
+    }
+
+    if (steerVoltage != null) {
+      steerMotor.setVoltage(steerVoltage.in(Volt));
+    } else {
+      steerMotor.setVoltage(0);
+    }
   }
 
   @Override
   public void setIdleMode(boolean isBrakeMode) {
-
+    driveMotor.setNeutralMode(isBrakeMode ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+    steerMotor.setIdleMode(isBrakeMode ? CANSparkBase.IdleMode.kBrake : CANSparkBase.IdleMode.kCoast);
   }
 
   @Override
   public void resetDriveEncoder() {
-
+    driveMotor.setPosition(0);
   }
 
   /**
@@ -105,11 +156,6 @@ public class SwerveModuleREAL implements SwerveModuleIO{
     talonFX.getSupplyCurrent().setUpdateFrequency(50); //sets as default
     talonFX.getStatorCurrent().setUpdateFrequency(50); //sets as default
     talonFX.getDeviceTemp().setUpdateFrequency(50);
-
-    VelocityDutyCycle velocityDutyCycle = new VelocityDutyCycle(0);
-    velocityDutyCycle.EnableFOC = false;
-
-//    driveMotorVelocityInput = velocity -> talonFX.setControl(velocityDutyCycle.withVelocity(velocity *  Constants.DriveTrain.Drive.driveGearRatio * Constants.DriveTrain.Drive.wheelCircumferenceMeters)); //creates a consumer that sets the target velocity for the motor
 
     talonFX.optimizeBusUtilization(); //optimizes canbus util
 
