@@ -17,9 +17,6 @@ public interface SwerveModuleIO {
     public Rotation2d steerMotorInput = new Rotation2d();
     public double driveMotorInput = 0.0;
 
-    public double steerMotorInputCalculated = 0.0;
-    public double driveMotorInputCalculated = 0.0;
-
     public String controlModeDrive = "Velocity";
     public String controlModeSteer = "Position";
   }
@@ -32,14 +29,16 @@ public interface SwerveModuleIO {
   /**
    * sets the active target for the module with position and speed conrol loop
    * @param targetState the target state for the module
+   * @return the optimized target state
    */
-  public void run(SwerveModuleState targetState);
+  public SwerveModuleState run(SwerveModuleState targetState);
 
   /**
    * sets the active target for the module with voltage control loop
    * @param targetState the target state for the module
+   * @return the optimized target state
    */
-  public void runVoltage(SwerveModuleState targetState);
+  public SwerveModuleState runVoltage(SwerveModuleState targetState);
 
   /**
    * gets the current state of the module
