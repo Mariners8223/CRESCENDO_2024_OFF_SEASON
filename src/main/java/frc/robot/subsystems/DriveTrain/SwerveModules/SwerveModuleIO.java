@@ -25,7 +25,7 @@ public interface SwerveModuleIO {
   /**
    * Updates the inputs of the module
    */
-  public void updateInputs();
+  public void modulePeriodic();
 
   /**
    * sets the active target for the module with position and speed control loop

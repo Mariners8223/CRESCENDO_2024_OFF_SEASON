@@ -52,7 +52,7 @@ public class SwerveModuleREAL implements SwerveModuleIO{
   }
 
   @Override
-  public void updateInputs() {
+  public void modulePeriodic() {
     steerMotor.getEncoder().setPosition(absEncoder.getPosition() * Constants.DriveTrain.Steer.steerGearRatio);
 
     inputs.currentState.angle = Rotation2d.fromRotations(steerMotor.getEncoder().getPosition() / Constants.DriveTrain.Steer.steerGearRatio);

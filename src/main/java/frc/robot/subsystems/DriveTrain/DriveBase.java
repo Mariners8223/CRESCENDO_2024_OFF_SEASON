@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleIO;
 import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleREAL;
-import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleREALOLD;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
@@ -62,6 +61,25 @@ public class DriveBase extends SubsystemBase {
   private final PathConstraints pathConstraints; //the constraints for pathPlanner
   
   private final DriveBaseInputsAutoLogged inputs; //an object representing the logger class
+
+  private void startModulesThread(long millis){
+    Runnable task = () -> {
+      try {
+        while(true){
+          for(int i = 0; i < 4; i++){
+            modules[i].modulePeriodic();
+          }
+          Thread.sleep(millis);
+        }
+      } catch (InterruptedException ignored) {
+      }
+    };
+
+    Thread thread = new Thread(task);
+    thread.setDaemon(true);
+    thread.start();
+  }
+
   @AutoLog
   public static class DriveBaseInputs{
     protected double XspeedInput = 0; //the X speed input
@@ -149,6 +167,8 @@ public class DriveBase extends SubsystemBase {
     inputs.targetStates = new SwerveModuleState[]{new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState()};
 
     inputs.isControlled = false;
+
+    startModulesThread(10);
   }
 
 
@@ -473,7 +493,7 @@ public class DriveBase extends SubsystemBase {
    */
   public void update(){
     for(int i = 0; i < 4; i++){
-      modules[i].updateInputs();
+      modules[i].modulePeriodic();
       inputs.currentStates[i] = modules[i].getSwerveModuleState();
       currentPositions[i] = modules[i].getSwerveModulePosition();
     }
