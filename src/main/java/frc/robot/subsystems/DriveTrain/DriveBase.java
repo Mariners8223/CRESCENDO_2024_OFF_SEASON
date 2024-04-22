@@ -6,6 +6,7 @@ package frc.robot.subsystems.DriveTrain;
 
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.Watchdog;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleIO;
 import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleREAL;
@@ -61,24 +62,6 @@ public class DriveBase extends SubsystemBase {
   private final PathConstraints pathConstraints; //the constraints for pathPlanner
   
   private final DriveBaseInputsAutoLogged inputs; //an object representing the logger class
-
-  private void startModulesThread(long millis){
-    Runnable task = () -> {
-      try {
-        while(true){
-          for(int i = 0; i < 4; i++){
-            modules[i].modulePeriodic();
-          }
-          Thread.sleep(millis);
-        }
-      } catch (InterruptedException ignored) {
-      }
-    };
-
-    Thread thread = new Thread(task);
-    thread.setDaemon(true);
-    thread.start();
-  }
 
   @AutoLog
   public static class DriveBaseInputs{
@@ -168,7 +151,26 @@ public class DriveBase extends SubsystemBase {
 
     inputs.isControlled = false;
 
-    startModulesThread(10);
+    startModulesThread(5);
+  }
+
+  private void startModulesThread(long millis){
+    Runnable task = () -> {
+      try {
+        while(true){
+          for(int i = 0; i < 4; i++){
+            modules[i].modulePeriodic();
+
+          }
+          Thread.sleep(millis);
+        }
+      } catch (InterruptedException ignored) {
+      }
+    };
+
+    Thread thread = new Thread(task);
+    thread.setDaemon(true);
+    thread.start();
   }
 
 
@@ -493,9 +495,17 @@ public class DriveBase extends SubsystemBase {
    */
   public void update(){
     for(int i = 0; i < 4; i++){
-      modules[i].modulePeriodic();
-      inputs.currentStates[i] = modules[i].getSwerveModuleState();
-      currentPositions[i] = modules[i].getSwerveModulePosition();
+      if(modules[i].getLock().tryLock()){
+      try {
+          inputs.currentStates[i] = modules[i].getSwerveModuleState();
+          currentPositions[i] = modules[i].getSwerveModulePosition();
+      } finally {
+        modules[i].getLock().unlock();
+      }
+    }
+    else{
+      DriverStation.reportError("Module " + i + " is locked", false);
+    }
     }
     poseEstimator.update(Rotation2d.fromDegrees(getNavxAngle()), currentPositions);
     inputs.currentPose = poseEstimator.getEstimatedPosition();
@@ -522,6 +532,7 @@ public class DriveBase extends SubsystemBase {
 
     public DriveCommand(){
       controller = RobotContainer.driveController;
+      driveBase = RobotContainer.driveBase;
 
       addRequirements(driveBase);
     }

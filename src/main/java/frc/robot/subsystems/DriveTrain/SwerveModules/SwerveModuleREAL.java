@@ -21,6 +21,9 @@ import frc.util.AbsEncoders.AbsEncoderIO;
 import frc.util.AbsEncoders.CanCoderIO;
 
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 import static edu.wpi.first.units.Units.Volt;
 
 public class SwerveModuleREAL implements SwerveModuleIO{
@@ -39,6 +42,8 @@ public class SwerveModuleREAL implements SwerveModuleIO{
 
   private final AbsEncoderIO absEncoder;
 
+  private final Lock lock = new ReentrantLock(true);
+
   public SwerveModuleREAL(SwerveModule constants) {
     this.constants = constants;
 
@@ -53,6 +58,7 @@ public class SwerveModuleREAL implements SwerveModuleIO{
 
   @Override
   public void modulePeriodic() {
+    lock.lock();
     steerMotor.getEncoder().setPosition(absEncoder.getPosition() * Constants.DriveTrain.Steer.steerGearRatio);
 
     inputs.currentState.angle = Rotation2d.fromRotations(steerMotor.getEncoder().getPosition() / Constants.DriveTrain.Steer.steerGearRatio);
@@ -60,6 +66,8 @@ public class SwerveModuleREAL implements SwerveModuleIO{
 
     modulePosition.angle = inputs.currentState.angle;
     modulePosition.distanceMeters = driveMotor.getPosition().getValueAsDouble() / Constants.DriveTrain.Drive.driveGearRatio / Constants.DriveTrain.Drive.wheelCircumferenceMeters;
+    
+    lock.unlock();
 
     inputs.isAtTargetPosition = Math.abs(inputs.currentState.angle.getRadians() - inputs.targetState.angle.getRadians()) < Constants.DriveTrain.Steer.steerMotorPID.getTolerance();
     inputs.isAtTargetSpeed = Math.abs(inputs.currentState.speedMetersPerSecond - inputs.targetState.speedMetersPerSecond) < Constants.DriveTrain.Drive.driveMotorPID.getTolerance();
@@ -134,6 +142,11 @@ public class SwerveModuleREAL implements SwerveModuleIO{
   public void setIdleMode(boolean isBrakeMode) {
     driveMotor.setNeutralMode(isBrakeMode ? NeutralModeValue.Brake : NeutralModeValue.Coast);
     steerMotor.setIdleMode(isBrakeMode ? CANSparkBase.IdleMode.kBrake : CANSparkBase.IdleMode.kCoast);
+  }
+
+  @Override
+  public Lock getLock() {
+    return lock;
   }
 
   @Override

@@ -7,6 +7,8 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Voltage;
 import org.littletonrobotics.junction.AutoLog;
 
+import java.util.concurrent.locks.Lock;
+
 public interface SwerveModuleIO {
   @AutoLog
   public static class SwerveModuleIOInputs {
@@ -63,6 +65,11 @@ public interface SwerveModuleIO {
    * @param isBrakeMode true for brake mode, false for coast mode
    */
   public void setIdleMode(boolean isBrakeMode);
+
+  /**
+   * gets the lock of the module
+   */
+  public Lock getLock();
 
   /**
    * resets the drive encoder

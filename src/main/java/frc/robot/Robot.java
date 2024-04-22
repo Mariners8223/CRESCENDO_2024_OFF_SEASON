@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.rlog.RLOGServer;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import org.littletonrobotics.urcl.URCL;
@@ -28,9 +29,6 @@ public class Robot extends LoggedRobot
     @Override
     public void robotInit() {
         robotContainer = new RobotContainer();
-        DataLogManager.start("U/logs/dataLogManager");
-        SignalLogger.enableAutoLogging(true);
-        SignalLogger.setPath("U/logs/signalLogger");
 
         Pathfinding.setPathfinder(new LocalADStarAK());
         Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
@@ -53,9 +51,15 @@ public class Robot extends LoggedRobot
         if(isReal()){
             Logger.addDataReceiver(new RLOGServer());
             Logger.addDataReceiver(new WPILOGWriter("/U/logs/AdvantageKit"));
+
+            DataLogManager.start("U/logs/dataLogManager");
+            SignalLogger.enableAutoLogging(true);
+            SignalLogger.setPath("U/logs/signalLogger");
+
         }
         else{
             Logger.addDataReceiver(new RLOGServer());
+            Logger.addDataReceiver(new NT4Publisher());
         }
 
         Logger.start();
