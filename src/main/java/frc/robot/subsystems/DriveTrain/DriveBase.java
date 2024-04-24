@@ -51,9 +51,10 @@ public class DriveBase extends SubsystemBase {
 
   private final SwerveDriveKinematics driveTrainKinematics = new SwerveDriveKinematics(Constants.DriveTrain.SwerveModule.moduleTranslations); //the kinematics of the swerve drivetrain
 
-          new SwerveModulePosition[]{new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition()},
-  new Pose2d()); //the pose estimator of the drivetrain
   private final SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(driveTrainKinematics, new Rotation2d(),
+          new SwerveModulePosition[]{new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition()},
+          new Pose2d()); //the pose estimator of the drivetrain
+
   private final FastGyro gyro; //the navx gyro of the robot
 
   private final PIDController thetaCorrectionController; //the pid controller that fixes the angle of the robot
@@ -98,11 +99,6 @@ public class DriveBase extends SubsystemBase {
     gyro.reset(new Pose2d());
 
     SmartDashboard.putData("Navx", gyro);
-
-    driveTrainKinematics = new SwerveDriveKinematics(Constants.DriveTrain.SwerveModule.moduleTranslations);
-
-    poseEstimator = new SwerveDrivePoseEstimator(driveTrainKinematics, new Rotation2d(), currentPositions, new Pose2d()); //creates a new pose estimator class with given value
-    navxOffset = 0;
 
     thetaCorrectionController = Constants.DriveTrain.Global.thetaCorrectionPID.createPIDController(); //creates the pid controller of the robots angle
 
@@ -154,7 +150,7 @@ public class DriveBase extends SubsystemBase {
 
       try {
         odometryLock.lock();
-        poseEstimator.updateWithTime(Logger.getTimestamp(), getRotation2d(), positions);
+        poseEstimator.updateWithTime(Logger.getTimestamp(), gyro.getRotation2d(), positions);
       } finally {
         odometryLock.unlock();
       }
@@ -174,18 +170,18 @@ public class DriveBase extends SubsystemBase {
     else inputs.currentPose = new Pose2d(inputs.currentPose.getX(), inputs.currentPose.getY(), new Rotation2d(-Math.PI));
     else inputs.currentPose = new Pose2d(inputs.currentPose.getX(), inputs.currentPose.getY(), new Rotation2d());
 
-    SwerveModulePosition positions[] = new SwerveModulePosition[4];
+    SwerveModulePosition[] positions = new SwerveModulePosition[4];
     for(int i = 0; i < 4; i++) positions[i] = modules[i].modulePeriodic();
 
     try {
       odometryLock.lock();
-      poseEstimator.resetPosition(Rotation2d.fromDegrees(getNavxAngle()), positions, inputs.currentPose);
+      poseEstimator.resetPosition(new Rotation2d(), positions, inputs.currentPose);
     } finally {
       odometryLock.unlock();
     }
 
+    gyro.reset(inputs.currentPose);
     inputs.targetRotation = inputs.currentPose.getRotation();
-    navxOffset = -getNavxAngle();
   }
 
   public void setModulesBrakeMode(boolean isBrake){
@@ -203,12 +199,12 @@ public class DriveBase extends SubsystemBase {
 
     try {
       odometryLock.lock();
-      poseEstimator.resetPosition(Rotation2d.fromDegrees(getNavxAngle()), positions, newPose);
+      poseEstimator.resetPosition(new Rotation2d(), positions, newPose);
     } finally {
       odometryLock.unlock();
     }
 
-    navxOffset = -(newPose.getRotation().getDegrees() - getNavxAngle());
+    gyro.reset(newPose);
     inputs.currentPose = poseEstimator.getEstimatedPosition();
     inputs.targetRotation = inputs.currentPose.getRotation();
 
@@ -511,16 +507,8 @@ public class DriveBase extends SubsystemBase {
     } finally {
       odometryLock.unlock();
     }
-    poseEstimator.update(Rotation2d.fromDegrees(getNavxAngle()), currentPositions);
-    currentPose = poseEstimator.getEstimatedPosition();
     
-    RobotContainer.field.setRobotPose(currentPose);
-
-    inputs.currentPose = currentPose;
-
-    inputs.currentStates = currentStates;
-
-    inputs.chassisAngle = getRotation2d();
+    RobotContainer.field.setRobotPose(inputs.currentPose);
 
     inputs.activeCommand = this.getCurrentCommand() != null ? this.getCurrentCommand().getName() : "None";
 
