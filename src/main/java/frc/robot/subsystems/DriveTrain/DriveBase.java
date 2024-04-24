@@ -159,8 +159,9 @@ public class DriveBase extends SubsystemBase {
       }
     };
 
-    Notifier odometryAndModulesThread = new Notifier(odometryAndModulesRunnable);
-    odometryAndModulesThread.startPeriodic(1 / Constants.DriveTrain.SwerveModule.modulesThreadHz);
+    try (Notifier odometryAndModulesThread = new Notifier(odometryAndModulesRunnable)) {
+      odometryAndModulesThread.startPeriodic(1 / Constants.DriveTrain.SwerveModule.modulesThreadHz);
+    }
   }
 
 
