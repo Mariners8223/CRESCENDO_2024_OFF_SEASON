@@ -61,11 +61,6 @@ public interface SwerveModuleIO {
   public void setIdleMode(boolean isBrakeMode);
 
   /**
-   * gets the lock of the module
-   */
-  public Lock getModuleState();
-
-  /**
    * resets the drive encoder
    */
   public void resetDriveEncoder();

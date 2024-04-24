@@ -10,18 +10,21 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.robot.subsystems.DriveTrain.DriveBase;
 
 public class RobotContainer{
     public static DriveBase driveBase;
-    public static CommandPS5Controller driveController;
+    // public static CommandPS5Controller driveController;
+    public static CommandPS4Controller driveController;
 
     public static Field2d field;
 
     public RobotContainer()
     {
-        driveController = new CommandPS5Controller(0);
+        // driveController = new CommandPS5Controller(0);
+        driveController = new CommandPS4Controller(0);
         driveBase = new DriveBase();
         configureBindings();
 

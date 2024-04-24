@@ -12,6 +12,7 @@ import org.littletonrobotics.junction.AutoLog
 import org.littletonrobotics.junction.LogTable
 import org.littletonrobotics.junction.Logger
 import org.littletonrobotics.junction.inputs.LoggableInputs
+import java.util.concurrent.locks.ReentrantLock
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -21,30 +22,50 @@ class FastNavx : FastGyro{
 
   private val inputs: NavxInputs = NavxInputs()
 
+  private val lock : ReentrantLock = ReentrantLock()
+
 
   /**
    * Resets the gyro to the specified pose.
    * @param newPose The new pose to set the gyro to.
    */
   override fun reset(newPose: Pose2d): Unit {
-    navx.reset()
-    inputs.angle = Rotation2d()
-    inputs.rotationOffset = newPose.rotation.unaryMinus()
-    inputs.estimatedPose = newPose
+    try{
+      lock.lock()
+      navx.reset()
+      inputs.angle = Rotation2d()
+      inputs.rotationOffset = newPose.rotation.unaryMinus()
+      inputs.estimatedPose = newPose
+    }
+    finally{
+      lock.unlock()
+    }
   }
 
   /**
    * returns the angle of the gyro in degrees. (in the Rotation2d range)
    */
   override fun getAngleDegrees(): Double {
-    return inputs.angle.degrees
+    try{
+      lock.lock()
+      return inputs.angle.degrees
+    }
+    finally{
+      lock.unlock()
+    }
   }
 
   /**
    * returns the angle of the gyro in Rotation2d.
    */
   override fun getRotation2d(): Rotation2d {
-    return inputs.angle
+    try {
+      lock.lock()
+      return inputs.angle
+    }
+    finally {
+      lock.unlock()
+    }
   }
 
   /**
@@ -52,25 +73,31 @@ class FastNavx : FastGyro{
    * needs to be called periodically
    */
   override fun update(): Unit {
-    inputs.angle = navx.rotation2d.minus(inputs.rotationOffset)
+    try {
+      lock.lock()
+      inputs.angle = navx.rotation2d.minus(inputs.rotationOffset)
 
-    inputs.yaw = navx.yaw.toDouble()
-    inputs.pitch = navx.pitch.toDouble()
-    inputs.roll = navx.roll.toDouble()
+      inputs.yaw = navx.yaw.toDouble()
+      inputs.pitch = navx.pitch.toDouble()
+      inputs.roll = navx.roll.toDouble()
 
-    inputs.velocityX = inputs.angle.cos * navx.velocityX - inputs.angle.sin * navx.velocityY
-    inputs.velocityY = inputs.angle.sin * navx.velocityX - inputs.angle.cos * navx.velocityY
+      inputs.velocityX = inputs.angle.cos * navx.velocityX - inputs.angle.sin * navx.velocityY
+      inputs.velocityY = inputs.angle.sin * navx.velocityX - inputs.angle.cos * navx.velocityY
 
-    inputs.accelerationX = (inputs.angle.cos * navx.worldLinearAccelX - inputs.angle.sin * navx.worldLinearAccelY) * 9.18
-    inputs.accelerationY = (inputs.angle.sin * navx.worldLinearAccelX - inputs.angle.cos * navx.worldLinearAccelY) * 9.18
+      inputs.accelerationX = (inputs.angle.cos * navx.worldLinearAccelX - inputs.angle.sin * navx.worldLinearAccelY) * 9.18
+      inputs.accelerationY = (inputs.angle.sin * navx.worldLinearAccelX - inputs.angle.cos * navx.worldLinearAccelY) * 9.18
 
-    inputs.estimatedPose = Pose2d((inputs.accelerationX + inputs.prevVelocityX) * (navx.lastSensorTimestamp - inputs.prevTimeStamp) / 2 + inputs.estimatedPose.x,
-      (inputs.accelerationY + inputs.prevVelocityY) * (navx.lastSensorTimestamp - inputs.prevTimeStamp) / 2 + inputs.estimatedPose.y,
-      inputs.angle)
+      inputs.estimatedPose = Pose2d((inputs.accelerationX + inputs.prevVelocityX) * (navx.lastSensorTimestamp - inputs.prevTimeStamp) / 2 + inputs.estimatedPose.x,
+        (inputs.accelerationY + inputs.prevVelocityY) * (navx.lastSensorTimestamp - inputs.prevTimeStamp) / 2 + inputs.estimatedPose.y,
+        inputs.angle)
 
-    inputs.prevVelocityX = inputs.velocityX
-    inputs.prevVelocityY = inputs.velocityY
-    inputs.prevTimeStamp = navx.lastSensorTimestamp
+      inputs.prevVelocityX = inputs.velocityX
+      inputs.prevVelocityY = inputs.velocityY
+      inputs.prevTimeStamp = navx.lastSensorTimestamp
+    }
+    finally {
+      lock.unlock()
+    }
 
     Logger.processInputs("FastNavx", inputs)
   }
@@ -79,49 +106,91 @@ class FastNavx : FastGyro{
    * gets the yaw of the gyro. (in degrees) not in Rotation2d space
    */
   override fun getYaw(): Double {
-    return inputs.yaw
+    try {
+      lock.lock()
+      return inputs.yaw
+    }
+    finally {
+      lock.unlock()
+    }
   }
 
   /**
    * gets the pitch of the gyro. (in degrees) not in Rotation2d space
    */
   override fun getPitch(): Double {
-    return inputs.pitch
+    try {
+      lock.lock()
+      return inputs.pitch
+    }
+    finally {
+      lock.unlock()
+    }
   }
 
   /**
    * gets the roll of the gyro. (in degrees) not in Rotation2d space
    */
   override fun getRoll(): Double {
-    return inputs.roll
+    try {
+      lock.lock()
+      return inputs.roll
+    }
+    finally {
+      lock.unlock()
+    }
   }
 
   /**
    * gets the x velocity of the gyro. (in m/s)
    */
   override fun getVelocityX(): Double {
-    return inputs.velocityX
+    try {
+      lock.lock()
+      return inputs.velocityX
+    }
+    finally {
+      lock.unlock()
+    }
   }
 
   /**
    * gets the y velocity of the gyro. (in m/s)
    */
   override fun getVelocityY(): Double {
-    return inputs.velocityY
+    try {
+      lock.lock()
+      return inputs.velocityY
+    }
+    finally {
+      lock.unlock()
+    }
   }
 
   /**
    * gets the x acceleration of the gyro. (in m/s^2)
    */
   override fun getAccelerationX(): Double {
-    return inputs.accelerationX
+    try {
+      lock.lock()
+      return inputs.accelerationX
+    }
+    finally {
+      lock.unlock()
+    }
   }
 
   /**
    * gets the y acceleration of the gyro. (in m/s^2)
    */
   override fun getAccelerationY(): Double {
-    return inputs.accelerationY
+    try {
+      lock.lock()
+      return inputs.accelerationY
+    }
+    finally {
+      lock.unlock()
+    }
   }
 
   /**

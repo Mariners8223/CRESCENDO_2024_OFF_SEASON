@@ -126,7 +126,13 @@ public class SwerveModuleREAL implements SwerveModuleIO{
 
   @Override
   public SwerveModuleState getSwerveModuleState() {
-    return inputs.currentState;
+    try{
+      moduleStateLock.lock();
+      return inputs.currentState;
+    }
+    finally {
+      moduleStateLock.unlock();
+    }
   }
 
   @Override
@@ -149,11 +155,6 @@ public class SwerveModuleREAL implements SwerveModuleIO{
   public void setIdleMode(boolean isBrakeMode) {
     driveMotor.setNeutralMode(isBrakeMode ? NeutralModeValue.Brake : NeutralModeValue.Coast);
     steerMotor.setIdleMode(isBrakeMode ? CANSparkBase.IdleMode.kBrake : CANSparkBase.IdleMode.kCoast);
-  }
-
-  @Override
-  public Lock getModuleState() {
-    return moduleStateLock;
   }
 
   @Override

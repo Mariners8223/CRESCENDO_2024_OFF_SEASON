@@ -4,13 +4,18 @@
 
 package frc.robot.subsystems.DriveTrain;
 
+import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleIO;
 import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleREAL;
+import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleSIM;
 import frc.util.FastGyros.FastGyro;
 import frc.util.FastGyros.FastNavx;
+import frc.util.FastGyros.FastSimGyro;
+import org.jetbrains.annotations.NotNull;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
@@ -26,15 +31,12 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
@@ -65,6 +67,8 @@ public class DriveBase extends SubsystemBase {
 
   private final ReentrantLock odometryLock = new ReentrantLock(); //a lock for the odometry and modules thread
 
+  private final SwerveModulePosition[] moduleDeltas = new SwerveModulePosition[]{new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition()}; //the deltas of the modules
+
   @AutoLog
   public static class DriveBaseInputs{
     protected double XspeedInput = 0; //the X speed input
@@ -84,19 +88,28 @@ public class DriveBase extends SubsystemBase {
     protected boolean isControlled;
   }
 
-
   /** Creates a new DriveBase. */
   public DriveBase() {
-    modules[0] = new SwerveModuleREAL(Constants.DriveTrain.front_left); //the front left module
-    modules[1] = new SwerveModuleREAL(Constants.DriveTrain.front_right); //the front right module
-    modules[2] = new SwerveModuleREAL(Constants.DriveTrain.back_left); //the back left module
-    modules[3] = new SwerveModuleREAL(Constants.DriveTrain.back_right); //the back right module
+    if(RobotBase.isReal()){
+      modules[0] = new SwerveModuleREAL(Constants.DriveTrain.front_left); //the front left module
+      modules[1] = new SwerveModuleREAL(Constants.DriveTrain.front_right); //the front right module
+      modules[2] = new SwerveModuleREAL(Constants.DriveTrain.back_left); //the back left module
+      modules[3] = new SwerveModuleREAL(Constants.DriveTrain.back_right); //the back right module
+    }
+    else{
+      modules[0] = new SwerveModuleSIM(Constants.DriveTrain.front_left); //the front left module
+      modules[1] = new SwerveModuleSIM(Constants.DriveTrain.front_right); //the front right module
+      modules[2] = new SwerveModuleSIM(Constants.DriveTrain.back_left); //the back left module
+      modules[3] = new SwerveModuleSIM(Constants.DriveTrain.back_right); //the back right module
+    }
 
     for(int i = 0; i < 4; i++) modules[i].resetDriveEncoder();
 
 
-    gyro = new FastNavx(); //creates a new navx gyro
-    gyro.reset(new Pose2d());
+//    gyro = new FastNavx(); //creates a new navx gyro
+    gyro = new FastSimGyro(() -> driveTrainKinematics.toTwist2d(moduleDeltas)); //creates a new sim gyro (for simulation
+
+    // gyro.reset(new Pose2d());
 
     SmartDashboard.putData("Navx", gyro);
 
@@ -142,11 +155,29 @@ public class DriveBase extends SubsystemBase {
 
     inputs.isControlled = false;
 
+    Notifier odometryAndModulesThread = getNotifier();
+    odometryAndModulesThread.startPeriodic(1 / Constants.DriveTrain.SwerveModule.modulesThreadHz);
+  }
+
+  private @NotNull Notifier getNotifier() {
+    SwerveModulePosition[] previousPositions = new SwerveModulePosition[]{new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition()};
+    SwerveModulePosition[] positions = new SwerveModulePosition[]{new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition()};
+
     Runnable odometryAndModulesRunnable = () -> {
-      SwerveModulePosition[] positions = new SwerveModulePosition[4];
       for (int i = 0; i < 4; i++) {
         positions[i] = modules[i].modulePeriodic();
+
+        moduleDeltas[i] = new SwerveModulePosition(
+          positions[i].distanceMeters - previousPositions[i].distanceMeters,
+          positions[i].angle
+        );
+
+        previousPositions[i] = positions[i].copy();
       }
+
+      // System.out.println(driveTrainKinematics.toTwist2d(moduleDeltas));
+      // System.out.println(moduleDeltas[0]);
+      gyro.update();
 
       try {
         odometryLock.lock();
@@ -156,9 +187,8 @@ public class DriveBase extends SubsystemBase {
       }
     };
 
-    try (Notifier odometryAndModulesThread = new Notifier(odometryAndModulesRunnable)) {
-      odometryAndModulesThread.startPeriodic(1 / Constants.DriveTrain.SwerveModule.modulesThreadHz);
-    }
+    Notifier odometryAndModulesThread = new Notifier(odometryAndModulesRunnable);
+    return odometryAndModulesThread;
   }
 
 
@@ -492,13 +522,7 @@ public class DriveBase extends SubsystemBase {
    */
   public void update(){
       for(int i = 0; i < 4; i++){
-        try{
-          modules[i].getModuleState().lock();
-          inputs.currentStates[i] = modules[i].getSwerveModuleState();
-        }
-        finally {
-          modules[i].getModuleState().unlock();
-        }
+        inputs.currentStates[i] = modules[i].getSwerveModuleState();
       }
 
     try {
@@ -524,7 +548,8 @@ public class DriveBase extends SubsystemBase {
 
   private static class DriveCommand extends Command{
     DriveBase driveBase;
-    CommandPS5Controller controller;
+    // CommandPS5Controller controller;
+    CommandPS4Controller controller;
 
     public DriveCommand(){
       controller = RobotContainer.driveController;
@@ -541,13 +566,21 @@ public class DriveBase extends SubsystemBase {
 
     @Override
     public void execute() {
+      // driveBase.drive(
+      //   //this basically takes the inputs from the controller and firsts checks if it's not drift or a mistake by checking if it is above a certain value then it multiplies it by the R2 axis that the driver uses to control the speed of the robot
+      //   (Math.abs(controller.getLeftY()) > 0.05 ? -controller.getLeftY() : 0) * (controller.getR2Axis() > 0.1 ? 1 + (Constants.DriveTrain.Drive.freeWheelSpeedMetersPerSec - 1) * (1 - controller.getR2Axis()) : 1),
+
+      //   (Math.abs(controller.getLeftX()) > 0.05 ? controller.getLeftX() : 0) * (controller.getR2Axis() > 0.1 ? 1 + (Constants.DriveTrain.Drive.freeWheelSpeedMetersPerSec - 1) * (1 - controller.getR2Axis()) : 1),
+
+      //   Math.abs(controller.getRightX()) > 0.05 ? controller.getRightX() : 0
+      //   );
       driveBase.drive(
         //this basically takes the inputs from the controller and firsts checks if it's not drift or a mistake by checking if it is above a certain value then it multiplies it by the R2 axis that the driver uses to control the speed of the robot
-        (Math.abs(controller.getLeftY()) > 0.05 ? -controller.getLeftY() : 0) * (controller.getR2Axis() > 0.1 ? 1 + (Constants.DriveTrain.Drive.freeWheelSpeedMetersPerSec - 1) * (1 - controller.getR2Axis()) : 1),
+        (Math.abs(controller.getLeftY()) > 0.05 ? -controller.getLeftY() : 0) * Constants.DriveTrain.Drive.freeWheelSpeedMetersPerSec,
 
-        (Math.abs(controller.getLeftX()) > 0.05 ? controller.getLeftX() : 0) * (controller.getR2Axis() > 0.1 ? 1 + (Constants.DriveTrain.Drive.freeWheelSpeedMetersPerSec - 1) * (1 - controller.getR2Axis()) : 1),
+        (Math.abs(controller.getLeftX()) > 0.05 ? controller.getLeftX() : 0) * -Constants.DriveTrain.Drive.freeWheelSpeedMetersPerSec,
 
-        Math.abs(controller.getRightX()) > 0.05 ? controller.getRightX() : 0
+        (Math.abs(controller.getRightX()) > 0.05 ? controller.getRightX() : 0) * -Constants.DriveTrain.Drive.freeWheelSpeedMetersPerSec
         );
     }
 
