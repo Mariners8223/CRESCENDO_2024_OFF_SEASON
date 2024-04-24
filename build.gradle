@@ -4,13 +4,12 @@ plugins {
     id "edu.wpi.first.GradleRIO" version "2024.3.2"
     id "idea"
     id "com.peterabeles.gversion" version "1.10.2"
+    id 'org.jetbrains.kotlin.jvm'
 }
 
 def javaVersion = JavaVersion.VERSION_17
 
 java {
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
 }
 
 def ROBOT_MAIN_CLASS = "frc.robot.Main"
@@ -77,6 +76,7 @@ dependencies {
 
     def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)
     annotationProcessor "org.littletonrobotics.akit.junction:junction-autolog:$akitJson.version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 }
 
 test{
@@ -107,6 +107,7 @@ repositories {
         }
     }
     mavenLocal()
+    mavenCentral()
 }
 
 configurations.all {
@@ -147,4 +148,7 @@ idea {
         // Exclude the .vscode directory from indexing and search
         excludeDirs+=file(".vscode" )
     }
+}
+kotlin {
+    jvmToolchain(17)
 }

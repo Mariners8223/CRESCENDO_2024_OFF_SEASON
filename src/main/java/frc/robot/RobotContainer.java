@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.robot.subsystems.DriveTrain.DriveBase;
 
-
 public class RobotContainer{
     public static DriveBase driveBase;
     public static CommandPS5Controller driveController;
@@ -35,6 +34,7 @@ public class RobotContainer{
     private void configureBindings() {
         driveController.options().onTrue(new InstantCommand(driveBase::resetOnlyDirection));
     }
+    
     
     
     public Command getAutonomousCommand()
