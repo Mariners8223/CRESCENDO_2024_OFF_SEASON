@@ -45,16 +45,16 @@ import java.util.concurrent.locks.ReentrantLock;
  * It controls the movement and positioning of the robot using swerve drive.
  */
 public class DriveBase extends SubsystemBase {
-//  private final SwerveModuleREALOLD[] modules = new SwerveModuleREALOLD[4]; //the array of the modules
   private final SwerveModuleIO[] modules = new SwerveModuleIO[4]; //the array of the modules
 
   private final SwerveDriveKinematics driveTrainKinematics = new SwerveDriveKinematics(Constants.DriveTrain.SwerveModule.moduleTranslations); //the kinematics of the swerve drivetrain
-  private final SwerveModulePosition[] currentPositions = new SwerveModulePosition[]{new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition()}; //the current positions of the modules
 
   private final AHRS Navx; //the gyro device
   
   private double navxOffset;
-  private final SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(driveTrainKinematics, new Rotation2d(), currentPositions, new Pose2d()); //the pose estimator of the drivetrain
+  private final SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(driveTrainKinematics, new Rotation2d(),
+          new SwerveModulePosition[]{new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition()},
+  new Pose2d()); //the pose estimator of the drivetrain
 
   private final PIDController thetaCorrectionController; //the pid controller that fixes the angle of the robot
 
@@ -88,10 +88,6 @@ public class DriveBase extends SubsystemBase {
 
   /** Creates a new DriveBase. */
   public DriveBase() {
-//    modules[0] = new SwerveModuleREALOLD(Constants.DriveTrain.front_left); //the front left module
-//    modules[1] = new SwerveModuleREALOLD(Constants.DriveTrain.front_right); //the front right module
-//    modules[2] = new SwerveModuleREALOLD(Constants.DriveTrain.back_left); //the back left module
-//    modules[3] = new SwerveModuleREALOLD(Constants.DriveTrain.back_right); //the back right module
     modules[0] = new SwerveModuleREAL(Constants.DriveTrain.front_left); //the front left module
     modules[1] = new SwerveModuleREAL(Constants.DriveTrain.front_right); //the front right module
     modules[2] = new SwerveModuleREAL(Constants.DriveTrain.back_left); //the back left module
@@ -175,7 +171,17 @@ public class DriveBase extends SubsystemBase {
     if(DriverStation.getAlliance().isPresent()) if(DriverStation.getAlliance().get() == Alliance.Blue) inputs.currentPose = new Pose2d(inputs.currentPose.getX(), inputs.currentPose.getY(), new Rotation2d());
     else inputs.currentPose = new Pose2d(inputs.currentPose.getX(), inputs.currentPose.getY(), new Rotation2d(-Math.PI));
     else inputs.currentPose = new Pose2d(inputs.currentPose.getX(), inputs.currentPose.getY(), new Rotation2d());
-    poseEstimator.resetPosition(Rotation2d.fromDegrees(getNavxAngle()), currentPositions, inputs.currentPose);
+
+    SwerveModulePosition positions[] = new SwerveModulePosition[4];
+    for(int i = 0; i < 4; i++) positions[i] = modules[i].modulePeriodic();
+
+    try {
+      odometryLock.lock();
+      poseEstimator.resetPosition(Rotation2d.fromDegrees(getNavxAngle()), positions, inputs.currentPose);
+    } finally {
+      odometryLock.unlock();
+    }
+
     inputs.targetRotation = inputs.currentPose.getRotation();
     navxOffset = -getNavxAngle();
   }
@@ -190,7 +196,16 @@ public class DriveBase extends SubsystemBase {
    * @param newPose the new pose the robot should be in
    */
   public void reset(Pose2d newPose){
-    poseEstimator.resetPosition(Rotation2d.fromDegrees(getNavxAngle()), currentPositions, newPose); //reset poseEstimator with the new starting postion
+    SwerveModulePosition positions[] = new SwerveModulePosition[4];
+    for(int i = 0; i < 4; i++) positions[i] = modules[i].modulePeriodic();
+
+    try {
+      odometryLock.lock();
+      poseEstimator.resetPosition(Rotation2d.fromDegrees(getNavxAngle()), positions, newPose);
+    } finally {
+      odometryLock.unlock();
+    }
+
     navxOffset = -(newPose.getRotation().getDegrees() - getNavxAngle());
     inputs.currentPose = poseEstimator.getEstimatedPosition();
     inputs.targetRotation = inputs.currentPose.getRotation();
@@ -490,14 +505,14 @@ public class DriveBase extends SubsystemBase {
   public void update(){
       for(int i = 0; i < 4; i++){
         try{
-          modules[i].getLock().lock();
+          modules[i].getModuleState().lock();
           inputs.currentStates[i] = modules[i].getSwerveModuleState();
         }
         finally {
-          modules[i].getLock().unlock();
+          modules[i].getModuleState().unlock();
         }
       }
-      
+
     try {
       odometryLock.lock();
       inputs.currentPose = poseEstimator.getEstimatedPosition();

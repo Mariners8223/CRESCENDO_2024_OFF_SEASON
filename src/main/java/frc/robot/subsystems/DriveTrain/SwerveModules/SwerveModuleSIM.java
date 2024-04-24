@@ -72,11 +72,6 @@ public class SwerveModuleSIM implements SwerveModuleIO{
     }
 
     @Override
-    public SwerveModulePosition getSwerveModulePosition() {
-        return null;
-    }
-
-    @Override
     public void runSysID(Measure<Voltage> driveVoltage, Measure<Voltage> steerVoltage) {
 
     }
@@ -87,7 +82,7 @@ public class SwerveModuleSIM implements SwerveModuleIO{
     }
 
     @Override
-    public Lock getLock() {
+    public Lock getModuleState() {
         return null;
     }
 

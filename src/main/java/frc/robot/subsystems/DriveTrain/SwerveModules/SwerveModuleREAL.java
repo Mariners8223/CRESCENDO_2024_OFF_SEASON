@@ -30,8 +30,6 @@ public class SwerveModuleREAL implements SwerveModuleIO{
   private final SwerveModuleIOInputsAutoLogged inputs = new SwerveModuleIOInputsAutoLogged();
   private final SwerveModule constants;
 
-  private final SwerveModulePosition modulePosition = new SwerveModulePosition();
-
   private final CANSparkMax steerMotor;
   private final TalonFX driveMotor;
 
@@ -42,7 +40,7 @@ public class SwerveModuleREAL implements SwerveModuleIO{
 
   private final AbsEncoderIO absEncoder;
 
-  private final Lock lock = new ReentrantLock(true);
+  private final Lock moduleStateLock = new ReentrantLock(true);
   private final Lock targetstateLock = new ReentrantLock(true);
 
   public SwerveModuleREAL(SwerveModule constants) {
@@ -59,18 +57,20 @@ public class SwerveModuleREAL implements SwerveModuleIO{
 
   @Override
   public SwerveModulePosition modulePeriodic() {
+
+    SwerveModulePosition position = new SwerveModulePosition();
     try {
-      lock.lock();
+      moduleStateLock.lock();
       steerMotor.getEncoder().setPosition(absEncoder.getPosition() * Constants.DriveTrain.Steer.steerGearRatio);
 
       inputs.currentState.angle = Rotation2d.fromRotations(steerMotor.getEncoder().getPosition() / Constants.DriveTrain.Steer.steerGearRatio);
       inputs.currentState.speedMetersPerSecond = driveMotor.getVelocity().getValueAsDouble() / Constants.DriveTrain.Drive.driveGearRatio / Constants.DriveTrain.Drive.wheelCircumferenceMeters;
 
-      modulePosition.angle = inputs.currentState.angle;
-      modulePosition.distanceMeters = driveMotor.getPosition().getValueAsDouble() / Constants.DriveTrain.Drive.driveGearRatio / Constants.DriveTrain.Drive.wheelCircumferenceMeters;
+      position.angle = inputs.currentState.angle;
+      position.distanceMeters = driveMotor.getPosition().getValueAsDouble() / Constants.DriveTrain.Drive.driveGearRatio / Constants.DriveTrain.Drive.wheelCircumferenceMeters;
     }
     finally {
-      lock.unlock();
+      moduleStateLock.unlock();
     }
 
     try{
@@ -91,7 +91,7 @@ public class SwerveModuleREAL implements SwerveModuleIO{
       targetstateLock.unlock();
     }
 
-    return modulePosition;
+    return position;
   }
 
   @Override
@@ -130,11 +130,6 @@ public class SwerveModuleREAL implements SwerveModuleIO{
   }
 
   @Override
-  public SwerveModulePosition getSwerveModulePosition() {
-    return modulePosition;
-  }
-
-  @Override
   public void runSysID(Measure<Voltage> driveVoltage,Measure<Voltage> steerVoltage) {
 
     if (driveVoltage != null) {
@@ -157,8 +152,8 @@ public class SwerveModuleREAL implements SwerveModuleIO{
   }
 
   @Override
-  public Lock getLock() {
-    return lock;
+  public Lock getModuleState() {
+    return moduleStateLock;
   }
 
   @Override
@@ -174,9 +169,9 @@ public class SwerveModuleREAL implements SwerveModuleIO{
 
     talonFX.getConfigurator().apply(config); //apply the given config
 
-    talonFX.getPosition().setUpdateFrequency(50); //position is needed more for destroy
+    talonFX.getPosition().setUpdateFrequency(SwerveModule.modulesThreadHz); //position is needed more for destroy
 
-    talonFX.getVelocity().setUpdateFrequency(50); //sets as default
+    talonFX.getVelocity().setUpdateFrequency(SwerveModule.modulesThreadHz); //sets as default
     talonFX.getMotorVoltage().setUpdateFrequency(50); //sets as default
     talonFX.getSupplyCurrent().setUpdateFrequency(50); //sets as default
     talonFX.getStatorCurrent().setUpdateFrequency(50); //sets as default
@@ -244,6 +239,8 @@ public class SwerveModuleREAL implements SwerveModuleIO{
     sparkMax.getPIDController().setSmartMotionMaxAccel(Constants.DriveTrain.Steer.maxAcceleration, 0); //set the max acceleration of the module angle
     sparkMax.getPIDController().setSmartMotionMaxVelocity(Constants.DriveTrain.Steer.maxVelocity, 0); //set the max velocity of the module angle
     sparkMax.getPIDController().setSmartMotionMinOutputVelocity(Constants.DriveTrain.Steer.minVelocity, 0); //set the min velocity of the module angle
+
+    sparkMax.setPeriodicFramePeriod(CANSparkMax.PeriodicFrame.kStatus2, (int)((1 / SwerveModule.modulesThreadHz) * 1000)); //sets the status 0 frame to 10ms
 
     sparkMax.getEncoder().setPositionConversionFactor(1); //sets the gear ratio for the module
 

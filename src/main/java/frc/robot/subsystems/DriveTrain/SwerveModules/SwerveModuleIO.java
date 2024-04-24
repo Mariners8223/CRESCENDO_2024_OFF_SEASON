@@ -48,11 +48,6 @@ public interface SwerveModuleIO {
   public SwerveModuleState getSwerveModuleState();
 
   /**
-   * gets the position of the module
-   */
-  public SwerveModulePosition getSwerveModulePosition();
-
-  /**
    * runs the system identification on the module
    * @param driveVoltage the voltage to run the drive motor at
    * @param steerVoltage the voltage to run the steer motor at
@@ -68,7 +63,7 @@ public interface SwerveModuleIO {
   /**
    * gets the lock of the module
    */
-  public Lock getLock();
+  public Lock getModuleState();
 
   /**
    * resets the drive encoder
