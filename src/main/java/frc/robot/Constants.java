@@ -90,6 +90,8 @@ public class Constants {
                  new Translation2d(-Global.distanceBetweenWheels / 2, Global.distanceBetweenWheels / 2), new Translation2d(-Global.distanceBetweenWheels / 2, -Global.distanceBetweenWheels / 2)};
             //^ places the translation of each module in the array in order of the enum (front left, front right, back left, back right)
 
+            public static final double modulesThreadHz = 200; //the frequency of the modules thread in hertz
+
             public final ModuleName moduleName; //the name of the module (enum)
 
             public final int driveMotorID; // the CAN ID of the drive motor

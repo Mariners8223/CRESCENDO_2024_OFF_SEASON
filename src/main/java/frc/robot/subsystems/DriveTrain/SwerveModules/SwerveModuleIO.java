@@ -18,16 +18,16 @@ public interface SwerveModuleIO {
     public boolean isAtTargetPosition = false;
     public boolean isAtTargetSpeed = false;
 
-    public Rotation2d steerMotorInput = new Rotation2d();
+    public double steerMotorInput = 0.0;
     public double driveMotorInput = 0.0;
 
-    public String controlMode = "MotorController-loop";
+    public boolean isUsingVoltageController = false;
   }
 
   /**
    * Updates the inputs of the module
    */
-  public void modulePeriodic();
+  public SwerveModulePosition modulePeriodic();
 
   /**
    * sets the active target for the module with position and speed control loop
@@ -37,11 +37,10 @@ public interface SwerveModuleIO {
   public SwerveModuleState run(SwerveModuleState targetState);
 
   /**
-   * sets the active target for the module with voltage control loop
-   * @param targetState the target state for the module
-   * @return the optimized target state
+   * sets the type of controller for the module (or voltage controller on rio or position and velocity controller on motor controller)
+   * @param isUsingVoltageController true for voltage control, false for speed and position controle
    */
-  public SwerveModuleState runVoltage(SwerveModuleState targetState);
+  public void setIsUsingVoltageController(boolean isUsingVoltageController);
 
   /**
    * gets the current state of the module

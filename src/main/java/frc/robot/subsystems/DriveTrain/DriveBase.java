@@ -5,8 +5,7 @@
 package frc.robot.subsystems.DriveTrain;
 
 import edu.wpi.first.units.Units;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.Watchdog;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleIO;
 import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleREAL;
@@ -29,8 +28,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -41,6 +38,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 /**
  * The DriveBase class represents the drivetrain of the robot.
  * It controls the movement and positioning of the robot using swerve drive.
@@ -49,19 +48,21 @@ public class DriveBase extends SubsystemBase {
 //  private final SwerveModuleREALOLD[] modules = new SwerveModuleREALOLD[4]; //the array of the modules
   private final SwerveModuleIO[] modules = new SwerveModuleIO[4]; //the array of the modules
 
-  private final SwerveDriveKinematics driveTrainKinematics; //the kinematics of the swerve drivetrain
+  private final SwerveDriveKinematics driveTrainKinematics = new SwerveDriveKinematics(Constants.DriveTrain.SwerveModule.moduleTranslations); //the kinematics of the swerve drivetrain
   private final SwerveModulePosition[] currentPositions = new SwerveModulePosition[]{new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition()}; //the current positions of the modules
 
   private final AHRS Navx; //the gyro device
   
   private double navxOffset;
-  private final SwerveDrivePoseEstimator poseEstimator; //the pose estimator of the drivetrain
+  private final SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(driveTrainKinematics, new Rotation2d(), currentPositions, new Pose2d()); //the pose estimator of the drivetrain
 
   private final PIDController thetaCorrectionController; //the pid controller that fixes the angle of the robot
 
   private final PathConstraints pathConstraints; //the constraints for pathPlanner
   
   private final DriveBaseInputsAutoLogged inputs; //an object representing the logger class
+
+  private final ReentrantLock odometryLock = new ReentrantLock(); //a lock for the odometry and modules thread
 
   @AutoLog
   public static class DriveBaseInputs{
@@ -104,9 +105,6 @@ public class DriveBase extends SubsystemBase {
 
     SmartDashboard.putData("Navx", Navx);
 
-    driveTrainKinematics = new SwerveDriveKinematics(Constants.DriveTrain.SwerveModule.moduleTranslations);
-
-    poseEstimator = new SwerveDrivePoseEstimator(driveTrainKinematics, new Rotation2d(), currentPositions, new Pose2d()); //creates a new pose estimator class with given value
     navxOffset = 0;
 
     thetaCorrectionController = Constants.DriveTrain.Global.thetaCorrectionPID.createPIDController(); //creates the pid controller of the robots angle
@@ -151,26 +149,22 @@ public class DriveBase extends SubsystemBase {
 
     inputs.isControlled = false;
 
-    startModulesThread(5);
-  }
+    Runnable odometryAndModulesRunnable = () -> {
+      SwerveModulePosition[] positions = new SwerveModulePosition[4];
+      for (int i = 0; i < 4; i++) {
+        positions[i] = modules[i].modulePeriodic();
+      }
 
-  private void startModulesThread(long millis){
-    Runnable task = () -> {
       try {
-        while(true){
-          for(int i = 0; i < 4; i++){
-            modules[i].modulePeriodic();
-
-          }
-          Thread.sleep(millis);
-        }
-      } catch (InterruptedException ignored) {
+        odometryLock.lock();
+        poseEstimator.updateWithTime(Logger.getTimestamp(), getRotation2d(), positions);
+      } finally {
+        odometryLock.unlock();
       }
     };
 
-    Thread thread = new Thread(task);
-    thread.setDaemon(true);
-    thread.start();
+    Notifier odometryAndModulesThread = new Notifier(odometryAndModulesRunnable);
+    odometryAndModulesThread.startPeriodic(1 / Constants.DriveTrain.SwerveModule.modulesThreadHz);
   }
 
 
@@ -494,21 +488,22 @@ public class DriveBase extends SubsystemBase {
    * this updates the states of the modules, call this function periodically
    */
   public void update(){
-    for(int i = 0; i < 4; i++){
-      if(modules[i].getLock().tryLock()){
-      try {
+      for(int i = 0; i < 4; i++){
+        try{
+          modules[i].getLock().lock();
           inputs.currentStates[i] = modules[i].getSwerveModuleState();
-          currentPositions[i] = modules[i].getSwerveModulePosition();
-      } finally {
-        modules[i].getLock().unlock();
+        }
+        finally {
+          modules[i].getLock().unlock();
+        }
       }
+      
+    try {
+      odometryLock.lock();
+      inputs.currentPose = poseEstimator.getEstimatedPosition();
+    } finally {
+      odometryLock.unlock();
     }
-    else{
-      DriverStation.reportError("Module " + i + " is locked", false);
-    }
-    }
-    poseEstimator.update(Rotation2d.fromDegrees(getNavxAngle()), currentPositions);
-    inputs.currentPose = poseEstimator.getEstimatedPosition();
     
     RobotContainer.field.setRobotPose(inputs.currentPose);
     

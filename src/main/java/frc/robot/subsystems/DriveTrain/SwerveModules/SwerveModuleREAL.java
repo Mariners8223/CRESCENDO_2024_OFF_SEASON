@@ -43,6 +43,7 @@ public class SwerveModuleREAL implements SwerveModuleIO{
   private final AbsEncoderIO absEncoder;
 
   private final Lock lock = new ReentrantLock(true);
+  private final Lock targetstateLock = new ReentrantLock(true);
 
   public SwerveModuleREAL(SwerveModule constants) {
     this.constants = constants;
@@ -57,58 +58,70 @@ public class SwerveModuleREAL implements SwerveModuleIO{
   }
 
   @Override
-  public void modulePeriodic() {
-    lock.lock();
-    steerMotor.getEncoder().setPosition(absEncoder.getPosition() * Constants.DriveTrain.Steer.steerGearRatio);
+  public SwerveModulePosition modulePeriodic() {
+    try {
+      lock.lock();
+      steerMotor.getEncoder().setPosition(absEncoder.getPosition() * Constants.DriveTrain.Steer.steerGearRatio);
 
-    inputs.currentState.angle = Rotation2d.fromRotations(steerMotor.getEncoder().getPosition() / Constants.DriveTrain.Steer.steerGearRatio);
-    inputs.currentState.speedMetersPerSecond = driveMotor.getVelocity().getValueAsDouble() / Constants.DriveTrain.Drive.driveGearRatio / Constants.DriveTrain.Drive.wheelCircumferenceMeters;
+      inputs.currentState.angle = Rotation2d.fromRotations(steerMotor.getEncoder().getPosition() / Constants.DriveTrain.Steer.steerGearRatio);
+      inputs.currentState.speedMetersPerSecond = driveMotor.getVelocity().getValueAsDouble() / Constants.DriveTrain.Drive.driveGearRatio / Constants.DriveTrain.Drive.wheelCircumferenceMeters;
 
-    modulePosition.angle = inputs.currentState.angle;
-    modulePosition.distanceMeters = driveMotor.getPosition().getValueAsDouble() / Constants.DriveTrain.Drive.driveGearRatio / Constants.DriveTrain.Drive.wheelCircumferenceMeters;
-    
-    lock.unlock();
+      modulePosition.angle = inputs.currentState.angle;
+      modulePosition.distanceMeters = driveMotor.getPosition().getValueAsDouble() / Constants.DriveTrain.Drive.driveGearRatio / Constants.DriveTrain.Drive.wheelCircumferenceMeters;
+    }
+    finally {
+      lock.unlock();
+    }
 
-    inputs.isAtTargetPosition = Math.abs(inputs.currentState.angle.getRadians() - inputs.targetState.angle.getRadians()) < Constants.DriveTrain.Steer.steerMotorPID.getTolerance();
-    inputs.isAtTargetSpeed = Math.abs(inputs.currentState.speedMetersPerSecond - inputs.targetState.speedMetersPerSecond) < Constants.DriveTrain.Drive.driveMotorPID.getTolerance();
+    try{
+      targetstateLock.lock();
+
+      if(inputs.isUsingVoltageController){
+        inputs.driveMotorInput = driveMotorVoltageController.calculate(inputs.currentState.speedMetersPerSecond, inputs.targetState.speedMetersPerSecond);
+        inputs.steerMotorInput = steerMotorVoltageController.calculate(inputs.currentState.angle.getRadians(), inputs.targetState.angle.getRadians());
+
+        driveMotor.setVoltage(inputs.driveMotorInput);
+        steerMotor.setVoltage(inputs.steerMotorInput);
+      }
+
+      inputs.isAtTargetPosition = Math.abs(inputs.currentState.angle.getRadians() - inputs.targetState.angle.getRadians()) < Constants.DriveTrain.Steer.steerMotorPID.getTolerance();
+      inputs.isAtTargetSpeed = Math.abs(inputs.currentState.speedMetersPerSecond - inputs.targetState.speedMetersPerSecond) < Constants.DriveTrain.Drive.driveMotorPID.getTolerance();
+    }
+    finally {
+      targetstateLock.unlock();
+    }
+
+    return modulePosition;
   }
 
   @Override
   public SwerveModuleState run(SwerveModuleState targetState) {
-    inputs.controlMode = "MotorController-loop";
-
     inputs.driveMotorInput = targetState.speedMetersPerSecond;
-    inputs.steerMotorInput = targetState.angle;
+    inputs.steerMotorInput = targetState.angle.getRotations();
 
     SwerveModuleState.optimize(targetState, inputs.currentState.angle);
 
     targetState.speedMetersPerSecond = targetState.speedMetersPerSecond * Math.cos(targetState.angle.getRadians() - inputs.currentState.angle.getRadians());
 
-    this.inputs.targetState = targetState;
+    if(!inputs.isUsingVoltageController){
+      driveMotor.setControl(driveMotorInput.withVelocity(targetState.speedMetersPerSecond * Constants.DriveTrain.Drive.driveGearRatio * Constants.DriveTrain.Drive.wheelCircumferenceMeters));
+      steerMotor.getPIDController().setReference(targetState.angle.getRotations() * Constants.DriveTrain.Steer.steerGearRatio, CANSparkBase.ControlType.kPosition);
+    }
 
-    driveMotor.setControl(driveMotorInput.withVelocity(targetState.speedMetersPerSecond * Constants.DriveTrain.Drive.driveGearRatio * Constants.DriveTrain.Drive.wheelCircumferenceMeters));
-    steerMotor.getPIDController().setReference(targetState.angle.getRotations() * Constants.DriveTrain.Steer.steerGearRatio, CANSparkBase.ControlType.kPosition);
+    try{
+      targetstateLock.lock();
+      this.inputs.targetState = targetState;
+    }
+    finally {
+      targetstateLock.unlock();
+    }
 
     return targetState;
   }
 
   @Override
-  public SwerveModuleState runVoltage(SwerveModuleState targetState) {
-    inputs.controlMode = "Voltage-loop";
-
-    inputs.driveMotorInput = targetState.speedMetersPerSecond;
-    inputs.steerMotorInput = targetState.angle;
-
-    SwerveModuleState.optimize(targetState, inputs.currentState.angle);
-
-    targetState.speedMetersPerSecond = targetState.speedMetersPerSecond * Math.cos(targetState.angle.getRadians() - inputs.currentState.angle.getRadians());
-
-    this.inputs.targetState = targetState;
-
-    driveMotor.setVoltage(driveMotorVoltageController.calculate(inputs.currentState.speedMetersPerSecond, targetState.speedMetersPerSecond));
-    steerMotor.setVoltage(steerMotorVoltageController.calculate(inputs.currentState.angle.getRadians(), targetState.angle.getRadians()));
-
-    return targetState;
+  public void setIsUsingVoltageController(boolean isUsingVoltageController) {
+    inputs.isUsingVoltageController = isUsingVoltageController;
   }
 
   @Override
@@ -123,7 +136,6 @@ public class SwerveModuleREAL implements SwerveModuleIO{
 
   @Override
   public void runSysID(Measure<Voltage> driveVoltage,Measure<Voltage> steerVoltage) {
-    inputs.controlMode = "SysId";
 
     if (driveVoltage != null) {
       driveMotor.setVoltage(driveVoltage.in(Volt));

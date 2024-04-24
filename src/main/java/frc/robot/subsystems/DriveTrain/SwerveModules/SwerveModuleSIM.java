@@ -37,7 +37,7 @@ public class SwerveModuleSIM implements SwerveModuleIO{
     }
 
     @Override
-    public void modulePeriodic() {
+    public SwerveModulePosition modulePeriodic() {
         driveMotor.update(loopTimeMs / 1000.0);
         steerMotor.update(loopTimeMs / 1000.0);
 
@@ -52,6 +52,8 @@ public class SwerveModuleSIM implements SwerveModuleIO{
         finally {
             lock.unlock();
         }
+
+        return this.modulePosition;
     }
 
     @Override
@@ -60,8 +62,8 @@ public class SwerveModuleSIM implements SwerveModuleIO{
     }
 
     @Override
-    public SwerveModuleState runVoltage(SwerveModuleState targetState) {
-        return null;
+    public void setIsUsingVoltageController(boolean isUsingVoltageController) {
+
     }
 
     @Override
