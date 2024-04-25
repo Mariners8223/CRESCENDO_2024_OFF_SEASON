@@ -16,6 +16,7 @@ import frc.util.FastGyros.FastNavx;
 import frc.util.FastGyros.FastSimGyro;
 import org.jetbrains.annotations.NotNull;
 import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -59,6 +60,12 @@ public class DriveBase extends SubsystemBase {
 
   private final ReentrantLock odometryLock = new ReentrantLock(); //a lock for the odometry and modules thread
 
+  @AutoLogOutput(key = "DriveBase/TargetStates")
+  private SwerveModuleState[] targetStates = new SwerveModuleState[4];
+
+  @AutoLogOutput(key = "DriveBase/EstimatedPose")
+  private Pose2d currentPose = new Pose2d();
+
 
   @AutoLog
   public static class DriveBaseInputs{
@@ -67,15 +74,9 @@ public class DriveBase extends SubsystemBase {
 
     protected double rotationSpeedInput = 0;
 
-    protected Pose2d currentPose = new Pose2d(); //the current pose of the robot
-    protected Rotation2d targetRotation = new Rotation2d(); //the target rotation of the robot (in radians)
-
     protected SwerveModuleState[] currentStates = new SwerveModuleState[4]; //the current states of the modules
-    protected SwerveModuleState[] targetStates = new SwerveModuleState[4]; //the target states of the modules
 
     protected String activeCommand; //the active command of the robot
-
-    protected boolean isControlled;
   }
 
   /** Creates a new DriveBase. */
@@ -132,9 +133,7 @@ public class DriveBase extends SubsystemBase {
 
     inputs = new DriveBaseInputsAutoLogged();
     inputs.currentStates = new SwerveModuleState[]{new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState()};
-    inputs.targetStates = new SwerveModuleState[]{new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState()};
-
-    inputs.isControlled = false;
+    targetStates = new SwerveModuleState[]{new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState()};
 
     Notifier odometryAndModulesThread = getNotifier();
     odometryAndModulesThread.startPeriodic(1 / Constants.DriveTrain.SwerveModule.modulesThreadHz);
@@ -177,22 +176,21 @@ public class DriveBase extends SubsystemBase {
    * resets the robot to 0, 0 and a rotation of 0 (towards red alliance)
    */
   public void resetOnlyDirection(){
-    if(DriverStation.getAlliance().isPresent()) if(DriverStation.getAlliance().get() == Alliance.Blue) inputs.currentPose = new Pose2d(inputs.currentPose.getX(), inputs.currentPose.getY(), new Rotation2d());
-    else inputs.currentPose = new Pose2d(inputs.currentPose.getX(), inputs.currentPose.getY(), new Rotation2d(-Math.PI));
-    else inputs.currentPose = new Pose2d(inputs.currentPose.getX(), inputs.currentPose.getY(), new Rotation2d());
+    if(DriverStation.getAlliance().isPresent()) if(DriverStation.getAlliance().get() == Alliance.Blue) currentPose = new Pose2d(currentPose.getX(), currentPose.getY(), new Rotation2d());
+    else currentPose = new Pose2d(currentPose.getX(), currentPose.getY(), new Rotation2d(-Math.PI));
+    else currentPose = new Pose2d(currentPose.getX(), currentPose.getY(), new Rotation2d());
 
     SwerveModulePosition[] positions = new SwerveModulePosition[4];
     for(int i = 0; i < 4; i++) positions[i] = modules[i].modulePeriodic();
 
     try {
       odometryLock.lock();
-      poseEstimator.resetPosition(new Rotation2d(), positions, inputs.currentPose);
+      poseEstimator.resetPosition(new Rotation2d(), positions, currentPose);
     } finally {
       odometryLock.unlock();
     }
 
-    gyro.reset(inputs.currentPose);
-    inputs.targetRotation = inputs.currentPose.getRotation();
+    gyro.reset(currentPose);
   }
 
   public void setModulesBrakeMode(boolean isBrake){
@@ -205,7 +203,7 @@ public class DriveBase extends SubsystemBase {
    * @param newPose the new pose the robot should be in
    */
   public void reset(Pose2d newPose){
-    SwerveModulePosition positions[] = new SwerveModulePosition[4];
+    SwerveModulePosition[] positions = new SwerveModulePosition[4];
     for(int i = 0; i < 4; i++) positions[i] = modules[i].modulePeriodic();
 
     try {
@@ -216,23 +214,12 @@ public class DriveBase extends SubsystemBase {
     }
 
     gyro.reset(newPose);
-    inputs.currentPose = poseEstimator.getEstimatedPosition();
-    inputs.targetRotation = inputs.currentPose.getRotation();
-
-    inputs.currentPose = newPose;
-
-    inputs.targetRotation = newPose.getRotation();
-
-    Logger.processInputs(getName(), inputs);
-  }
-
-  public void setIsControlled(boolean isControlled){
-    inputs.isControlled = isControlled;
+    currentPose = newPose;
     Logger.processInputs(getName(), inputs);
   }
 
   /**
-   * gets the acclartion of the robot in the X direction
+   * gets the acceleration of the robot in the X direction
    * @return the acceleration of the robot in the X direction G
    */
   public double getXAcceleration(){
@@ -240,7 +227,7 @@ public class DriveBase extends SubsystemBase {
   }
 
   /**
-   * gets the acclartion of the robot in the Y direction
+   * gets the acceleration of the robot in the Y direction
    * @return the acceleration of the robot in the Y direction G
    */
   public double getYAcceleration() {
@@ -287,31 +274,13 @@ public class DriveBase extends SubsystemBase {
    if(getAngle() > 0) return Rotation2d.fromDegrees(getAngle() - (getAngle()%360 + angle.getDegrees()));
    else return Rotation2d.fromDegrees((getAngle() - (getAngle()%360 + angle.getDegrees()))-360);
   }
-  
-  /**
-   * sets the target rotation of the robot's angle (of the theta pid controller)
-   * @param alpha the target rotation
-   * @param isBeyond360 if the target rotation is beyond 360 degrees
-   */
-  public void setTargetRotation(Rotation2d alpha, boolean isBeyond360){
-    if(isBeyond360) inputs.targetRotation = alpha;
-    else inputs.targetRotation = getWantedAngleInCurrentRobotAngle(alpha);
-  }
-
-  /**
-   * gets the target rotation of the robot's angle
-   * @return //the target rotation
-   */
-  public Rotation2d getTargetRotation(){
-    return inputs.targetRotation;
-  }
 
   /**
    * gets the current pose of the robot
    * @return the current pose of the robot
    */
   public Pose2d getPose(){
-    return inputs.currentPose;
+    return currentPose;
   }
 
   /**
@@ -331,13 +300,12 @@ public class DriveBase extends SubsystemBase {
    * @param centerOfRotation the center that the robot rotates about
    */
   public void drive(double Xspeed, double Yspeed, double rotation, Translation2d centerOfRotation){
-    inputs.targetRotation = getRotation2d();
 
-    inputs.targetStates = driveTrainKinematics.toSwerveModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(Xspeed, Yspeed, rotation, getRotation2d()), centerOfRotation); //calculates the target states
-    SwerveDriveKinematics.desaturateWheelSpeeds(inputs.targetStates, Constants.DriveTrain.Drive.freeWheelSpeedMetersPerSec); //desaturates the wheel speeds (to make sure none of the wheel exceed the max speed)
+    targetStates = driveTrainKinematics.toSwerveModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(Xspeed, Yspeed, rotation, getRotation2d()), centerOfRotation); //calculates the target states
+    SwerveDriveKinematics.desaturateWheelSpeeds(targetStates, Constants.DriveTrain.Drive.freeWheelSpeedMetersPerSec); //desaturates the wheel speeds (to make sure none of the wheel exceed the max speed)
 
     for(int i = 0; i < 4; i++){
-      inputs.targetStates[i] = modules[i].run(inputs.targetStates[i]); //sets the module state
+      targetStates[i] = modules[i].run(targetStates[i]); //sets the module state
     }
 
     inputs.XspeedInput = Xspeed; //logs the X speed before PID
@@ -353,18 +321,17 @@ public class DriveBase extends SubsystemBase {
    * @param rotation  the rotation of the robot (left is positive) rad/s
    */
   public void robotRelativeDrive(double Xspeed, double Yspeed, double rotation){
-    inputs.targetRotation = getRotation2d();
 
-    inputs.targetStates = driveTrainKinematics.toSwerveModuleStates(new ChassisSpeeds(Xspeed, Yspeed, rotation));
+    targetStates = driveTrainKinematics.toSwerveModuleStates(new ChassisSpeeds(Xspeed, Yspeed, rotation));
     SwerveDriveKinematics.desaturateWheelSpeeds(inputs.currentStates, Constants.DriveTrain.Drive.freeWheelSpeedMetersPerSec);
 
     for(int i = 0; i < 4; i++){
-      inputs.targetStates[i] = modules[i].run(inputs.targetStates[i]);
+      targetStates[i] = modules[i].run(targetStates[i]);
     }
 
     inputs.XspeedInput = Xspeed;
     inputs.YspeedInput = Yspeed;
-    inputs.rotationSpeedInputBeforePID = rotation;
+    inputs.rotationSpeedInput = rotation;
     Logger.processInputs(getName(), inputs);
   }
 
@@ -381,16 +348,16 @@ public class DriveBase extends SubsystemBase {
    * @param chassisSpeeds the chassis speeds of the target
    */
   public void drive(ChassisSpeeds chassisSpeeds){
-    inputs.targetStates = driveTrainKinematics.toSwerveModuleStates(chassisSpeeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(inputs.targetStates, Constants.DriveTrain.Drive.freeWheelSpeedMetersPerSec);
+    targetStates = driveTrainKinematics.toSwerveModuleStates(chassisSpeeds);
+    SwerveDriveKinematics.desaturateWheelSpeeds(targetStates, Constants.DriveTrain.Drive.freeWheelSpeedMetersPerSec);
 
     for(int i = 0; i < 4; i++){
-      inputs.targetStates[i] = modules[i].run(inputs.targetStates[i]);
+      targetStates[i] = modules[i].run(targetStates[i]);
     }
 
     inputs.XspeedInput = chassisSpeeds.vxMetersPerSecond;
     inputs.YspeedInput = chassisSpeeds.vyMetersPerSecond;
-    inputs.rotationSpeedInputBeforePID = chassisSpeeds.omegaRadiansPerSecond;
+    inputs.rotationSpeedInput = chassisSpeeds.omegaRadiansPerSecond;
     Logger.processInputs(getName(), inputs);
   }
 
@@ -402,16 +369,16 @@ public class DriveBase extends SubsystemBase {
    * @param centerOfRotation the center that the robot rotates about
    */
   public void driveWithOutPID(double Xspeed, double Yspeed, double rotation, Translation2d centerOfRotation){
-    inputs.targetStates = driveTrainKinematics.toSwerveModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(Xspeed, Yspeed, rotation, getRotation2d()), centerOfRotation);
-    SwerveDriveKinematics.desaturateWheelSpeeds(inputs.targetStates, Constants.DriveTrain.Drive.freeWheelSpeedMetersPerSec);
+    targetStates = driveTrainKinematics.toSwerveModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(Xspeed, Yspeed, rotation, getRotation2d()), centerOfRotation);
+    SwerveDriveKinematics.desaturateWheelSpeeds(targetStates, Constants.DriveTrain.Drive.freeWheelSpeedMetersPerSec);
 
     for(int i = 0; i < 4; i++){
-      inputs.targetStates[i] = modules[i].run(inputs.targetStates[i]);
+      targetStates[i] = modules[i].run(targetStates[i]);
     }
 
     inputs.XspeedInput = Xspeed;
     inputs.YspeedInput = Yspeed;
-    inputs.rotationSpeedInputBeforePID = rotation;
+    inputs.rotationSpeedInput = rotation;
     Logger.processInputs(getName(), inputs);
   }
 
@@ -483,12 +450,12 @@ public class DriveBase extends SubsystemBase {
 
     try {
       odometryLock.lock();
-      inputs.currentPose = poseEstimator.getEstimatedPosition();
+      currentPose = poseEstimator.getEstimatedPosition();
     } finally {
       odometryLock.unlock();
     }
     
-    RobotContainer.field.setRobotPose(inputs.currentPose);
+    RobotContainer.field.setRobotPose(currentPose);
 
     inputs.activeCommand = this.getCurrentCommand() != null ? this.getCurrentCommand().getName() : "None";
 
@@ -517,7 +484,6 @@ public class DriveBase extends SubsystemBase {
     @Override
     public void initialize() {
       driveBase.drive(0, 0, 0);
-      driveBase.setIsControlled(false);
     }
 
     @Override
