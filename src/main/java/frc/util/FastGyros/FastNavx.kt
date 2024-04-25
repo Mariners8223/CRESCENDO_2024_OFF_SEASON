@@ -1,20 +1,13 @@
-@file:JvmName("FastNavxss") 
 package frc.util.FastGyros
 
 import com.kauailabs.navx.frc.AHRS
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
-import edu.wpi.first.math.geometry.Transform2d
-import edu.wpi.first.math.util.Units
-import edu.wpi.first.util.sendable.Sendable
 import edu.wpi.first.util.sendable.SendableBuilder
-import org.littletonrobotics.junction.AutoLog
 import org.littletonrobotics.junction.LogTable
 import org.littletonrobotics.junction.Logger
 import org.littletonrobotics.junction.inputs.LoggableInputs
 import java.util.concurrent.locks.ReentrantLock
-import kotlin.math.cos
-import kotlin.math.sin
 
 class FastNavx : FastGyro{
 
@@ -29,7 +22,7 @@ class FastNavx : FastGyro{
    * Resets the gyro to the specified pose.
    * @param newPose The new pose to set the gyro to.
    */
-  override fun reset(newPose: Pose2d): Unit {
+  override fun reset(newPose: Pose2d){
     try{
       lock.lock()
       navx.reset()
@@ -72,7 +65,7 @@ class FastNavx : FastGyro{
    * Updates the gyro's inputs.
    * needs to be called periodically
    */
-  override fun update(): Unit {
+  override fun update(){
     try {
       lock.lock()
       inputs.angle = navx.rotation2d.minus(inputs.rotationOffset)

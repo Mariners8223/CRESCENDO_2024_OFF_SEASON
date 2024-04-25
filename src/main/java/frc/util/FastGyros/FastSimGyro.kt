@@ -4,18 +4,11 @@ import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Twist2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
-import edu.wpi.first.math.kinematics.SwerveModuleState
 import edu.wpi.first.util.sendable.SendableBuilder
-import edu.wpi.first.wpilibj.Notifier
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import frc.robot.Constants
-import org.littletonrobotics.junction.LogTable
 import org.littletonrobotics.junction.Logger
-import org.littletonrobotics.junction.inputs.LoggableInputs
 import java.util.concurrent.locks.ReentrantLock
 import java.util.function.Supplier
-import kotlin.math.cos
-import kotlin.math.sin
 
 class FastSimGyro(private val twistSupplier: Supplier<Twist2d>, private val chassisSpeedsSupplier: Supplier<ChassisSpeeds>) : FastGyro{
   private val lock : ReentrantLock = ReentrantLock()
@@ -24,8 +17,8 @@ class FastSimGyro(private val twistSupplier: Supplier<Twist2d>, private val chas
   private var velocityX: Double = 0.0
   private var velocityY: Double = 0.0
 
-  private var displacmentX: Double = 0.0
-  private var displacmentY: Double = 0.0
+  private var displacementX: Double = 0.0
+  private var displacementY: Double = 0.0
 
   private var accelerationX: Double = 0.0
   private var accelerationY: Double = 0.0
@@ -54,22 +47,22 @@ class FastSimGyro(private val twistSupplier: Supplier<Twist2d>, private val chas
   }
 
 
-  override fun update() : Unit {
+  override fun update() {
     try{
       lock.lock()
       val twist = twistSupplier.get()
       angle = Rotation2d.fromRadians(twist.dtheta + angle.radians)
       Logger.recordOutput("Gyro/angle", angle)
 
-      displacmentX += twist.dx * cos(angle.radians) - twist.dy * sin(angle.radians)
-      displacmentY += twist.dy * cos(angle.radians) + twist.dx * sin(angle.radians)
+      displacementX += twist.dx * angle.cos - twist.dy * angle.sin
+      displacementY += twist.dy * angle.cos + twist.dx * angle.sin
 
-      Logger.recordOutput("Gyro/EstimatedPose", Pose2d(displacmentX, displacmentY, angle))
+      Logger.recordOutput("Gyro/EstimatedPose", Pose2d(displacementX, displacementY, angle))
 
       val chassisSpeeds = chassisSpeedsSupplier.get()
 
-      velocityX = chassisSpeeds.vxMetersPerSecond * cos(angle.radians) - chassisSpeeds.vyMetersPerSecond * sin(angle.radians)
-      velocityY = chassisSpeeds.vyMetersPerSecond * cos(angle.radians) + chassisSpeeds.vxMetersPerSecond * sin(angle.radians)
+      velocityX = chassisSpeeds.vxMetersPerSecond * angle.cos - chassisSpeeds.vyMetersPerSecond * angle.sin
+      velocityY = chassisSpeeds.vyMetersPerSecond * angle.cos + chassisSpeeds.vxMetersPerSecond * angle.sin
 
       accelerationX = (velocityX - prevVelocityX) / (1 / Constants.DriveTrain.SwerveModule.modulesThreadHz)
       accelerationY = (velocityY - prevVelocityY) / (1 / Constants.DriveTrain.SwerveModule.modulesThreadHz)
@@ -152,8 +145,8 @@ class FastSimGyro(private val twistSupplier: Supplier<Twist2d>, private val chas
     try {
       lock.lock()
       angle = newPose.rotation
-      displacmentX = newPose.translation.x
-      displacmentY = newPose.translation.y
+      displacementX = newPose.translation.x
+      displacementY = newPose.translation.y
     }
     finally {
       lock.unlock()

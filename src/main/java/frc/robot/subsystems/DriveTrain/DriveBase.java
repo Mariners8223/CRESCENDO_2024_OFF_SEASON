@@ -164,8 +164,7 @@ public class DriveBase extends SubsystemBase {
       }
     };
 
-    Notifier odometryAndModulesThread = new Notifier(odometryAndModulesRunnable);
-    return odometryAndModulesThread;
+    return new Notifier(odometryAndModulesRunnable);
   }
 
 
