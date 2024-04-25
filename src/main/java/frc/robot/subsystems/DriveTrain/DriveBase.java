@@ -536,12 +536,14 @@ public class DriveBase extends SubsystemBase {
     public static enum SysIDType{
       Steer,
       Drive,
-      XY,
+      X,
+      Y,
       Theta
     }
     SysIdRoutine steerSysId;
     SysIdRoutine driveSysId;
-    SysIdRoutine xySpeedSysId;
+    SysIdRoutine xSpeedSysId;
+    SysIdRoutine ySpeedSYSId;
     SysIdRoutine thetaSpeedSysId;
 
     public SysID(DriveBase driveBase){
@@ -573,23 +575,40 @@ public class DriveBase extends SubsystemBase {
                       "driveSysId"
               ));
 
-      xySpeedSysId = new SysIdRoutine(
+      xSpeedSysId = new SysIdRoutine(
         new SysIdRoutine.Config(
-          null, null, null, (state) -> Logger.recordOutput("SysIDXYState", state.toString())
+          Units.Volts.of(0.5).per(Units.Seconds), Units.Volts.of(3), null, (state) -> Logger.recordOutput("SysIDXYState", state.toString())
         ),
               new SysIdRoutine.Mechanism(
                       (voltage) -> {
-                        driveBase.drive(voltage.in(Units.Volts) / 3, 0, 0);
+                        driveBase.drive(voltage.in(Units.Volts), 0, 0);
                       },
                       (log) -> {
-                        ChassisSpeeds chassisSpeeds = driveBase.getChassisSpeeds();
+                        ChassisSpeeds chassisSpeeds = driveBase.getAbsoluteChassisSpeeds();
                         Pose2d pose = driveBase.getPose();
-                        log.motor("robotX").linearAcceleration(Units.MetersPerSecondPerSecond.of(driveBase.getXAcceleration())).linearVelocity(Units.MetersPerSecond.of(chassisSpeeds.vxMetersPerSecond)).linearPosition(Units.Meters.of(pose.getX()));
-                        log.motor("robotY").linearAcceleration(Units.MetersPerSecondPerSecond.of(driveBase.getYAcceleration())).linearVelocity(Units.MetersPerSecond.of(chassisSpeeds.vyMetersPerSecond)).linearPosition(Units.Meters.of(pose.getY()));
+                        Logger.recordOutput("/SysID/velocityX", chassisSpeeds.vxMetersPerSecond);
                       },
                       driveBase,
                       "xySpeedSysId"
               ));
+
+      ySpeedSYSId = new SysIdRoutine(
+              new SysIdRoutine.Config(
+                null, null, null, (state) -> Logger.recordOutput("SysIDYState", state.toString())
+              ),
+              new SysIdRoutine.Mechanism(
+                      (voltage) -> {
+                        driveBase.drive(0, voltage.in(Units.Volts), 0);
+                      },
+                      (log) -> {
+                        ChassisSpeeds chassisSpeeds = driveBase.getAbsoluteChassisSpeeds();
+                        Pose2d pose = driveBase.getPose();
+                        Logger.recordOutput("/SysID/velocityY", chassisSpeeds.vyMetersPerSecond);
+                      },
+                      driveBase,
+                      "ySpeedSysId"
+              )
+      );
 
       double[] prevAngleVelocity = {0};
       double[] preAngleVelocityTimeStamp = {0};
@@ -619,14 +638,16 @@ public class DriveBase extends SubsystemBase {
       return isDynamic ? switch (type) {
         case Steer -> steerSysId.dynamic(isForward ? SysIdRoutine.Direction.kForward : SysIdRoutine.Direction.kReverse);
         case Drive -> driveSysId.dynamic(isForward ? SysIdRoutine.Direction.kForward : SysIdRoutine.Direction.kReverse);
-        case XY -> xySpeedSysId.dynamic(isForward ? SysIdRoutine.Direction.kForward : SysIdRoutine.Direction.kReverse);
+        case X -> xSpeedSysId.dynamic(isForward ? SysIdRoutine.Direction.kForward : SysIdRoutine.Direction.kReverse);
+        case Y -> ySpeedSYSId.dynamic(isForward ? SysIdRoutine.Direction.kForward : SysIdRoutine.Direction.kReverse);
         case Theta -> thetaSpeedSysId.dynamic(isForward ? SysIdRoutine.Direction.kForward : SysIdRoutine.Direction.kReverse);
         default -> null;
       }
       : switch (type) {
         case Steer -> steerSysId.quasistatic(isForward ? SysIdRoutine.Direction.kForward : SysIdRoutine.Direction.kReverse);
         case Drive -> driveSysId.quasistatic(isForward ? SysIdRoutine.Direction.kForward : SysIdRoutine.Direction.kReverse);
-        case XY -> xySpeedSysId.quasistatic(isForward ? SysIdRoutine.Direction.kForward : SysIdRoutine.Direction.kReverse);
+        case X -> xSpeedSysId.quasistatic(isForward ? SysIdRoutine.Direction.kForward : SysIdRoutine.Direction.kReverse);
+        case Y -> ySpeedSYSId.quasistatic(isForward ? SysIdRoutine.Direction.kForward : SysIdRoutine.Direction.kReverse);
         case Theta -> thetaSpeedSysId.quasistatic(isForward ? SysIdRoutine.Direction.kForward : SysIdRoutine.Direction.kReverse);
         default -> null;
       };

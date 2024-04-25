@@ -94,10 +94,10 @@ public class RobotContainer{
     
     private void configureBindings(SysID drivebaseSysID) {
         driveController.options().onTrue(new InstantCommand(driveBase::resetOnlyDirection));
-        driveController.cross().whileTrue(drivebaseSysID.getSysIDCommand(SysIDType.Drive, true, true));
-        driveController.square().whileTrue(drivebaseSysID.getSysIDCommand(SysIDType.Drive, false, true));
-        driveController.triangle().whileTrue(drivebaseSysID.getSysIDCommand(SysIDType.Drive, true, false));
-        driveController.circle().whileTrue(drivebaseSysID.getSysIDCommand(SysIDType.Drive, false, false));
+        driveController.cross().whileTrue(drivebaseSysID.getSysIDCommand(SysIDType.X, true, true));
+        driveController.square().whileTrue(drivebaseSysID.getSysIDCommand(SysIDType.X, false, true));
+        driveController.triangle().whileTrue(drivebaseSysID.getSysIDCommand(SysIDType.X, true, false));
+        driveController.circle().whileTrue(drivebaseSysID.getSysIDCommand(SysIDType.X, false, false));
     }
     
     
