@@ -18,23 +18,22 @@ import org.littletonrobotics.junction.Logger;
 
 public class SwerveModuleSIM implements SwerveModuleIO{
     private final SwerveModuleIOInputsAutoLogged inputs = new SwerveModuleIOInputsAutoLogged();
-    private final SwerveModule consants;
+    private final SwerveModule constants;
 
     private final SwerveModulePosition modulePosition = new SwerveModulePosition();
 
-    private final DCMotorSim driveMotor;
-    private final DCMotorSim steerMotor;
+    private final DCMotorSim driveMotor = new DCMotorSim(DCMotor.getFalcon500(1), Constants.DriveTrain.Drive.driveGearRatio, 0.25);;
+    private final DCMotorSim steerMotor = new DCMotorSim(DCMotor.getNeo550(1), Constants.DriveTrain.Steer.steerGearRatio, 0.25);
 
     private final PIDController drivePIDController = Constants.DriveTrain.Drive.driveMotorPID.createPIDController();
     private final PIDController steerPIDController = Constants.DriveTrain.Steer.steerMotorPID.createPIDController();
 
     private final ReentrantLock currentLock = new ReentrantLock();
 
-    public SwerveModuleSIM(SwerveModule constants) {
-        this.consants = constants;
+    private boolean runningSysID = false;
 
-        this.driveMotor = new DCMotorSim(DCMotor.getFalcon500(1), Constants.DriveTrain.Drive.driveGearRatio, 0.25);
-        this.steerMotor = new DCMotorSim(DCMotor.getNeo550(1), Constants.DriveTrain.Steer.steerGearRatio, 0.25);
+    public SwerveModuleSIM(SwerveModule constants) {
+        this.constants = constants;
 
         SmartDashboard.putData("Drive PID", drivePIDController);
         SmartDashboard.putData("Steer PID", steerPIDController);
@@ -50,19 +49,25 @@ public class SwerveModuleSIM implements SwerveModuleIO{
             inputs.currentState.speedMetersPerSecond = driveMotor.getAngularVelocityRadPerSec() * Constants.DriveTrain.Drive.wheelRadiusMeters;
             inputs.currentState.angle = Rotation2d.fromRadians(steerMotor.getAngularPositionRad());
 
+            inputs.SteerVelocityRadPerSec = steerMotor.getAngularVelocityRadPerSec();
+
             this.modulePosition.angle = inputs.currentState.angle;
             this.modulePosition.distanceMeters = driveMotor.getAngularPositionRad() * Constants.DriveTrain.Drive.wheelRadiusMeters;
+
+            inputs.DrivePositionMeters = this.modulePosition.distanceMeters;
 
             inputs.isAtTargetSpeed = drivePIDController.atSetpoint();
             inputs.isAtTargetPosition = steerPIDController.atSetpoint();
 
-            inputs.driveMotorInput = drivePIDController.calculate(inputs.currentState.speedMetersPerSecond, inputs.targetState.speedMetersPerSecond);
-            inputs.steerMotorInput = steerPIDController.calculate(inputs.currentState.angle.getRotations(), inputs.targetState.angle.getRotations());
+            if(!runningSysID) {
+                inputs.driveMotorInput = drivePIDController.calculate(inputs.currentState.speedMetersPerSecond, inputs.targetState.speedMetersPerSecond);
+                inputs.steerMotorInput = steerPIDController.calculate(inputs.currentState.angle.getRadians(), inputs.targetState.angle.getRadians());
+            }
 
             driveMotor.setInputVoltage(inputs.driveMotorInput);
             steerMotor.setInputVoltage(inputs.steerMotorInput);
 
-            Logger.processInputs("MODULE " + consants.moduleName, inputs);
+            Logger.processInputs("MODULE " + constants.moduleName, inputs);
 
             return this.modulePosition;
         }
@@ -73,6 +78,7 @@ public class SwerveModuleSIM implements SwerveModuleIO{
 
     @Override
     public SwerveModuleState run(SwerveModuleState targetState) {
+        if(runningSysID) runningSysID = false;
 
         targetState = SwerveModuleState.optimize(targetState, inputs.currentState.angle);
 
@@ -105,7 +111,16 @@ public class SwerveModuleSIM implements SwerveModuleIO{
 
     @Override
     public void runSysID(Measure<Voltage> driveVoltage, Measure<Voltage> steerVoltage) {
+        if(!runningSysID) runningSysID = true;
 
+        try {
+            currentLock.lock();
+            inputs.driveMotorInput = driveVoltage != null ? driveVoltage.baseUnitMagnitude() : 0;
+            inputs.steerMotorInput = steerVoltage != null ? steerVoltage.baseUnitMagnitude() : 0;
+        }
+        finally {
+            currentLock.unlock();
+        }
     }
 
     @Override

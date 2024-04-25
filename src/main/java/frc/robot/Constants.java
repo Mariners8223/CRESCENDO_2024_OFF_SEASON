@@ -38,7 +38,7 @@ public class Constants {
 
         public static final class Drive{
             // public static final PIDFGains driveMotorPID = new PIDFGains(0.4, 0.001, 0.001, 0.0, 0.22, 0); //the pid gains for the PID Controller of the drive motor, (units in rotations per second)
-            public static final PIDFGains driveMotorPID = new PIDFGains(10, 0.001, 0.001, 0.0, 0.22, 0); //the pid gains for the PID Controller of the drive motor, (units in rotations per second)
+            public static final PIDFGains driveMotorPID = new PIDFGains(3.5037 * 6.75, 0.00, 0.00, 0.0, 0.22, 0); //the pid gains for the PID Controller of the drive motor, (units in rotations per second)
 
             public static final double freeWheelSpeedMetersPerSec = 3.75; //the max speed of the drive wheel in meters per second //TODO find real value
 
@@ -56,7 +56,7 @@ public class Constants {
             public static final double steerGearRatio = 12.5 * 3; //the gear ratio between the steer motor and the module itself
             // public static final double newGearRatio = steerGearRatio * 3; //this is for our old swerve
             // public static final PIDFGains steerMotorPID = new PIDFGains(0.4, 0, 0.1, 0, 0.0005, 0); //the pid gains for the PID Controller of the steer motor, units are in rotations //TODO needs tuning with SysID
-            public static final PIDFGains steerMotorPID = new PIDFGains(10, 0, 0.1, 0, 0.0005, 0); //the pid gains for the PID Controller of the steer motor, units are in rotations //TODO needs tuning with SysID
+            public static final PIDFGains steerMotorPID = new PIDFGains(14.042 * steerGearRatio, 0, 1.4 * steerGearRatio, 0, 0.1, 0); //the pid gains for the PID Controller of the steer motor, units are in rotations //TODO needs tuning with SysID
 
             public static final double maxVelocity = 1; //the max velocity of the modules steer aspect in module rotations per minute (only used by smart Motion) //TODO find real value
             public static final double minVelocity = 0.1; //the min velocity of the modules steer aspect in module rotation per minute (only used by smart Motion) //TODO find real value

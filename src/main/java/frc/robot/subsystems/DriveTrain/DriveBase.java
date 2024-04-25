@@ -498,7 +498,7 @@ public class DriveBase extends SubsystemBase {
 
         (Math.abs(controller.getLeftX()) > 0.05 ? controller.getLeftX() : 0) * -Constants.DriveTrain.Drive.freeWheelSpeedMetersPerSec,
 
-        (Math.abs(controller.getRightX()) > 0.05 ? controller.getRightX() : 0) * -Constants.DriveTrain.Drive.freeWheelSpeedMetersPerSec
+        (Math.abs(controller.getRightX()) > 0.05 ? controller.getRightX() : 0) * -Constants.DriveTrain.Drive.freeWheelSpeedMetersPerSec * 4
         );
     }
 
@@ -530,7 +530,7 @@ public class DriveBase extends SubsystemBase {
     public void end(boolean interrupted) { driveBase.drive(0, 0, 0);}
   }
 
-  private static class SysID{
+  public static class SysID{
     public static enum SysIDType{
       Steer,
       Drive,
@@ -542,9 +542,11 @@ public class DriveBase extends SubsystemBase {
     SysIdRoutine xySpeedSysId;
     SysIdRoutine thetaSpeedSysId;
 
-    private SysID(DriveBase driveBase){
+    public SysID(DriveBase driveBase){
       steerSysId = new SysIdRoutine(
-              new SysIdRoutine.Config(),
+              new SysIdRoutine.Config(
+                null, null, null, (state) -> Logger.recordOutput("SysIDSteerState", state.toString())
+              ),
               new SysIdRoutine.Mechanism(
                       (voltage) -> {
                         for(int i = 0; i < 4; i++) driveBase.modules[i].runSysID(null, voltage);
@@ -555,7 +557,9 @@ public class DriveBase extends SubsystemBase {
               ));
 
       driveSysId = new SysIdRoutine(
-              new SysIdRoutine.Config(),
+        new SysIdRoutine.Config(
+          null, null, null, (state) -> Logger.recordOutput("SysIDDriveState", state.toString())
+        ),
               new SysIdRoutine.Mechanism(
                       (voltage) -> {
                         for(int i = 0; i < 4; i++){
@@ -568,7 +572,9 @@ public class DriveBase extends SubsystemBase {
               ));
 
       xySpeedSysId = new SysIdRoutine(
-              new SysIdRoutine.Config(),
+        new SysIdRoutine.Config(
+          null, null, null, (state) -> Logger.recordOutput("SysIDXYState", state.toString())
+        ),
               new SysIdRoutine.Mechanism(
                       (voltage) -> {
                         driveBase.drive(voltage.in(Units.Volts) / 3, 0, 0);
@@ -587,7 +593,9 @@ public class DriveBase extends SubsystemBase {
       double[] preAngleVelocityTimeStamp = {0};
 
       thetaSpeedSysId = new SysIdRoutine(
-              new SysIdRoutine.Config(),
+        new SysIdRoutine.Config(
+          null, null, null, (state) -> Logger.recordOutput("SysIDThetaState", state.toString())
+        ),
               new SysIdRoutine.Mechanism(
                       (voltage) -> {
                         driveBase.drive(0, 0, voltage.in(Units.Volts));

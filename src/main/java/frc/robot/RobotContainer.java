@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.robot.subsystems.DriveTrain.DriveBase;
+import frc.robot.subsystems.DriveTrain.DriveBase.SysID;
+import frc.robot.subsystems.DriveTrain.DriveBase.SysID.SysIDType;
 
 public class RobotContainer{
     public static DriveBase driveBase;
@@ -26,7 +28,9 @@ public class RobotContainer{
         // driveController = new CommandPS5Controller(0);
         driveController = new CommandPS4Controller(0);
         driveBase = new DriveBase();
-        configureBindings();
+        SysID drivebaseSysID = new SysID(driveBase);
+
+        configureBindings(drivebaseSysID);
 
         field = new Field2d();
 
@@ -34,8 +38,12 @@ public class RobotContainer{
     }
     
     
-    private void configureBindings() {
+    private void configureBindings(SysID drivebaseSysID) {
         driveController.options().onTrue(new InstantCommand(driveBase::resetOnlyDirection));
+        driveController.cross().whileTrue(drivebaseSysID.getSysIDCommand(SysIDType.Drive, true, true));
+        driveController.square().whileTrue(drivebaseSysID.getSysIDCommand(SysIDType.Drive, false, true));
+        driveController.triangle().whileTrue(drivebaseSysID.getSysIDCommand(SysIDType.Drive, true, false));
+        driveController.circle().whileTrue(drivebaseSysID.getSysIDCommand(SysIDType.Drive, false, false));
     }
     
     

@@ -15,6 +15,9 @@ public interface SwerveModuleIO {
     public SwerveModuleState currentState = new SwerveModuleState();
     public SwerveModuleState targetState = new SwerveModuleState();
 
+    public double SteerVelocityRadPerSec = 0.0;
+    public double DrivePositionMeters = 0.0;
+
     public boolean isAtTargetPosition = false;
     public boolean isAtTargetSpeed = false;
 
