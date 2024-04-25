@@ -28,11 +28,7 @@ public class Constants {
             public static final double maxAcceleration = 40; //the max xy acceleration of the robot in meter per second squared //TODO find real value
             public static final double maxAccelerationRotation = 40; //the max rotation acceleration of the robot in omega radians per second squared //TODO find real value
 
-            public static final PIDFGains thetaCorrectionPID = new PIDFGains(3, 0.0, 0.15); //TODO tune with SysID
-
-            public static final double chassisSpeedsDeadZone = 0.05; // the value of then deadZone (any input below this value will be considered 0)
-
-            public static final double distanceBetweenWheels = 0.55; // the distance between each wheel in meters //TODO update based on new swerve maybe?
+            public static final double distanceBetweenWheels = 0.576; // the distance between each wheel in meters //TODO update based on new swerve maybe?
 
             public static final double maxRotationSpeed = 6.27; //the max speed the robot can rotate in (radians per second) //TODO find real value
 

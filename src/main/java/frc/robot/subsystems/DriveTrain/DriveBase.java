@@ -94,7 +94,7 @@ public class DriveBase extends SubsystemBase {
       modules[1] = new SwerveModuleSIM(Constants.DriveTrain.front_right); //the front right module
       modules[2] = new SwerveModuleSIM(Constants.DriveTrain.back_left); //the back left module
       modules[3] = new SwerveModuleSIM(Constants.DriveTrain.back_right); //the back right module
-      gyro = new FastSimGyro(() -> driveTrainKinematics.toTwist2d(moduleDeltas), this::getAbsoluteChassisSpeeds);
+      gyro = new FastSimGyro(() -> driveTrainKinematics.toTwist2d(moduleDeltas), this::getChassisSpeeds);
     }
 
     for(int i = 0; i < 4; i++) modules[i].resetDriveEncoder();
@@ -134,12 +134,9 @@ public class DriveBase extends SubsystemBase {
     inputs = new DriveBaseInputsAutoLogged();
     inputs.currentStates = new SwerveModuleState[]{new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState()};
     targetStates = new SwerveModuleState[]{new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState()};
-
-    Notifier odometryAndModulesThread = getNotifier();
-    odometryAndModulesThread.startPeriodic(1 / Constants.DriveTrain.SwerveModule.modulesThreadHz);
   }
 
-  private @NotNull Notifier getNotifier() {
+  public @NotNull Notifier getNotifier() {
     SwerveModulePosition[] previousPositions = new SwerveModulePosition[]{new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition()};
     SwerveModulePosition[] positions = new SwerveModulePosition[]{new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition()};
 

@@ -30,8 +30,6 @@ public class SwerveModuleSIM implements SwerveModuleIO{
 
     private final ReentrantLock currentLock = new ReentrantLock();
 
-    private final long loopTimeMs = (long) (1000.0 / SwerveModule.modulesThreadHz);;
-
     public SwerveModuleSIM(SwerveModule constants) {
         this.consants = constants;
 
@@ -44,8 +42,8 @@ public class SwerveModuleSIM implements SwerveModuleIO{
 
     @Override
     public SwerveModulePosition modulePeriodic() {
-        driveMotor.update(loopTimeMs / 1000.0);
-        steerMotor.update(loopTimeMs / 1000.0);
+        driveMotor.update(1 / SwerveModule.modulesThreadHz);
+        steerMotor.update(1 / SwerveModule.modulesThreadHz);
 
         try {
             currentLock.lock();

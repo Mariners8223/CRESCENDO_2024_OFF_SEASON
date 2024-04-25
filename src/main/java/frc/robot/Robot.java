@@ -7,6 +7,8 @@ package frc.robot;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.pathplanner.lib.pathfinding.Pathfinding;
+import com.pathplanner.lib.util.PathPlannerLogging;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import frc.util.LocalADStarAK;
 
@@ -14,6 +16,7 @@ import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.LoggedRobot;
 
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.Logger;
@@ -34,6 +37,12 @@ public class Robot extends LoggedRobot
         robotContainer = new RobotContainer();
 
         Pathfinding.setPathfinder(new LocalADStarAK());
+        PathPlannerLogging.setLogActivePathCallback((path) ->
+                Logger.recordOutput("PathPlanner/ActivePath", path.toArray(new Pose2d[0])));
+
+        PathPlannerLogging.setLogTargetPoseCallback((targetPose) ->
+                Logger.recordOutput("PathPlanner/TargetPose", targetPose));
+
         Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
         Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
         Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
@@ -58,7 +67,6 @@ public class Robot extends LoggedRobot
             DataLogManager.start("U/logs/dataLogManager");
             SignalLogger.enableAutoLogging(true);
             SignalLogger.setPath("U/logs/signalLogger");
-
         }
         else{
             Logger.addDataReceiver(new RLOGServer());
@@ -66,6 +74,9 @@ public class Robot extends LoggedRobot
         }
 
         Logger.start();
+
+        Notifier odometryAndModulesThread = RobotContainer.driveBase.getNotifier();
+        odometryAndModulesThread.startPeriodic(1 / Constants.DriveTrain.SwerveModule.modulesThreadHz);
     }
     
     

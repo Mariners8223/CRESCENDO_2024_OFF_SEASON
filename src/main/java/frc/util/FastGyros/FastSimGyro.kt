@@ -32,8 +32,6 @@ class FastSimGyro(private val twistSupplier: Supplier<Twist2d>, private val chas
 
   private var prevVelocityX: Double = 0.0
   private var prevVelocityY: Double = 0.0
-  private var prevTimestamp: Long = 0L
-
 
   override fun getAngleDegrees(): Double {
     try {
@@ -63,21 +61,24 @@ class FastSimGyro(private val twistSupplier: Supplier<Twist2d>, private val chas
       angle = Rotation2d.fromRadians(twist.dtheta + angle.radians)
       Logger.recordOutput("Gyro/angle", angle)
 
-      displacmentX += twist.dx * cos(angle.radians) + twist.dy * sin(angle.radians)
-      displacmentY += twist.dx * sin(angle.radians) + twist.dy * cos(angle.radians)
+      displacmentX += twist.dx * cos(angle.radians) - twist.dy * sin(angle.radians)
+      displacmentY += twist.dy * cos(angle.radians) + twist.dx * sin(angle.radians)
 
       Logger.recordOutput("Gyro/EstimatedPose", Pose2d(displacmentX, displacmentY, angle))
 
-      velocityX = chassisSpeedsSupplier.get().vxMetersPerSecond
-      velocityY = chassisSpeedsSupplier.get().vyMetersPerSecond
+      val chassisSpeeds = chassisSpeedsSupplier.get()
 
-      accelerationX = (velocityX - prevVelocityX) / (Logger.getTimestamp() - prevTimestamp)
-      accelerationY = (velocityY - prevVelocityY) / (Logger.getTimestamp() - prevTimestamp)
+      velocityX = chassisSpeeds.vxMetersPerSecond * cos(angle.radians) - chassisSpeeds.vyMetersPerSecond * sin(angle.radians)
+      velocityY = chassisSpeeds.vyMetersPerSecond * cos(angle.radians) + chassisSpeeds.vxMetersPerSecond * sin(angle.radians)
+
+      accelerationX = (velocityX - prevVelocityX) / (1 / Constants.DriveTrain.SwerveModule.modulesThreadHz)
+      accelerationY = (velocityY - prevVelocityY) / (1 / Constants.DriveTrain.SwerveModule.modulesThreadHz)
+
+      Logger.recordOutput("Gyro/PrevVelocityX", prevVelocityX)
+      Logger.recordOutput("Gyro/PrevVelocityY", prevVelocityY)
 
       prevVelocityX = velocityX
       prevVelocityY = velocityY
-
-      prevTimestamp = Logger.getTimestamp()
 
       Logger.recordOutput("Gyro/velocityX", velocityX)
       Logger.recordOutput("Gyro/velocityY", velocityY)
