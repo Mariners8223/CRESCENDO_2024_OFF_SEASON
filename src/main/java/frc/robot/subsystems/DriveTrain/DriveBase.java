@@ -120,6 +120,8 @@ public class DriveBase extends SubsystemBase {
       () -> {if(DriverStation.getAlliance().isPresent()) return DriverStation.getAlliance().get() == Alliance.Red;
       else return false;},
       this);
+
+      AutoBuilder.isPathfindingConfigured();
     //^configures the auto builder for pathPlanner
 
     new Trigger(RobotState::isEnabled).whileTrue(new StartEndCommand(() -> // sets the modules to brake mode when the robot is enabled
@@ -216,7 +218,7 @@ public class DriveBase extends SubsystemBase {
 
   /**
    * gets the acceleration of the robot in the X direction
-   * @return the acceleration of the robot in the X direction G
+   * @return the acceleration of the robot in the X direction m/s^2
    */
   public double getXAcceleration(){
     return gyro.getAccelerationX();
@@ -224,7 +226,7 @@ public class DriveBase extends SubsystemBase {
 
   /**
    * gets the acceleration of the robot in the Y direction
-   * @return the acceleration of the robot in the Y direction G
+   * @return the acceleration of the robot in the Y direction m/s^2
    */
   public double getYAcceleration() {
     return gyro.getAccelerationY();
@@ -582,8 +584,8 @@ public class DriveBase extends SubsystemBase {
                       (log) -> {
                         ChassisSpeeds chassisSpeeds = driveBase.getChassisSpeeds();
                         Pose2d pose = driveBase.getPose();
-                        log.motor("robotX").linearAcceleration(Units.MetersPerSecondPerSecond.of(driveBase.getXAcceleration() * 9.80665)).linearVelocity(Units.MetersPerSecond.of(chassisSpeeds.vxMetersPerSecond)).linearPosition(Units.Meters.of(pose.getX()));
-                        log.motor("robotY").linearAcceleration(Units.MetersPerSecondPerSecond.of(driveBase.getYAcceleration() * 9.80665)).linearVelocity(Units.MetersPerSecond.of(chassisSpeeds.vyMetersPerSecond)).linearPosition(Units.Meters.of(pose.getY()));
+                        log.motor("robotX").linearAcceleration(Units.MetersPerSecondPerSecond.of(driveBase.getXAcceleration())).linearVelocity(Units.MetersPerSecond.of(chassisSpeeds.vxMetersPerSecond)).linearPosition(Units.Meters.of(pose.getX()));
+                        log.motor("robotY").linearAcceleration(Units.MetersPerSecondPerSecond.of(driveBase.getYAcceleration())).linearVelocity(Units.MetersPerSecond.of(chassisSpeeds.vyMetersPerSecond)).linearPosition(Units.Meters.of(pose.getY()));
                       },
                       driveBase,
                       "xySpeedSysId"

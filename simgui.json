@@ -6,7 +6,8 @@
       "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/Gyro": "Gyro",
       "/SmartDashboard/Navx": "Gyro",
-      "/SmartDashboard/Steer PID": "PIDController"
+      "/SmartDashboard/Steer PID": "PIDController",
+      "/SmartDashboard/chooser": "String Chooser"
     }
   },
   "NetworkTables Info": {

@@ -60,6 +60,8 @@ public class SwerveModuleSIM implements SwerveModuleIO{
             inputs.isAtTargetPosition = steerPIDController.atSetpoint();
 
             if(!runningSysID) {
+                inputs.targetState = SwerveModuleState.optimize(inputs.targetState, inputs.currentState.angle);
+
                 inputs.driveMotorInput = drivePIDController.calculate(inputs.currentState.speedMetersPerSecond, inputs.targetState.speedMetersPerSecond);
                 inputs.steerMotorInput = steerPIDController.calculate(inputs.currentState.angle.getRadians(), inputs.targetState.angle.getRadians());
             }

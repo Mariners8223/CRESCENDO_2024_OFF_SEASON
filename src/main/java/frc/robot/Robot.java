@@ -6,6 +6,7 @@
 package frc.robot;
 
 import com.ctre.phoenix6.SignalLogger;
+import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -30,18 +31,12 @@ public class Robot extends LoggedRobot
     private Command autonomousCommand;
     
     private RobotContainer robotContainer;
+    String lastAutoName = "InstantCommand";
     
     
     @Override
     public void robotInit() {
         robotContainer = new RobotContainer();
-
-        Pathfinding.setPathfinder(new LocalADStarAK());
-        PathPlannerLogging.setLogActivePathCallback((path) ->
-                Logger.recordOutput("PathPlanner/ActivePath", path.toArray(new Pose2d[0])));
-
-        PathPlannerLogging.setLogTargetPoseCallback((targetPose) ->
-                Logger.recordOutput("PathPlanner/TargetPose", targetPose));
 
         Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
         Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
@@ -75,6 +70,15 @@ public class Robot extends LoggedRobot
 
         Logger.start();
 
+        Pathfinding.setPathfinder(new LocalADStarAK());
+        PathPlannerLogging.setLogActivePathCallback((path) ->
+                Logger.recordOutput("PathPlanner/ActivePath", path.toArray(new Pose2d[0])));
+
+        PathPlannerLogging.setLogTargetPoseCallback((targetPose) ->
+                Logger.recordOutput("PathPlanner/TargetPose", targetPose));
+
+        PathfindingCommand.warmupCommand().schedule();
+
         Notifier odometryAndModulesThread = RobotContainer.driveBase.getNotifier();
         odometryAndModulesThread.startPeriodic(1 / Constants.DriveTrain.SwerveModule.modulesThreadHz);
     }
@@ -92,7 +96,12 @@ public class Robot extends LoggedRobot
     
     
     @Override
-    public void disabledPeriodic() {}
+    public void disabledPeriodic() {
+        if(RobotContainer.getAutoCommand() != null && RobotContainer.getAutoCommand().getName() != lastAutoName){
+            lastAutoName = RobotContainer.getAutoCommand().getName();
+            RobotContainer.updateFieldFromAuto(lastAutoName);
+        }
+    }
     
     
     @Override
@@ -102,7 +111,7 @@ public class Robot extends LoggedRobot
     @Override
     public void autonomousInit()
     {
-        autonomousCommand = robotContainer.getAutonomousCommand();
+        autonomousCommand = robotContainer.getAutoCommand();
         
         if (autonomousCommand != null)
         {

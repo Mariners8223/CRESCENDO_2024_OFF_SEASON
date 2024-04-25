@@ -56,7 +56,7 @@ public class Constants {
             public static final double steerGearRatio = 12.5 * 3; //the gear ratio between the steer motor and the module itself
             // public static final double newGearRatio = steerGearRatio * 3; //this is for our old swerve
             // public static final PIDFGains steerMotorPID = new PIDFGains(0.4, 0, 0.1, 0, 0.0005, 0); //the pid gains for the PID Controller of the steer motor, units are in rotations //TODO needs tuning with SysID
-            public static final PIDFGains steerMotorPID = new PIDFGains(14.042 * steerGearRatio, 0, 1.4 * steerGearRatio, 0, 0.1, 0); //the pid gains for the PID Controller of the steer motor, units are in rotations //TODO needs tuning with SysID
+            public static final PIDFGains steerMotorPID = new PIDFGains(14.042 * steerGearRatio, 0, 1.4 * steerGearRatio, 0, 0.1 * steerGearRatio, 0); //the pid gains for the PID Controller of the steer motor, units are in rotations //TODO needs tuning with SysID
 
             public static final double maxVelocity = 1; //the max velocity of the modules steer aspect in module rotations per minute (only used by smart Motion) //TODO find real value
             public static final double minVelocity = 0.1; //the min velocity of the modules steer aspect in module rotation per minute (only used by smart Motion) //TODO find real value

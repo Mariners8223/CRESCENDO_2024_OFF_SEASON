@@ -61,8 +61,10 @@ class FastSimGyro(private val twistSupplier: Supplier<Twist2d>, private val chas
 
       val chassisSpeeds = chassisSpeedsSupplier.get()
 
-      velocityX = chassisSpeeds.vxMetersPerSecond * angle.cos - chassisSpeeds.vyMetersPerSecond * angle.sin
-      velocityY = chassisSpeeds.vyMetersPerSecond * angle.cos + chassisSpeeds.vxMetersPerSecond * angle.sin
+//      velocityX = chassisSpeeds.vxMetersPerSecond * angle.cos - chassisSpeeds.vyMetersPerSecond * angle.sin
+//      velocityY = chassisSpeeds.vyMetersPerSecond * angle.cos + chassisSpeeds.vxMetersPerSecond * angle.sin
+      velocityX = chassisSpeeds.vxMetersPerSecond
+      velocityY = chassisSpeeds.vyMetersPerSecond
 
       accelerationX = (velocityX - prevVelocityX) / (1 / Constants.DriveTrain.SwerveModule.modulesThreadHz)
       accelerationY = (velocityY - prevVelocityY) / (1 / Constants.DriveTrain.SwerveModule.modulesThreadHz)
