@@ -5,6 +5,7 @@
 package frc.robot;
 
 
+import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.util.PIDFGains;
 
@@ -82,6 +83,11 @@ public class Constants {
             public static final boolean enableDynamicRePlanning = true; //if pathplanner should replan the path if the robot is beyond the tolerance or if the spike is too big
             public static final double pathErrorTolerance = 0.1; //the max error in position before pathPlanner replans the path in meters
             public static final double pathErrorSpikeTolerance = 1; //the max position spike before path planner replans the path in meters
+
+            public static final PathConstraints pathConstraints = new PathConstraints(
+                    Constants.DriveTrain.Drive.freeWheelSpeedMetersPerSec, Constants.DriveTrain.Global.maxAcceleration,
+                    Constants.DriveTrain.Global.maxRotationSpeed, Constants.DriveTrain.Global.maxAccelerationRotation); //the constraints for pathPlanner
+
 
             public static final PIDFGains thetaPID = new PIDFGains(5, 0, 0); //the pid gains for the PID Controller of the robot angle, units are radians per second
             public static final PIDFGains XYPID = new PIDFGains(5.5, 0.055, 0.05); //the pid gains for the pid controller of the robot's velocity, units are meters per second

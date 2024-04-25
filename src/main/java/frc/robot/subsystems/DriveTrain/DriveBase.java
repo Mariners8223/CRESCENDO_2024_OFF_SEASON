@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems.DriveTrain;
 
-import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.*;
@@ -19,14 +18,11 @@ import org.jetbrains.annotations.NotNull;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
-import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.ReplanningConfig;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -53,29 +49,23 @@ public class DriveBase extends SubsystemBase {
 
   private final SwerveDriveKinematics driveTrainKinematics = new SwerveDriveKinematics(Constants.DriveTrain.SwerveModule.moduleTranslations); //the kinematics of the swerve drivetrain
 
-  private final SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(driveTrainKinematics, new Rotation2d(),
-          new SwerveModulePosition[]{new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition()},
-          new Pose2d()); //the pose estimator of the drivetrain
+  private final SwerveModulePosition[] moduleDeltas = new SwerveModulePosition[]{new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition()}; //the deltas of the modules
+
+  private final SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(driveTrainKinematics, new Rotation2d(), moduleDeltas, new Pose2d()); //the pose estimator of the drivetrain
 
   private final FastGyro gyro; //the navx gyro of the robot
-
-  private final PIDController thetaCorrectionController; //the pid controller that fixes the angle of the robot
-
-  private final PathConstraints pathConstraints; //the constraints for pathPlanner
 
   private final DriveBaseInputsAutoLogged inputs; //an object representing the logger class
 
   private final ReentrantLock odometryLock = new ReentrantLock(); //a lock for the odometry and modules thread
 
-  private final SwerveModulePosition[] moduleDeltas = new SwerveModulePosition[]{new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition()}; //the deltas of the modules
 
   @AutoLog
   public static class DriveBaseInputs{
     protected double XspeedInput = 0; //the X speed input
     protected double YspeedInput = 0; //the Y speed input
 
-    protected double rotationSpeedInputBeforePID = 0; //the rotation speed input before PID
-    protected double rotationSpeedInputAfterPID = 0; //the rotation speed input after PID
+    protected double rotationSpeedInput = 0;
 
     protected Pose2d currentPose = new Pose2d(); //the current pose of the robot
     protected Rotation2d targetRotation = new Rotation2d(); //the target rotation of the robot (in radians)
@@ -95,25 +85,20 @@ public class DriveBase extends SubsystemBase {
       modules[1] = new SwerveModuleREAL(Constants.DriveTrain.front_right); //the front right module
       modules[2] = new SwerveModuleREAL(Constants.DriveTrain.back_left); //the back left module
       modules[3] = new SwerveModuleREAL(Constants.DriveTrain.back_right); //the back right module
+      gyro = new FastNavx();
+      gyro.reset(new Pose2d());
     }
     else{
       modules[0] = new SwerveModuleSIM(Constants.DriveTrain.front_left); //the front left module
       modules[1] = new SwerveModuleSIM(Constants.DriveTrain.front_right); //the front right module
       modules[2] = new SwerveModuleSIM(Constants.DriveTrain.back_left); //the back left module
       modules[3] = new SwerveModuleSIM(Constants.DriveTrain.back_right); //the back right module
+      gyro = new FastSimGyro(() -> driveTrainKinematics.toTwist2d(moduleDeltas), this::getAbsoluteChassisSpeeds);
     }
 
     for(int i = 0; i < 4; i++) modules[i].resetDriveEncoder();
 
-
-//    gyro = new FastNavx(); //creates a new navx gyro
-    gyro = new FastSimGyro(() -> driveTrainKinematics.toTwist2d(moduleDeltas)); //creates a new sim gyro (for simulation
-
-    // gyro.reset(new Pose2d());
-
-    SmartDashboard.putData("Navx", gyro);
-
-    thetaCorrectionController = Constants.DriveTrain.Global.thetaCorrectionPID.createPIDController(); //creates the pid controller of the robots angle
+    SmartDashboard.putData("Gyro", gyro);
 
     ReplanningConfig replanConfig = new ReplanningConfig(Constants.DriveTrain.PathPlanner.planPathToStartingPointIfNotAtIt, Constants.DriveTrain.PathPlanner.enableDynamicRePlanning, Constants.DriveTrain.PathPlanner.pathErrorTolerance, Constants.DriveTrain.PathPlanner.pathErrorSpikeTolerance);
     // ^how pathplanner reacts to position error
@@ -123,10 +108,6 @@ public class DriveBase extends SubsystemBase {
       Constants.DriveTrain.Drive.freeWheelSpeedMetersPerSec,
       Math.sqrt(Math.pow((Constants.DriveTrain.Global.distanceBetweenWheels / 2), 2) * 2),
       replanConfig);
-
-    pathConstraints = new PathConstraints(
-      Constants.DriveTrain.Drive.freeWheelSpeedMetersPerSec, Constants.DriveTrain.Global.maxAcceleration,
-      Constants.DriveTrain.Global.maxRotationSpeed, Constants.DriveTrain.Global.maxAccelerationRotation);
     //^creates path constraints for pathPlanner
 
     AutoBuilder.configureHolonomic(
@@ -251,13 +232,6 @@ public class DriveBase extends SubsystemBase {
   }
 
   /**
-   * @return if a calculation is controlling the robot's angle and not the last angle of the robot while under user control
-   */
-  public boolean isControlled(){
-    return inputs.isControlled;
-  }
-
-  /**
    * gets the acclartion of the robot in the X direction
    * @return the acceleration of the robot in the X direction G
    */
@@ -350,16 +324,6 @@ public class DriveBase extends SubsystemBase {
   }
 
   /**
-   * calculates the theta value to give to the chassis speed using the target rotation
-   * @return the value to give to the drive
-   */
-  private double calculateTheta(){
-    double value = thetaCorrectionController.calculate(getRotation2d().getRadians(), inputs.targetRotation.getRadians());
-    if(Math.abs(value) < Constants.DriveTrain.Global.chassisSpeedsDeadZone) return 0;
-    return value;
-  }
-
-  /**
    * drives the robot with angle PID fix
    * @param Xspeed the speed in the X direction (positive is away from the driver station)
    * @param Yspeed the speed in the Y direction (positive is left)
@@ -367,12 +331,7 @@ public class DriveBase extends SubsystemBase {
    * @param centerOfRotation the center that the robot rotates about
    */
   public void drive(double Xspeed, double Yspeed, double rotation, Translation2d centerOfRotation){
-    inputs.rotationSpeedInputBeforePID = rotation; //logs the rotation speed before PID
-
-    if(rotation == 0) rotation = calculateTheta();
-    else if(!isControlled()){
-      inputs.targetRotation = getRotation2d();
-    }
+    inputs.targetRotation = getRotation2d();
 
     inputs.targetStates = driveTrainKinematics.toSwerveModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(Xspeed, Yspeed, rotation, getRotation2d()), centerOfRotation); //calculates the target states
     SwerveDriveKinematics.desaturateWheelSpeeds(inputs.targetStates, Constants.DriveTrain.Drive.freeWheelSpeedMetersPerSec); //desaturates the wheel speeds (to make sure none of the wheel exceed the max speed)
@@ -383,7 +342,7 @@ public class DriveBase extends SubsystemBase {
 
     inputs.XspeedInput = Xspeed; //logs the X speed before PID
     inputs.YspeedInput = Yspeed; //logs the Y speed before PID
-    inputs.rotationSpeedInputAfterPID = rotation;
+    inputs.rotationSpeedInput = rotation; //logs the rotation speed before PID
     Logger.processInputs(getName(), inputs);
   }
 
@@ -394,10 +353,7 @@ public class DriveBase extends SubsystemBase {
    * @param rotation  the rotation of the robot (left is positive) rad/s
    */
   public void robotRelativeDrive(double Xspeed, double Yspeed, double rotation){
-    if(rotation == 0) rotation = calculateTheta();
-    else if(!isControlled()){
-      inputs.targetRotation = getRotation2d();
-    }
+    inputs.targetRotation = getRotation2d();
 
     inputs.targetStates = driveTrainKinematics.toSwerveModuleStates(new ChassisSpeeds(Xspeed, Yspeed, rotation));
     SwerveDriveKinematics.desaturateWheelSpeeds(inputs.currentStates, Constants.DriveTrain.Drive.freeWheelSpeedMetersPerSec);
@@ -476,7 +432,7 @@ public class DriveBase extends SubsystemBase {
    * @return a command that follows a path to the target pose
    */
   public Command findPath(Pose2d targetPose, double endVelocity ,double rotationDelay){
-    return AutoBuilder.pathfindToPose(targetPose, pathConstraints, endVelocity, rotationDelay);
+    return AutoBuilder.pathfindToPose(targetPose, Constants.DriveTrain.PathPlanner.pathConstraints, endVelocity, rotationDelay);
   }
 
   /**
@@ -486,7 +442,7 @@ public class DriveBase extends SubsystemBase {
    * @return a command that follows a path to the target pose
    */
   public Command findPath(Pose2d targetPose, double endVelocity){
-    return AutoBuilder.pathfindToPose(targetPose, pathConstraints, endVelocity);
+    return AutoBuilder.pathfindToPose(targetPose, Constants.DriveTrain.PathPlanner.pathConstraints, endVelocity);
   }
 
   /**
@@ -495,7 +451,7 @@ public class DriveBase extends SubsystemBase {
    * @return a command that follows a path to the target pose
    */
   public Command findPath(Pose2d targetPose){
-    return AutoBuilder.pathfindToPose(targetPose, pathConstraints);
+    return AutoBuilder.pathfindToPose(targetPose, Constants.DriveTrain.PathPlanner.pathConstraints);
   }
 
   /**
@@ -504,7 +460,7 @@ public class DriveBase extends SubsystemBase {
    * @return a command that path finds to a given path then follows that path
    */
   public Command pathFindToPathAndFollow(PathPlannerPath targetPath){
-    return AutoBuilder.pathfindThenFollowPath(targetPath, pathConstraints);
+    return AutoBuilder.pathfindThenFollowPath(targetPath, Constants.DriveTrain.PathPlanner.pathConstraints);
   }
 
   /**
@@ -514,7 +470,7 @@ public class DriveBase extends SubsystemBase {
    * @return a command that path finds to a given path then follows that path
    */
   public Command pathFindToPathAndFollow(PathPlannerPath targetPath, double rotationDelay){
-    return AutoBuilder.pathfindThenFollowPath(targetPath, pathConstraints, rotationDelay);
+    return AutoBuilder.pathfindThenFollowPath(targetPath, Constants.DriveTrain.PathPlanner.pathConstraints, rotationDelay);
   }
 
   /**
