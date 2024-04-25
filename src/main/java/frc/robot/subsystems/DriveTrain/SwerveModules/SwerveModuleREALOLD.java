@@ -2,21 +2,22 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems.DriveTrain;
+package frc.robot.subsystems.DriveTrain.SwerveModules;
 
 import java.util.function.Consumer;
 
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.signals.*;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
+
 import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
@@ -24,64 +25,57 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import frc.robot.Constants;
 
-public class SwerveModule{
+public class SwerveModuleREALOLD {
   private final Constants.DriveTrain.SwerveModule moduleConstants; //the constants of this module
 
   private final SwerveModulePosition modulePosition = new SwerveModulePosition(0, new Rotation2d());
   private Consumer<Double> steerMotorPositionInput; //a consumer for the new target of the steer motor position loop (including the gear ratio)
   private Consumer<Double> driveMotorVelocityInput; //a consumer for the new speed target of the drive motor velocity loop (including the gear ratio and circumstance)
-  
 
+
+  private final SwerveModulePosition modulePosition = new SwerveModulePosition();
   private final TalonFX driveMotor; //the drive motor
-  private final DutyCycleEncoder absEncoder; //the absolute encoder
-  private final CANSparkMax steerMotor; //the steer motor
-  private RelativeEncoder steerEncoder;
 
-  private final SwerveModuleInputsAutoLogged inputs;
+  private final CANcoder absEncoder; //the absolute encoder
+  private final CANSparkMax steerMotor; //the steer motor
+
+  private final SwerveModuleInputsAutoLogged inputs = new SwerveModuleInputsAutoLogged();
 
 
   @AutoLog
   public static class SwerveModuleInputs{
 
+<<<<<<< HEAD:src/main/java/frc/robot/subsystems/DriveTrain/SwerveModule.java
     protected SwerveModuleState currentState = new SwerveModuleState(0, new Rotation2d());
     protected SwerveModuleState targetState = new SwerveModuleState(0, new Rotation2d());
+=======
+    protected SwerveModuleState currentState = new SwerveModuleState();
+    protected SwerveModuleState targetState = new SwerveModuleState();
+
+>>>>>>> MultiThread:src/main/java/frc/robot/subsystems/DriveTrain/SwerveModules/SwerveModuleREALOLD.java
     protected boolean isModuleAtPosition;
     protected boolean isModuleAtSpeed;
 
     protected double driveMotorInput;
     protected double steerMotorInput;
-
-    protected double driveMotorOutPutCurrent;
-    protected double driveMotorInputCurrent;
-    protected double driveMotorTemperature;
-
-    protected double steerMotorOutPutCurrent;
-    protected double steerMotorVelocity;
-    protected double steerMotorTemperature;
-
-    protected double absEncoderAbsPosition;
-    protected double absEncoderPosition;
+    protected double steerMotorInputCurrent;
   }
 
   /**
    * the constructor of the swerve module
    * @param moduleConstants the constants of the module
    */
-  public SwerveModule(Constants.DriveTrain.SwerveModule moduleConstants) {
+  public SwerveModuleREALOLD(Constants.DriveTrain.SwerveModule moduleConstants) {
     this.moduleConstants = moduleConstants;
 
-    absEncoder = configDutyCycleEncoder();
+    absEncoder = configCanCoder();
 
     TalonFXConfiguration driveMotorConfig = getTalonFXConfiguration();
     driveMotor = configTalonFX(driveMotorConfig);
 
     steerMotor = configCanSparkMax();
-    if(moduleConstants.isUsingAbsEncoderForRelativePosition) steerEncoder = configRelativeEncoder();
-
-    inputs = new frc.robot.subsystems.DriveTrain.SwerveModuleInputsAutoLogged();
   }
 
  
@@ -140,9 +134,13 @@ public class SwerveModule{
    * get the current position of the module
    * @return the position of the module
    */
+<<<<<<< HEAD:src/main/java/frc/robot/subsystems/DriveTrain/SwerveModule.java
   public SwerveModulePosition getModulePosition(){
     return modulePosition;
   }
+=======
+  public SwerveModulePosition getModulePosition(){ return modulePosition; }
+>>>>>>> MultiThread:src/main/java/frc/robot/subsystems/DriveTrain/SwerveModules/SwerveModuleREALOLD.java
 
   /**
    * use this to set the module state and target for the motors
@@ -151,7 +149,11 @@ public class SwerveModule{
   public void setModuleState(SwerveModuleState targetState){
     this.inputs.targetState = targetState;
 
+<<<<<<< HEAD:src/main/java/frc/robot/subsystems/DriveTrain/SwerveModule.java
     this.inputs.targetState.angle = Rotation2d.fromDegrees(this.inputs.targetState.angle.getDegrees());
+=======
+//    this.inputs.targetState.angle = Rotation2d.fromDegrees(this.inputs.targetState.angle.getDegrees()); // probably for edens calc IDK why is it here
+>>>>>>> MultiThread:src/main/java/frc/robot/subsystems/DriveTrain/SwerveModules/SwerveModuleREALOLD.java
 
     driveMotorVelocityInput.accept(this.inputs.targetState.speedMetersPerSecond);//gives the drive motor the new input
     steerMotorPositionInput.accept(this.inputs.targetState.angle.getRotations()); //sets the new angle for the steer motor
@@ -162,32 +164,50 @@ public class SwerveModule{
     Logger.processInputs(moduleConstants.moduleName.name(), inputs); //updates logger
   }
 
+<<<<<<< HEAD:src/main/java/frc/robot/subsystems/DriveTrain/SwerveModule.java
+=======
+  /**
+   * sets the steer motor voltage
+   * @param voltage the voltage to set the motor to
+   */
+  public void setSteerMotorVoltage(double voltage){
+    steerMotor.getPIDController().setReference(voltage, ControlType.kVoltage);
+  }
+
+  /**
+   * sets the drive motor voltage
+   * @param voltage the voltage to set the motor to
+   */
+  public void setDriveMotorVoltage(double voltage){
+    VoltageOut voltageOut = new VoltageOut(voltage);
+    voltageOut.EnableFOC = false;
+    driveMotor.setControl(voltageOut);
+  }
+
+>>>>>>> MultiThread:src/main/java/frc/robot/subsystems/DriveTrain/SwerveModules/SwerveModuleREALOLD.java
   /**
    * this updates the module state and the module position, run this function periodically
    */
   public void update(){
-    inputs.absEncoderAbsPosition = absEncoder.getAbsolutePosition() - absEncoder.getPositionOffset();
 
-    if(moduleConstants.isUsingAbsEncoderForRelativePosition){
-      inputs.absEncoderPosition = steerEncoder.getPosition() / Constants.DriveTrain.Steer.steerGearRatio;
-      inputs.currentState.angle = Rotation2d.fromRotations(inputs.absEncoderPosition);
+    if(moduleConstants.shouldSteerMotorBeResetedByAbsEncoder){
+      steerMotor.getEncoder().setPosition(absEncoder.getPosition().getValueAsDouble() * Constants.DriveTrain.Steer.steerGearRatio);
+      inputs.currentState.angle = Rotation2d.fromRotations(absEncoder.getPosition().getValueAsDouble());
     }
     else{
-      steerMotor.getEncoder().setPosition(absEncoder.get() * Constants.DriveTrain.Steer.steerGearRatio);
-      inputs.currentState.angle = Rotation2d.fromRotations(absEncoder.get());
+      inputs.currentState.angle = Rotation2d.fromRotations(steerMotor.getEncoder().getPosition() / Constants.DriveTrain.Steer.steerGearRatio);
     }
 
     modulePosition.angle = inputs.currentState.angle;
     inputs.currentState.speedMetersPerSecond = driveMotor.getVelocity().getValueAsDouble();
+<<<<<<< HEAD:src/main/java/frc/robot/subsystems/DriveTrain/SwerveModule.java
     modulePosition.distanceMeters = driveMotor.getVelocity().getValueAsDouble();
+=======
+    modulePosition.distanceMeters = driveMotor.getPosition().getValueAsDouble();
+>>>>>>> MultiThread:src/main/java/frc/robot/subsystems/DriveTrain/SwerveModules/SwerveModuleREALOLD.java
 
-    inputs.driveMotorInputCurrent = driveMotor.getSupplyCurrent().getValueAsDouble(); //updates the current output of the drive motor
-    inputs.driveMotorOutPutCurrent = driveMotor.getStatorCurrent().getValueAsDouble(); //updates the current output of the drive motor.
-    inputs.driveMotorTemperature = driveMotor.getDeviceTemp().getValueAsDouble();
 
-    inputs.steerMotorOutPutCurrent = steerMotor.getOutputCurrent(); //updates the current output of the steer motor
-    inputs.steerMotorVelocity = steerMotor.getEncoder().getVelocity(); //updates the velocity of the steer motor
-    inputs.steerMotorTemperature = steerMotor.getMotorTemperature();
+    inputs.steerMotorInputCurrent = steerMotor.getOutputCurrent() * steerMotor.getAppliedOutput(); //updates the input current of the steer motor
 
     inputs.isModuleAtPosition = isAtRequestedPosition(); //updates if the module is at the requested position
     inputs.isModuleAtSpeed = isAtRequestedSpeed(); //updates if the module is at the requested speed
@@ -218,16 +238,29 @@ public class SwerveModule{
   }
 
 
-  private  RelativeEncoder configRelativeEncoder(){
-    RelativeEncoder encoder = steerMotor.getAlternateEncoder(8192);
-    encoder.setPositionConversionFactor(Constants.DriveTrain.Steer.steerGearRatio);
-    encoder.setInverted(moduleConstants.isAbsEncoderInverted);
-    encoder.setPosition(absEncoder.getAbsolutePosition() * Constants.DriveTrain.Steer.steerGearRatio);
+  private CANcoder configCanCoder(){
+    CANcoderConfiguration config = new CANcoderConfiguration();
 
-    steerMotor.getPIDController().setFeedbackDevice(encoder);
+    config.FutureProofConfigs = false;
 
-    return  encoder;
+    config.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
+
+    config.MagnetSensor.SensorDirection = moduleConstants.isAbsEncoderInverted ? SensorDirectionValue.Clockwise_Positive : SensorDirectionValue.CounterClockwise_Positive;
+
+    config.MagnetSensor.MagnetOffset = moduleConstants.absoluteEncoderZeroOffset;
+
+    CANcoder canCoder = new CANcoder(moduleConstants.AbsEncoderID);
+
+    canCoder.getConfigurator().apply(config);
+
+    canCoder.getAbsolutePosition().setUpdateFrequency(50);
+    canCoder.getPosition().setUpdateFrequency(50);
+
+    canCoder.optimizeBusUtilization();
+
+    return canCoder;
   }
+<<<<<<< HEAD:src/main/java/frc/robot/subsystems/DriveTrain/SwerveModule.java
   private DutyCycleEncoder configDutyCycleEncoder(){
     DutyCycleEncoder encoder = new DutyCycleEncoder(moduleConstants.AbsEncoderPort);
     encoder.setPositionOffset(moduleConstants.absoluteEncoderZeroOffset);
@@ -235,6 +268,8 @@ public class SwerveModule{
     return encoder;
   }
 
+=======
+>>>>>>> MultiThread:src/main/java/frc/robot/subsystems/DriveTrain/SwerveModules/SwerveModuleREALOLD.java
   /**
    * use this to config the drive motor at the start of the program
    */
@@ -248,6 +283,7 @@ public class SwerveModule{
     talonFX.getVelocity().setUpdateFrequency(50); //sets as default
     talonFX.getMotorVoltage().setUpdateFrequency(50); //sets as default
     talonFX.getSupplyCurrent().setUpdateFrequency(50); //sets as default
+    talonFX.getStatorCurrent().setUpdateFrequency(50); //sets as default
     talonFX.getDeviceTemp().setUpdateFrequency(50);
 
     VelocityDutyCycle velocityDutyCycle = new VelocityDutyCycle(0);
@@ -321,7 +357,7 @@ public class SwerveModule{
 
     sparkMax.getEncoder().setPositionConversionFactor(1); //sets the gear ratio for the module
 
-    sparkMax.getEncoder().setPosition(absEncoder.getAbsolutePosition() * Constants.DriveTrain.Steer.steerGearRatio); //sets the position of the motor to the absolute encoder
+    sparkMax.getEncoder().setPosition(absEncoder.getAbsolutePosition().getValueAsDouble() * Constants.DriveTrain.Steer.steerGearRatio); //sets the position of the motor to the absolute encoder
 
     steerMotorPositionInput = position -> sparkMax.getPIDController().setReference(position * Constants.DriveTrain.Steer.steerGearRatio, ControlType.kPosition);
 

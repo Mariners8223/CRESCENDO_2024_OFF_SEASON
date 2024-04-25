@@ -331,3 +331,7 @@ bin/
 
 # End entries from WPI Lib team
 
+
+src/main/java/frc/robot/BuildConstants.java
+
+ctre_sim/
