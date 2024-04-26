@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Twist2d;
 import frc.util.LocalADStarAK;
 
 import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -23,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.rlog.RLOGServer;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import org.littletonrobotics.urcl.URCL;
 
@@ -64,7 +66,13 @@ public class Robot extends LoggedRobot
             SignalLogger.setPath("U/logs/signalLogger");
         }
         else{
-            Logger.addDataReceiver(new RLOGServer());
+            if(Constants.robotType == Constants.RobotType.REPLAY){
+                String logPath = LogFileUtil.findReplayLog();
+
+                Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+                Logger.setReplaySource(new WPILOGReader(logPath));
+            }
+            Logger.addDataReceiver(new WPILOGWriter("F:/downloads"));
             Logger.addDataReceiver(new NT4Publisher());
         }
 

@@ -13,6 +13,15 @@ import java.util.Map;
 
 /** Add your docs here. */
 public class Constants {
+    public enum RobotType{
+        COMPETITION,
+        DEVELOPMENT,
+        REPLAY
+    }
+
+    public static final RobotType robotType = RobotType.COMPETITION; //the type of robot the code is running on
+
+
     public static final class DriveTrain{
         /**
          * the name of the swerve modules by order
