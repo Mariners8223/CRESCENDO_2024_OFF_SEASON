@@ -7,7 +7,7 @@ import edu.wpi.first.util.sendable.SendableBuilder
 import org.littletonrobotics.junction.LogTable
 import org.littletonrobotics.junction.inputs.LoggableInputs
 
-class FastPigeon(canID: Int) : FastGyro {
+class PigeonIO(canID: Int) : GyroIO {
   private val pigeon: Pigeon2 = Pigeon2(canID)
 
   private val inputs: FastPigeonInputs = FastPigeonInputs()

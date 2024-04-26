@@ -9,7 +9,7 @@ import org.littletonrobotics.junction.Logger
 import org.littletonrobotics.junction.inputs.LoggableInputs
 import java.util.concurrent.locks.ReentrantLock
 
-class FastNavx : FastGyro{
+class NavxIO : GyroIO{
 
   private val navx: AHRS = AHRS()
 

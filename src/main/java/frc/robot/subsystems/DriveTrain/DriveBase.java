@@ -9,9 +9,9 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModule;
-import frc.util.FastGyros.FastGyro;
-import frc.util.FastGyros.FastNavx;
-import frc.util.FastGyros.FastSimGyro;
+import frc.util.FastGyros.GyroIO;
+import frc.util.FastGyros.NavxIO;
+import frc.util.FastGyros.SimGyroIO;
 import org.jetbrains.annotations.NotNull;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -32,7 +32,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
-import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
@@ -52,7 +51,7 @@ public class DriveBase extends SubsystemBase {
 
   private final SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(driveTrainKinematics, new Rotation2d(), moduleDeltas, new Pose2d()); //the pose estimator of the drivetrain
 
-  private final FastGyro gyro; //the navx gyro of the robot
+  private final GyroIO gyro; //the navx gyro of the robot
 
   private final DriveBaseInputsAutoLogged inputs; //an object representing the logger class
 
@@ -85,10 +84,10 @@ public class DriveBase extends SubsystemBase {
     modules[3] = new SwerveModule(Constants.DriveTrain.back_right);
 
     if(RobotBase.isReal()){
-      gyro = new FastNavx();
+      gyro = new NavxIO();
       gyro.reset(new Pose2d());
     }
-    else gyro = new FastSimGyro(() -> driveTrainKinematics.toTwist2d(moduleDeltas), this::getChassisSpeeds);
+    else gyro = new SimGyroIO(() -> driveTrainKinematics.toTwist2d(moduleDeltas), this::getChassisSpeeds);
 
     for(int i = 0; i < 4; i++) modules[i].resetDriveEncoder();
 
