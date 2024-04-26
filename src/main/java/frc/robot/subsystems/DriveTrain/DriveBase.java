@@ -7,6 +7,7 @@ package frc.robot.subsystems.DriveTrain;
 import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModule;
 import frc.util.FastGyros.GyroIO;
@@ -112,8 +113,6 @@ public class DriveBase extends SubsystemBase {
       () -> {if(DriverStation.getAlliance().isPresent()) return DriverStation.getAlliance().get() == Alliance.Red;
       else return false;},
       this);
-
-      AutoBuilder.isPathfindingConfigured();
     //^configures the auto builder for pathPlanner
 
     new Trigger(RobotState::isEnabled).whileTrue(new StartEndCommand(() -> // sets the modules to brake mode when the robot is enabled
@@ -253,16 +252,6 @@ public class DriveBase extends SubsystemBase {
    */
   public ChassisSpeeds getAbsoluteChassisSpeeds(){
     return ChassisSpeeds.fromRobotRelativeSpeeds(getChassisSpeeds(), getRotation2d());
-  }
-
-  /**
-   * gets the target rotation from and angle (from the robot to the target)
-   * @param angle the angle to the target
-   * @return the target rotation
-   */
-  public Rotation2d getWantedAngleInCurrentRobotAngle(Rotation2d angle){
-   if(getAngle() > 0) return Rotation2d.fromDegrees(getAngle() - (getAngle()%360 + angle.getDegrees()));
-   else return Rotation2d.fromDegrees((getAngle() - (getAngle()%360 + angle.getDegrees()))-360);
   }
 
   /**
@@ -507,36 +496,17 @@ public class DriveBase extends SubsystemBase {
     }
   }
 
-
-  public static class lockSwerveInXPatternCommand extends Command{
-    DriveBase driveBase;
-    public lockSwerveInXPatternCommand(){
-      driveBase = RobotContainer.driveBase;
-      addRequirements(driveBase);
-    }
-
-    @Override
-    public void initialize(){
-//      for(int i = 0; i < 4; i++) driveBase.modules[i].goToXPosition();
-    }
-
-    @Override
-    public void end(boolean interrupted) { driveBase.drive(0, 0, 0);}
-  }
-
   public static class SysID{
-    public static enum SysIDType{
+    public enum SysIDType{
       Steer,
       Drive,
       X,
       Y,
-      Theta
     }
     SysIdRoutine steerSysId;
     SysIdRoutine driveSysId;
     SysIdRoutine xSpeedSysId;
     SysIdRoutine ySpeedSYSId;
-    SysIdRoutine thetaSpeedSysId;
 
     public SysID(DriveBase driveBase){
       steerSysId = new SysIdRoutine(
@@ -572,14 +542,8 @@ public class DriveBase extends SubsystemBase {
           Units.Volts.of(0.5).per(Units.Seconds), Units.Volts.of(3), null, (state) -> Logger.recordOutput("SysIDXYState", state.toString())
         ),
               new SysIdRoutine.Mechanism(
-                      (voltage) -> {
-                        driveBase.drive(voltage.in(Units.Volts), 0, 0);
-                      },
-                      (log) -> {
-                        ChassisSpeeds chassisSpeeds = driveBase.getAbsoluteChassisSpeeds();
-                        Pose2d pose = driveBase.getPose();
-                        Logger.recordOutput("/SysID/velocityX", chassisSpeeds.vxMetersPerSecond);
-                      },
+                      (voltage) -> driveBase.drive(voltage.in(Units.Volts), 0, 0),
+                      (log) -> Logger.recordOutput("/SysID/velocityX", driveBase.getChassisSpeeds().vxMetersPerSecond),
                       driveBase,
                       "xySpeedSysId"
               ));
@@ -589,41 +553,12 @@ public class DriveBase extends SubsystemBase {
                 null, null, null, (state) -> Logger.recordOutput("SysIDYState", state.toString())
               ),
               new SysIdRoutine.Mechanism(
-                      (voltage) -> {
-                        driveBase.drive(0, voltage.in(Units.Volts), 0);
-                      },
-                      (log) -> {
-                        ChassisSpeeds chassisSpeeds = driveBase.getAbsoluteChassisSpeeds();
-                        Pose2d pose = driveBase.getPose();
-                        Logger.recordOutput("/SysID/velocityY", chassisSpeeds.vyMetersPerSecond);
-                      },
+                      (voltage) -> driveBase.drive(0, voltage.in(Units.Volts), 0),
+                      (log) -> Logger.recordOutput("/SysID/velocityY", driveBase.getAbsoluteChassisSpeeds().vyMetersPerSecond),
                       driveBase,
                       "ySpeedSysId"
               )
       );
-
-      double[] prevAngleVelocity = {0};
-      double[] preAngleVelocityTimeStamp = {0};
-
-      thetaSpeedSysId = new SysIdRoutine(
-        new SysIdRoutine.Config(
-          null, null, null, (state) -> Logger.recordOutput("SysIDThetaState", state.toString())
-        ),
-              new SysIdRoutine.Mechanism(
-                      (voltage) -> {
-                        driveBase.drive(0, 0, voltage.in(Units.Volts));
-                      },
-                      (log) -> {
-                        ChassisSpeeds chassisSpeeds = driveBase.getChassisSpeeds();
-                        Pose2d pose = driveBase.getPose();
-                        double angleAccl = (chassisSpeeds.omegaRadiansPerSecond - prevAngleVelocity[0]) / (Timer.getFPGATimestamp() - preAngleVelocityTimeStamp[0]);
-                        prevAngleVelocity[0] = chassisSpeeds.omegaRadiansPerSecond;
-                        preAngleVelocityTimeStamp[0] = Timer.getFPGATimestamp();
-                        log.motor("robotTheta").angularPosition(Units.Radians.of(pose.getRotation().getRadians())).angularVelocity(Units.RadiansPerSecond.of(chassisSpeeds.omegaRadiansPerSecond)).angularAcceleration(Units.RadiansPerSecond.per(Units.Seconds).of(angleAccl));
-                      },
-                      driveBase,
-                      "thetaSpeedSysId"
-              ));
     }
 
     public Command getSysIDCommand(SysIDType type, boolean isDynamic, boolean isForward){
@@ -632,16 +567,12 @@ public class DriveBase extends SubsystemBase {
         case Drive -> driveSysId.dynamic(isForward ? SysIdRoutine.Direction.kForward : SysIdRoutine.Direction.kReverse);
         case X -> xSpeedSysId.dynamic(isForward ? SysIdRoutine.Direction.kForward : SysIdRoutine.Direction.kReverse);
         case Y -> ySpeedSYSId.dynamic(isForward ? SysIdRoutine.Direction.kForward : SysIdRoutine.Direction.kReverse);
-        case Theta -> thetaSpeedSysId.dynamic(isForward ? SysIdRoutine.Direction.kForward : SysIdRoutine.Direction.kReverse);
-        default -> null;
       }
       : switch (type) {
         case Steer -> steerSysId.quasistatic(isForward ? SysIdRoutine.Direction.kForward : SysIdRoutine.Direction.kReverse);
         case Drive -> driveSysId.quasistatic(isForward ? SysIdRoutine.Direction.kForward : SysIdRoutine.Direction.kReverse);
         case X -> xSpeedSysId.quasistatic(isForward ? SysIdRoutine.Direction.kForward : SysIdRoutine.Direction.kReverse);
         case Y -> ySpeedSYSId.quasistatic(isForward ? SysIdRoutine.Direction.kForward : SysIdRoutine.Direction.kReverse);
-        case Theta -> thetaSpeedSysId.quasistatic(isForward ? SysIdRoutine.Direction.kForward : SysIdRoutine.Direction.kReverse);
-        default -> null;
       };
     }
   }

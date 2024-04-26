@@ -16,14 +16,16 @@ public class SwerveModuleIOSIM implements SwerveModuleIO{
   private double driveMotorVoltage = 0;
   private double steerMotorVoltage = 0;
 
-  public SwerveModuleIOSIM(String moduleName, Constants.RobotType botType){
+  public SwerveModuleIOSIM(String moduleName){
     driveMotor = new DCMotorSim(DCMotor.getFalcon500(1), Constants.DriveTrain.Drive.driveGearRatio, 0.25);
-    steerMotor = new DCMotorSim(DCMotor.getNeo550(1), Constants.DriveTrain.Steer.steerGearRatio, 0.25);
-//    if (Objects.requireNonNull(botType) == Constants.RobotType.COMPETITION) {
-//      steerMotor = new DCMotorSim(DCMotor.getNeo550(1), Constants.DriveTrain.Steer.steerGearRatio, 0.25);
-//    } else {
-//      steerMotor = new DCMotorSim(DCMotor.getNEO(1), Constants.DriveTrain.Steer.steerGearRatio, 0.25);
-//    }
+
+    if (Constants.robotType == Constants.RobotType.DEVELOPMENT) {
+      steerMotor = new DCMotorSim(DCMotor.getNEO(1), Constants.DriveTrain.Steer.steerGearRatio, 0.25);
+    } else {
+      steerMotor = new DCMotorSim(DCMotor.getNeo550(1), Constants.DriveTrain.Steer.steerGearRatio, 0.25);
+    }
+
+
 
     this.moduleName = moduleName;
   }

@@ -26,7 +26,7 @@ public class SwerveModule {
   public SwerveModule(Constants.DriveTrain.SwerveModule constants) {
     if(RobotBase.isSimulation()){
       if(Constants.robotType == Constants.RobotType.REPLAY) this.io = new SwerveModuleIO() {};
-      else this.io = new SwerveModuleIOSIM(constants.moduleName.name(), Constants.robotType);
+      else this.io = new SwerveModuleIOSIM(constants.moduleName.name());
     }
     else this.io = new SwerveModuleIODevBot(constants);
   }
