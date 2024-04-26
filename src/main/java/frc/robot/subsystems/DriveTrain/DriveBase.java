@@ -8,12 +8,10 @@ import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleIO;
-import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleREAL;
-import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleSIM;
-import frc.util.FastGyros.FastGyro;
-import frc.util.FastGyros.FastNavx;
-import frc.util.FastGyros.FastSimGyro;
+import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModule;
+import frc.util.FastGyros.GyroIO;
+import frc.util.FastGyros.NavxIO;
+import frc.util.FastGyros.SimGyroIO;
 import org.jetbrains.annotations.NotNull;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -34,7 +32,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
-import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
@@ -46,7 +43,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * It controls the movement and positioning of the robot using swerve drive.
  */
 public class DriveBase extends SubsystemBase {
-  private final SwerveModuleIO[] modules = new SwerveModuleIO[4]; //the array of the modules
+  private final SwerveModule[] modules = new SwerveModule[4]; //the array of the modules
 
   private final SwerveDriveKinematics driveTrainKinematics = new SwerveDriveKinematics(Constants.DriveTrain.SwerveModule.moduleTranslations); //the kinematics of the swerve drivetrain
 
@@ -54,7 +51,7 @@ public class DriveBase extends SubsystemBase {
 
   private final SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(driveTrainKinematics, new Rotation2d(), moduleDeltas, new Pose2d()); //the pose estimator of the drivetrain
 
-  private final FastGyro gyro; //the navx gyro of the robot
+  private final GyroIO gyro; //the navx gyro of the robot
 
   private final DriveBaseInputsAutoLogged inputs; //an object representing the logger class
 
@@ -81,21 +78,16 @@ public class DriveBase extends SubsystemBase {
 
   /** Creates a new DriveBase. */
   public DriveBase() {
+    modules[0] = new SwerveModule(Constants.DriveTrain.front_left);
+    modules[1] = new SwerveModule(Constants.DriveTrain.front_right);
+    modules[2] = new SwerveModule(Constants.DriveTrain.back_left);
+    modules[3] = new SwerveModule(Constants.DriveTrain.back_right);
+
     if(RobotBase.isReal()){
-      modules[0] = new SwerveModuleREAL(Constants.DriveTrain.front_left); //the front left module
-      modules[1] = new SwerveModuleREAL(Constants.DriveTrain.front_right); //the front right module
-      modules[2] = new SwerveModuleREAL(Constants.DriveTrain.back_left); //the back left module
-      modules[3] = new SwerveModuleREAL(Constants.DriveTrain.back_right); //the back right module
-      gyro = new FastNavx();
+      gyro = new NavxIO();
       gyro.reset(new Pose2d());
     }
-    else{
-      modules[0] = new SwerveModuleSIM(Constants.DriveTrain.front_left); //the front left module
-      modules[1] = new SwerveModuleSIM(Constants.DriveTrain.front_right); //the front right module
-      modules[2] = new SwerveModuleSIM(Constants.DriveTrain.back_left); //the back left module
-      modules[3] = new SwerveModuleSIM(Constants.DriveTrain.back_right); //the back right module
-      gyro = new FastSimGyro(() -> driveTrainKinematics.toTwist2d(moduleDeltas), this::getChassisSpeeds);
-    }
+    else gyro = new SimGyroIO(() -> driveTrainKinematics.toTwist2d(moduleDeltas), this::getChassisSpeeds);
 
     for(int i = 0; i < 4; i++) modules[i].resetDriveEncoder();
 
@@ -443,7 +435,7 @@ public class DriveBase extends SubsystemBase {
    */
   public void update(){
       for(int i = 0; i < 4; i++){
-        inputs.currentStates[i] = modules[i].getSwerveModuleState();
+        inputs.currentStates[i] = modules[i].getCurrentState();
       }
 
     try {

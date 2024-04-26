@@ -10,7 +10,7 @@ import org.littletonrobotics.junction.Logger
 import java.util.concurrent.locks.ReentrantLock
 import java.util.function.Supplier
 
-class FastSimGyro(private val twistSupplier: Supplier<Twist2d>, private val chassisSpeedsSupplier: Supplier<ChassisSpeeds>) : FastGyro{
+class SimGyroIO(private val twistSupplier: Supplier<Twist2d>, private val chassisSpeedsSupplier: Supplier<ChassisSpeeds>) : GyroIO{
   private val lock : ReentrantLock = ReentrantLock()
   private var angle: Rotation2d = Rotation2d()
 
