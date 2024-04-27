@@ -1,11 +1,13 @@
 package frc.robot.subsystems.DriveTrain.SwerveModules;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 
 import java.util.concurrent.locks.ReentrantLock;
@@ -16,7 +18,7 @@ public class SwerveModule {
   private final SwerveModuleIO io;
   private final SwerveModuleIOInputsAutoLogged inputs = new SwerveModuleIOInputsAutoLogged();
 
-  private final PIDController drivePIDController = Constants.DriveTrain.Drive.driveMotorPID.createPIDController();
+  private final ProfiledPIDController drivePIDController = Constants.DriveTrain.Drive.driveMotorPID.createProfiledPIDController();
   private final PIDController steerPIDController = Constants.DriveTrain.Steer.steerMotorPID.createPIDController();
 
   private SwerveModuleState targetState;
@@ -27,8 +29,12 @@ public class SwerveModule {
     if(RobotBase.isSimulation()){
       if(Constants.robotType == Constants.RobotType.REPLAY) this.io = new SwerveModuleIO() {};
       else this.io = new SwerveModuleIOSIM(constants.moduleName.name());
+
+      SmartDashboard.putData("drivePIDController", drivePIDController);
+      SmartDashboard.putData("steerPIDController", steerPIDController);
     }
     else this.io = new SwerveModuleIODevBot(constants);
+    
   }
 
   public SwerveModulePosition modulePeriodic() {

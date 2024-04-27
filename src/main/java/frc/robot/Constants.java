@@ -47,7 +47,7 @@ public class Constants {
 
         public static final class Drive{
             // public static final PIDFGains driveMotorPID = new PIDFGains(0.4, 0.001, 0.001, 0.0, 0.22, 0); //the pid gains for the PID Controller of the drive motor, (units in rotations per second)
-            public static final PIDFGains driveMotorPID = new PIDFGains(3.5037 * 6.75, 0.00, 0.00, 0.0, 0.22, 0); //the pid gains for the PID Controller of the drive motor, (units in rotations per second)
+            public static final PIDFGains driveMotorPID = new PIDFGains(3.5037 * 6.75, 0.00, 0.00, 0.0, 0.22, 0, 6, 12); //the pid gains for the PID Controller of the drive motor, (units in rotations per second)
 
             public static final double freeWheelSpeedMetersPerSec = 3.75; //the max speed of the drive wheel in meters per second //TODO find real value
 

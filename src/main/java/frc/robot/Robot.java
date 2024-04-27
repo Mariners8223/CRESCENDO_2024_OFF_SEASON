@@ -10,10 +10,8 @@ import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Twist2d;
 import frc.util.LocalADStarAK;
 
-import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 
@@ -72,7 +70,7 @@ public class Robot extends LoggedRobot
                 Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
                 Logger.setReplaySource(new WPILOGReader(logPath));
             }
-            Logger.addDataReceiver(new WPILOGWriter("F:/downloads"));
+            // Logger.addDataReceiver(new WPILOGWriter("F:/downloads"));
             Logger.addDataReceiver(new NT4Publisher());
         }
 
@@ -119,7 +117,7 @@ public class Robot extends LoggedRobot
     @Override
     public void autonomousInit()
     {
-        autonomousCommand = robotContainer.getAutoCommand();
+        autonomousCommand = RobotContainer.getAutoCommand();
         
         if (autonomousCommand != null)
         {

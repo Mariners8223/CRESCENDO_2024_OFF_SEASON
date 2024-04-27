@@ -1,10 +1,16 @@
 package frc.robot.subsystems.DriveTrain.SwerveModules;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.Constants;
+
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class SwerveModuleIOSIM implements SwerveModuleIO{
@@ -25,8 +31,6 @@ public class SwerveModuleIOSIM implements SwerveModuleIO{
       steerMotor = new DCMotorSim(DCMotor.getNeo550(1), Constants.DriveTrain.Steer.steerGearRatio, 0.25);
     }
 
-
-
     this.moduleName = moduleName;
   }
 
@@ -44,18 +48,21 @@ public class SwerveModuleIOSIM implements SwerveModuleIO{
     inputs.driveMotorAppliedVoltage = driveMotorVoltage;
     inputs.steerMotorAppliedVoltage = steerMotorVoltage;
 
+    Logger.recordOutput("SwerveModules/" + moduleName + "/driveMotorCurrent", driveMotor.getCurrentDrawAmps());
+    Logger.recordOutput("SwerveModules/" + moduleName + "/steerMotorCurrent", steerMotor.getCurrentDrawAmps());
+
     Logger.processInputs(moduleName + " SwerveModule", inputs);
   }
 
   @Override
   public void setDriveMotorVoltage(double voltage) {
-    driveMotorVoltage = voltage;
+    driveMotorVoltage = MathUtil.clamp(voltage, -RobotController.getBatteryVoltage(), RobotController.getBatteryVoltage());
     driveMotor.setInputVoltage(voltage);
   }
 
   @Override
   public void setSteerMotorVoltage(double voltage) {
-    steerMotorVoltage = voltage;
+    steerMotorVoltage = MathUtil.clamp(voltage, -RobotController.getBatteryVoltage(), RobotController.getBatteryVoltage());
     steerMotor.setInputVoltage(voltage);
   }
 
