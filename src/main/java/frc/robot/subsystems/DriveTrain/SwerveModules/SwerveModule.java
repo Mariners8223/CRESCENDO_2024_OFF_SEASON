@@ -89,7 +89,7 @@ public class SwerveModule {
   public SwerveModuleState getCurrentState(){
     try {
       lock.lock();
-      Logger.processInputs(moduleName + " SwerveModule", inputs);
+      Logger.processInputs("SwerveModule " + moduleName, inputs);
       return inputs.currentState;
     }
     finally {
