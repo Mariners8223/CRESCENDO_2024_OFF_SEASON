@@ -24,6 +24,8 @@ public class SwerveModuleIOCompBot implements SwerveModuleIO{
 
     public static final PIDFGains driveMotorPID = new PIDFGains(3.5037 * 6.75, 0.00, 0.00, 0.0, 0.22, 0, 6, 12);
     public static final PIDFGains steerMotorPID = new PIDFGains(14.042 * steerGearRatio, 0, 1.4 * steerGearRatio, 0, 0.1 * steerGearRatio, 0);
+
+    public static final double keepDriveMotorSpeedVoltage = 1.2;
   }
 
   private final TalonFX driveMotor;
