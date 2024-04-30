@@ -16,7 +16,6 @@ import frc.util.FastGyros.NavxIO;
 import frc.util.FastGyros.SimGyroIO;
 import org.jetbrains.annotations.NotNull;
 import org.littletonrobotics.junction.AutoLog;
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -55,16 +54,14 @@ public class DriveBase extends SubsystemBase {
 
   private final GyroIO gyro; //the navx gyro of the robot
 
-  private final DriveBaseInputsAutoLogged inputs; //an object representing the logger class
+  private final DriveBaseInputsAutoLogged inputs = new DriveBaseInputsAutoLogged(); //an object representing the logger class
 
   private final ReentrantLock odometryLock = new ReentrantLock(); //a lock for the odometry and modules thread
 
   private final double maxFreeWheelSpeed = Constants.robotType == Constants.RobotType.DEVELOPMENT ? SwerveModuleIODevBot.DevBotConstants.maxDriveVelocityMetersPerSecond : SwerveModuleIOCompBot.CompBotConstants.maxDriveVelocityMetersPerSecond; //the max speed the wheels can spin when the robot is not moving
 
-  @AutoLogOutput(key = "DriveBase/TargetStates")
-  private SwerveModuleState[] targetStates = new SwerveModuleState[4];
+  private SwerveModuleState[] targetStates = new SwerveModuleState[]{new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState()};
 
-  @AutoLogOutput(key = "DriveBase/EstimatedPose")
   private Pose2d currentPose = new Pose2d();
 
 
@@ -75,7 +72,7 @@ public class DriveBase extends SubsystemBase {
 
     protected double rotationSpeedInput = 0;
 
-    protected SwerveModuleState[] currentStates = new SwerveModuleState[4]; //the current states of the modules
+    protected SwerveModuleState[] currentStates = new SwerveModuleState[]{new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState()}; //the current states of the modules
 
     protected String activeCommand; //the active command of the robot
   }
@@ -120,24 +117,13 @@ public class DriveBase extends SubsystemBase {
 
     new Trigger(RobotState::isEnabled).whileTrue(new StartEndCommand(() -> // sets the modules to brake mode when the robot is enabled
       setModulesBrakeMode(true)
-    , () -> 
+    , () ->
       {if(!DriverStation.isFMSAttached()) setModulesBrakeMode(false);}
     ).ignoringDisable(true));
 
     new Trigger(RobotState::isTeleop).and(RobotState::isEnabled).whileTrue(new StartEndCommand(() ->
     this.setDefaultCommand(new DriveCommand()), this::removeDefaultCommand).ignoringDisable(true));
-
-    inputs = new DriveBaseInputsAutoLogged();
-    inputs.currentStates = new SwerveModuleState[]{new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState()};
-    targetStates = new SwerveModuleState[]{new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState()};
-
-    Notifier delay = new Notifier(() ->{
-      Notifier notifier = getNotifier();
-      notifier.setName("Swerve Updates Thread");
-      notifier.startPeriodic(1 / SwerveModule.SwerveModuleConstants.moduleThreadHz);
-    });
-    delay.startSingle(2);
-  }
+    }
 
   public @NotNull Notifier getNotifier() {
     SwerveModulePosition[] previousPositions = new SwerveModulePosition[]{new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition()};
@@ -443,7 +429,11 @@ public class DriveBase extends SubsystemBase {
     } finally {
       odometryLock.unlock();
     }
-    
+
+    Logger.recordOutput("DriveBase/estimatedPose", currentPose);
+    Logger.recordOutput("DriveBase/ChassisSpeeds", getChassisSpeeds());
+    Logger.recordOutput("DriveBase/targetStates", targetStates);
+
     RobotContainer.field.setRobotPose(currentPose);
 
     inputs.activeCommand = this.getCurrentCommand() != null ? this.getCurrentCommand().getName() : "None";

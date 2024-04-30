@@ -10,6 +10,7 @@ import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
+import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModule.SwerveModuleConstants;
 import frc.util.LocalADStarAK;
 
 import org.littletonrobotics.junction.LogFileUtil;
@@ -30,13 +31,12 @@ public class Robot extends LoggedRobot
 {
     private Command autonomousCommand;
     
-    private RobotContainer robotContainer;
     String lastAutoName = "InstantCommand";
     
     
     @Override
     public void robotInit() {
-        robotContainer = new RobotContainer();
+        new RobotContainer();
 
         Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
         Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
@@ -84,6 +84,11 @@ public class Robot extends LoggedRobot
                 Logger.recordOutput("PathPlanner/TargetPose", targetPose));
 
         PathfindingCommand.warmupCommand().schedule();
+
+        Notifier notifier = RobotContainer.driveBase.getNotifier();
+        notifier.setName("DriveBaseNotifier");
+        System.out.println("Starting DriveBase Notifier");
+        notifier.startPeriodic(1 / SwerveModuleConstants.moduleThreadHz);
     }
     
     
