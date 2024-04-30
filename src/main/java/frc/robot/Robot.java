@@ -10,6 +10,7 @@ import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
+import frc.robot.Constants.RobotType;
 import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModule.SwerveModuleConstants;
 import frc.util.LocalADStarAK;
 
@@ -56,8 +57,8 @@ public class Robot extends LoggedRobot
         Logger.registerURCL(URCL.startExternal(Constants.DriveTrain.sparkMaxNames));
 
         if(isReal()){
-            Logger.addDataReceiver(new RLOGServer());
             Logger.addDataReceiver(new WPILOGWriter("/U/logs/AdvantageKit"));
+            if(Constants.robotType == RobotType.DEVELOPMENT) Logger.addDataReceiver(new NT4Publisher());
 
             DataLogManager.start("U/logs/dataLogManager");
             SignalLogger.enableAutoLogging(true);

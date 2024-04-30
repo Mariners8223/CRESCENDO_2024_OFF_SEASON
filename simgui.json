@@ -7,7 +7,9 @@
       "/SmartDashboard/Gyro": "Gyro",
       "/SmartDashboard/Navx": "Gyro",
       "/SmartDashboard/Steer PID": "PIDController",
-      "/SmartDashboard/chooser": "String Chooser"
+      "/SmartDashboard/chooser": "String Chooser",
+      "/SmartDashboard/drivePIDController": "ProfiledPIDController",
+      "/SmartDashboard/steerPIDController": "PIDController"
     }
   },
   "NetworkTables Info": {

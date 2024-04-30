@@ -69,7 +69,7 @@ public class SwerveModule {
         targetState.speedMetersPerSecond *= Math.cos(targetState.angle.getRadians() - inputs.currentState.angle.getRadians());
 
         io.setDriveMotorVoltage(drivePIDController.calculate(inputs.currentState.speedMetersPerSecond, targetState.speedMetersPerSecond));
-        io.setSteerMotorVoltage(steerPIDController.calculate(inputs.currentState.angle.getRadians(), targetState.angle.getRadians()));
+        io.setSteerMotorVoltage(steerPIDController.calculate(inputs.currentState.angle.getRotations(), targetState.angle.getRotations()));
       }
       return new SwerveModulePosition(inputs.drivePositionMeters, inputs.currentState.angle);
     }
@@ -107,8 +107,8 @@ public class SwerveModule {
   public void runSysID(Measure<Voltage> driveVoltage, Measure<Voltage> steerVoltage){
     try{
       lock.lock();
-      io.setDriveMotorVoltage(driveVoltage.in(Volts));
-      io.setSteerMotorVoltage(steerVoltage.in(Volts));
+      if(driveVoltage != null) io.setDriveMotorVoltage(driveVoltage.in(Volts));
+      if(steerVoltage != null) io.setSteerMotorVoltage(steerVoltage.in(Volts));
       targetState = null;
     }
     finally {

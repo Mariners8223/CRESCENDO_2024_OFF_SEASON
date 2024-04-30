@@ -54,12 +54,12 @@ public class SwerveModuleIODevBot implements SwerveModuleIO{
 
   @Override
   public void setDriveMotorVoltage(double voltage) {
-    driveMotor.set(voltage);
+    driveMotor.setVoltage(voltage);
   }
 
   @Override
   public void setSteerMotorVoltage(double voltage) {
-    steerMotor.set(voltage);
+    steerMotor.setVoltage(voltage);
   }
 
   @Override
