@@ -4,37 +4,59 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
+import org.littletonrobotics.junction.Logger;
 
 import java.util.concurrent.locks.ReentrantLock;
 
 import static edu.wpi.first.units.Units.Volts;
 
 public class SwerveModule {
+  public static class SwerveModuleConstants{
+    public static final double moduleThreadHz = 200;
+  }
+
+  private final String moduleName;
   private final SwerveModuleIO io;
   private final SwerveModuleIOInputsAutoLogged inputs = new SwerveModuleIOInputsAutoLogged();
 
-  private final ProfiledPIDController drivePIDController = Constants.DriveTrain.Drive.driveMotorPID.createProfiledPIDController();
-  private final PIDController steerPIDController = Constants.DriveTrain.Steer.steerMotorPID.createPIDController();
+  private final ProfiledPIDController drivePIDController;
+  private final PIDController steerPIDController;
 
   private SwerveModuleState targetState;
 
   private final ReentrantLock lock = new ReentrantLock();
 
   public SwerveModule(Constants.DriveTrain.SwerveModule constants) {
+    if(Constants.robotType == Constants.RobotType.DEVELOPMENT){
+      drivePIDController = SwerveModuleIODevBot.DevBotConstants.driveMotorPID.createProfiledPIDController();
+      steerPIDController = SwerveModuleIODevBot.DevBotConstants.steerMotorPID.createPIDController();
+    }
+    else if(Constants.robotType == Constants.RobotType.COMPETITION){
+      drivePIDController = SwerveModuleIOCompBot.CompBotConstants.driveMotorPID.createProfiledPIDController();
+      steerPIDController = SwerveModuleIOCompBot.CompBotConstants.steerMotorPID.createPIDController();
+    }
+    else{
+      drivePIDController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(0, 0), 0);
+      steerPIDController = new PIDController(0, 0, 0);
+    }
+
     if(RobotBase.isSimulation()){
       if(Constants.robotType == Constants.RobotType.REPLAY) this.io = new SwerveModuleIO() {};
-      else this.io = new SwerveModuleIOSIM(constants.moduleName.name());
+      else this.io = new SwerveModuleIOSIM();
 
       SmartDashboard.putData("drivePIDController", drivePIDController);
       SmartDashboard.putData("steerPIDController", steerPIDController);
     }
-    else this.io = new SwerveModuleIODevBot(constants);
-    
+    else if(Constants.robotType == Constants.RobotType.DEVELOPMENT) this.io = new SwerveModuleIODevBot(constants);
+    else this.io = new SwerveModuleIOCompBot(constants);
+
+    this.moduleName = constants.moduleName.name();
   }
 
   public SwerveModulePosition modulePeriodic() {
@@ -59,6 +81,7 @@ public class SwerveModule {
   public SwerveModuleState getCurrentState(){
     try {
       lock.lock();
+      Logger.processInputs(moduleName + " SwerveModule", inputs);
       return inputs.currentState;
     }
     finally {

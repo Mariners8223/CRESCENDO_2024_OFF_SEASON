@@ -84,9 +84,6 @@ public class Robot extends LoggedRobot
                 Logger.recordOutput("PathPlanner/TargetPose", targetPose));
 
         PathfindingCommand.warmupCommand().schedule();
-
-        Notifier odometryAndModulesThread = RobotContainer.driveBase.getNotifier();
-        odometryAndModulesThread.startPeriodic(1 / Constants.DriveTrain.SwerveModule.modulesThreadHz);
     }
     
     

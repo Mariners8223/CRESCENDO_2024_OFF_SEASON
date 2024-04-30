@@ -9,6 +9,8 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModule;
+import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleIOCompBot;
+import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleIODevBot;
 import frc.util.FastGyros.GyroIO;
 import frc.util.FastGyros.NavxIO;
 import frc.util.FastGyros.SimGyroIO;
@@ -57,6 +59,8 @@ public class DriveBase extends SubsystemBase {
 
   private final ReentrantLock odometryLock = new ReentrantLock(); //a lock for the odometry and modules thread
 
+  private final double maxFreeWheelSpeed = Constants.robotType == Constants.RobotType.DEVELOPMENT ? SwerveModuleIODevBot.DevBotConstants.maxDriveVelocityMetersPerSecond : SwerveModuleIOCompBot.CompBotConstants.maxDriveVelocityMetersPerSecond; //the max speed the wheels can spin when the robot is not moving
+
   @AutoLogOutput(key = "DriveBase/TargetStates")
   private SwerveModuleState[] targetStates = new SwerveModuleState[4];
 
@@ -98,7 +102,7 @@ public class DriveBase extends SubsystemBase {
     HolonomicPathFollowerConfig pathFollowerConfig = new HolonomicPathFollowerConfig(
       Constants.DriveTrain.PathPlanner.XYPID.createPIDConstants(),
       Constants.DriveTrain.PathPlanner.thetaPID.createPIDConstants(),
-      Constants.DriveTrain.Drive.freeWheelSpeedMetersPerSec,
+      maxFreeWheelSpeed,
       Math.sqrt(Math.pow((Constants.DriveTrain.Global.distanceBetweenWheels / 2), 2) * 2),
       replanConfig);
     //^creates path constraints for pathPlanner
@@ -126,6 +130,13 @@ public class DriveBase extends SubsystemBase {
     inputs = new DriveBaseInputsAutoLogged();
     inputs.currentStates = new SwerveModuleState[]{new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState()};
     targetStates = new SwerveModuleState[]{new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState()};
+
+    Notifier delay = new Notifier(() ->{
+      Notifier notifier = getNotifier();
+      notifier.setName("Swerve Updates Thread");
+      notifier.startPeriodic(1 / SwerveModule.SwerveModuleConstants.moduleThreadHz);
+    });
+    delay.startSingle(2);
   }
 
   public @NotNull Notifier getNotifier() {
@@ -280,7 +291,7 @@ public class DriveBase extends SubsystemBase {
   public void drive(double Xspeed, double Yspeed, double rotation, Translation2d centerOfRotation){
 
     targetStates = driveTrainKinematics.toSwerveModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(Xspeed, Yspeed, rotation, getRotation2d()), centerOfRotation); //calculates the target states
-    SwerveDriveKinematics.desaturateWheelSpeeds(targetStates, Constants.DriveTrain.Drive.freeWheelSpeedMetersPerSec); //desaturates the wheel speeds (to make sure none of the wheel exceed the max speed)
+    SwerveDriveKinematics.desaturateWheelSpeeds(targetStates, maxFreeWheelSpeed); //desaturates the wheel speeds (to make sure none of the wheel exceed the max speed)
 
     for(int i = 0; i < 4; i++){
       targetStates[i] = modules[i].run(targetStates[i]); //sets the module state
@@ -301,7 +312,7 @@ public class DriveBase extends SubsystemBase {
   public void robotRelativeDrive(double Xspeed, double Yspeed, double rotation){
 
     targetStates = driveTrainKinematics.toSwerveModuleStates(new ChassisSpeeds(Xspeed, Yspeed, rotation));
-    SwerveDriveKinematics.desaturateWheelSpeeds(inputs.currentStates, Constants.DriveTrain.Drive.freeWheelSpeedMetersPerSec);
+    SwerveDriveKinematics.desaturateWheelSpeeds(inputs.currentStates, maxFreeWheelSpeed);
 
     for(int i = 0; i < 4; i++){
       targetStates[i] = modules[i].run(targetStates[i]);
@@ -327,7 +338,7 @@ public class DriveBase extends SubsystemBase {
    */
   public void drive(ChassisSpeeds chassisSpeeds){
     targetStates = driveTrainKinematics.toSwerveModuleStates(chassisSpeeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(targetStates, Constants.DriveTrain.Drive.freeWheelSpeedMetersPerSec);
+    SwerveDriveKinematics.desaturateWheelSpeeds(targetStates, maxFreeWheelSpeed);
 
     for(int i = 0; i < 4; i++){
       targetStates[i] = modules[i].run(targetStates[i]);
@@ -348,7 +359,7 @@ public class DriveBase extends SubsystemBase {
    */
   public void driveWithOutPID(double Xspeed, double Yspeed, double rotation, Translation2d centerOfRotation){
     targetStates = driveTrainKinematics.toSwerveModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(Xspeed, Yspeed, rotation, getRotation2d()), centerOfRotation);
-    SwerveDriveKinematics.desaturateWheelSpeeds(targetStates, Constants.DriveTrain.Drive.freeWheelSpeedMetersPerSec);
+    SwerveDriveKinematics.desaturateWheelSpeeds(targetStates, maxFreeWheelSpeed);
 
     for(int i = 0; i < 4; i++){
       targetStates[i] = modules[i].run(targetStates[i]);
@@ -443,7 +454,6 @@ public class DriveBase extends SubsystemBase {
   @Override
   public void periodic() {
     update();
-
   }
 
 
@@ -476,11 +486,11 @@ public class DriveBase extends SubsystemBase {
       //   );
       driveBase.drive(
         //this basically takes the inputs from the controller and firsts checks if it's not drift or a mistake by checking if it is above a certain value then it multiplies it by the R2 axis that the driver uses to control the speed of the robot
-        (Math.abs(controller.getLeftY()) > 0.05 ? -controller.getLeftY() : 0) * Constants.DriveTrain.Drive.freeWheelSpeedMetersPerSec,
+        (Math.abs(controller.getLeftY()) > 0.05 ? -controller.getLeftY() : 0) * driveBase.maxFreeWheelSpeed,
 
-        (Math.abs(controller.getLeftX()) > 0.05 ? controller.getLeftX() : 0) * -Constants.DriveTrain.Drive.freeWheelSpeedMetersPerSec,
+        (Math.abs(controller.getLeftX()) > 0.05 ? controller.getLeftX() : 0) * -driveBase.maxFreeWheelSpeed,
 
-        (Math.abs(controller.getRightX()) > 0.05 ? controller.getRightX() : 0) * -Constants.DriveTrain.Drive.freeWheelSpeedMetersPerSec * 4
+        (Math.abs(controller.getRightX()) > 0.05 ? controller.getRightX() : 0) * -driveBase.maxFreeWheelSpeed * 4
         );
     }
 

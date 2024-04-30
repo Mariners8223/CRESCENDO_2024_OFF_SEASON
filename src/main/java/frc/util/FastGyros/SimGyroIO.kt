@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Twist2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.util.sendable.SendableBuilder
 import frc.robot.Constants
+import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModule
 import org.littletonrobotics.junction.Logger
 import java.util.concurrent.locks.ReentrantLock
 import java.util.function.Supplier
@@ -66,8 +67,8 @@ class SimGyroIO(private val twistSupplier: Supplier<Twist2d>, private val chassi
       velocityX = chassisSpeeds.vxMetersPerSecond
       velocityY = chassisSpeeds.vyMetersPerSecond
 
-      accelerationX = (velocityX - prevVelocityX) / (1 / Constants.DriveTrain.SwerveModule.modulesThreadHz)
-      accelerationY = (velocityY - prevVelocityY) / (1 / Constants.DriveTrain.SwerveModule.modulesThreadHz)
+      accelerationX = (velocityX - prevVelocityX) / (1 / SwerveModule.SwerveModuleConstants.moduleThreadHz)
+      accelerationY = (velocityY - prevVelocityY) / (1 / SwerveModule.SwerveModuleConstants.moduleThreadHz)
 
       Logger.recordOutput("Gyro/PrevVelocityX", prevVelocityX)
       Logger.recordOutput("Gyro/PrevVelocityY", prevVelocityY)
