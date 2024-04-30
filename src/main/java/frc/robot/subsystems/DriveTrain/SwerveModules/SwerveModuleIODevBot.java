@@ -47,6 +47,8 @@ public class SwerveModuleIODevBot implements SwerveModuleIO{
     inputs.currentState.angle = Rotation2d.fromRotations(steerMotor.getEncoder().getPosition() / DevBotConstants.steerGearRatio);
     inputs.currentState.speedMetersPerSecond = driveMotor.getVelocity().getValueAsDouble() * DevBotConstants.wheelCircumferenceMeters / DevBotConstants.steerGearRatio;
 
+    inputs.steerPositionRadians = inputs.currentState.angle.getRadians();
+
     inputs.steerVelocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(steerMotor.getEncoder().getVelocity() / DevBotConstants.steerGearRatio);
     inputs.drivePositionMeters = driveMotor.getPosition().getValueAsDouble() * DevBotConstants.driveGearRatio / DevBotConstants.driveGearRatio;
 
@@ -86,6 +88,9 @@ public class SwerveModuleIODevBot implements SwerveModuleIO{
     config.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
     config.MagnetSensor.SensorDirection = constants.isAbsEncoderInverted ? SensorDirectionValue.Clockwise_Positive : SensorDirectionValue.CounterClockwise_Positive;
     config.MagnetSensor.MagnetOffset = constants.absoluteEncoderZeroOffset;
+
+    canCoder.getPosition().setUpdateFrequency(SwerveModule.SwerveModuleConstants.moduleThreadHz);
+    canCoder.setPosition(canCoder.getAbsolutePosition().getValueAsDouble());
 
     canCoder.getConfigurator().apply(config);
     canCoder.optimizeBusUtilization();

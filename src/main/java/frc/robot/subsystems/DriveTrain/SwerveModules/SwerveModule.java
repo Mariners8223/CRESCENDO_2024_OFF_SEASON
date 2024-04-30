@@ -69,7 +69,7 @@ public class SwerveModule {
         targetState = SwerveModuleState.optimize(targetState, inputs.currentState.angle);
         targetState.speedMetersPerSecond *= Math.cos(targetState.angle.getRadians() - inputs.currentState.angle.getRadians());
 
-        double steerOutPut = steerPIDController.calculate(inputs.currentState.angle.getRotations(), targetState.angle.getRotations());
+        double steerOutPut = steerPIDController.calculate(inputs.currentState.angle.getRadians(), targetState.angle.getRadians());
 
         io.setDriveMotorVoltage(drivePIDController.calculate(inputs.currentState.speedMetersPerSecond, targetState.speedMetersPerSecond));
         io.setSteerMotorVoltage(steerPIDController.atSetpoint() ? 0 : steerOutPut);
