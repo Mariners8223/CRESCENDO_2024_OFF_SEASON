@@ -10,9 +10,6 @@ import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
-import frc.robot.Constants.RobotType;
-import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleIOCompBot.CompBotConstants;
-import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleIODevBot.DevBotConstants;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -72,11 +69,9 @@ public class SwerveModule {
         targetState = SwerveModuleState.optimize(targetState, inputs.currentState.angle);
         targetState.speedMetersPerSecond *= Math.cos(targetState.angle.getRadians() - inputs.currentState.angle.getRadians());
 
-        double driveOutPut = drivePIDController.calculate(inputs.currentState.speedMetersPerSecond, targetState.speedMetersPerSecond);
         double steerOutPut = steerPIDController.calculate(inputs.currentState.angle.getRotations(), targetState.angle.getRotations());
 
-        io.setDriveMotorVoltage(drivePIDController.atGoal() ? 
-        (Constants.robotType == RobotType.DEVELOPMENT ? DevBotConstants.keepDriveMotorSpeedVoltage : CompBotConstants.keepDriveMotorSpeedVoltage) : driveOutPut);
+        io.setDriveMotorVoltage(drivePIDController.calculate(inputs.currentState.speedMetersPerSecond, targetState.speedMetersPerSecond));
         io.setSteerMotorVoltage(steerPIDController.atSetpoint() ? 0 : steerOutPut);
       }
       return new SwerveModulePosition(inputs.drivePositionMeters, inputs.currentState.angle);
