@@ -7,6 +7,7 @@ package frc.robot.subsystems.DriveTrain;
 import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModule;
 import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleIOCompBot;
@@ -32,7 +33,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
@@ -449,8 +449,7 @@ public class DriveBase extends SubsystemBase {
 
   private static class DriveCommand extends Command{
     DriveBase driveBase;
-    // CommandPS5Controller controller;
-    CommandPS4Controller controller;
+    CommandPS5Controller controller;
 
     public DriveCommand(){
       controller = RobotContainer.driveController;
@@ -466,22 +465,14 @@ public class DriveBase extends SubsystemBase {
 
     @Override
     public void execute() {
-      // driveBase.drive(
-      //   //this basically takes the inputs from the controller and firsts checks if it's not drift or a mistake by checking if it is above a certain value then it multiplies it by the R2 axis that the driver uses to control the speed of the robot
-      //   (Math.abs(controller.getLeftY()) > 0.05 ? -controller.getLeftY() : 0) * (controller.getR2Axis() > 0.1 ? 1 + (Constants.DriveTrain.Drive.freeWheelSpeedMetersPerSec - 1) * (1 - controller.getR2Axis()) : 1),
+       driveBase.drive(
+         //this basically takes the inputs from the controller and firsts checks if it's not drift or a mistake by checking if it is above a certain value then it multiplies it by the R2 axis that the driver uses to control the speed of the robot
+         (Math.abs(controller.getLeftY()) > 0.05 ? -controller.getLeftY() : 0) * (controller.getR2Axis() > 0.1 ? 1 + (driveBase.maxFreeWheelSpeed - 1) * (1 - controller.getR2Axis()) : 1),
 
-      //   (Math.abs(controller.getLeftX()) > 0.05 ? controller.getLeftX() : 0) * (controller.getR2Axis() > 0.1 ? 1 + (Constants.DriveTrain.Drive.freeWheelSpeedMetersPerSec - 1) * (1 - controller.getR2Axis()) : 1),
+         (Math.abs(controller.getLeftX()) > 0.05 ? controller.getLeftX() : 0) * (controller.getR2Axis() > 0.1 ? 1 + (driveBase.maxFreeWheelSpeed- 1) * (1 - controller.getR2Axis()) : 1),
 
-      //   Math.abs(controller.getRightX()) > 0.05 ? controller.getRightX() : 0
-      //   );
-      driveBase.drive(
-        //this basically takes the inputs from the controller and firsts checks if it's not drift or a mistake by checking if it is above a certain value then it multiplies it by the R2 axis that the driver uses to control the speed of the robot
-        (Math.abs(controller.getLeftY()) > 0.05 ? -controller.getLeftY() : 0) * driveBase.maxFreeWheelSpeed,
-
-        (Math.abs(controller.getLeftX()) > 0.05 ? controller.getLeftX() : 0) * -driveBase.maxFreeWheelSpeed,
-
-        (Math.abs(controller.getRightX()) > 0.05 ? controller.getRightX() : 0) * -driveBase.maxFreeWheelSpeed * 4
-        );
+         Math.abs(controller.getRightX()) > 0.05 ? controller.getRightX() : 0
+         );
     }
 
     @Override
