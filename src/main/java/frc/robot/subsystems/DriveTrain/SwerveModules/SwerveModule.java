@@ -19,9 +19,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import static edu.wpi.first.units.Units.Volts;
 
 public class SwerveModule {
-  public static class SwerveModuleConstants{
-    public static final double moduleThreadHz = 200;
-  }
+
+  public static final double moduleThreadHz = 200;
 
   private final String moduleName;
   private final SwerveModuleIO io;
@@ -46,8 +45,8 @@ public class SwerveModule {
       steerPIDController = SwerveModuleIOCompBot.CompBotConstants.steerMotorPID.createPIDController();
     }
     else{
-      drivePIDController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(0, 0), 1 / SwerveModuleConstants.moduleThreadHz);
-      steerPIDController = new PIDController(0, 0, 0, 1 / SwerveModuleConstants.moduleThreadHz);
+      drivePIDController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(0, 0), 1 / moduleThreadHz);
+      steerPIDController = new PIDController(0, 0, 0, 1 / moduleThreadHz);
     }
 
     if(RobotBase.isSimulation()){

@@ -28,8 +28,8 @@ public class SwerveModuleIODevBot implements SwerveModuleIO{
     public static final double back_left_zeroOffset = -0.164; // the offset between the absolute encoder on the back left module, in degrees
     public static final double back_right_zeroOffset = 0.303; // the offset between the absolute encoder on the back right module, in degrees
 
-    public static final PIDFGains driveMotorPID = new PIDFGains(10, 0.00, 0.00, 0.0, 0.22, 0, 6, 12, 1 / SwerveModule.SwerveModuleConstants.moduleThreadHz);
-    public static final PIDFGains steerMotorPID = new PIDFGains(10, 0, 0, 0.14, 0.1, 0, 1 / SwerveModule.SwerveModuleConstants.moduleThreadHz);
+    public static final PIDFGains driveMotorPID = new PIDFGains(10, 0.00, 0.00, 0.0, 0.22, 0, 1 / SwerveModule.moduleThreadHz, 12, 6);
+    public static final PIDFGains steerMotorPID = new PIDFGains(10, 0, 0, 0.14, 0.1, 0, 1 / SwerveModule.moduleThreadHz);
   }
 
   private final TalonFX driveMotor;
@@ -84,7 +84,7 @@ public class SwerveModuleIODevBot implements SwerveModuleIO{
   private CANcoder configCANCoder(Constants.DriveTrain.SwerveModule constants){
     CANcoder canCoder = new CANcoder(constants.absEncoderID);
 
-    canCoder.getPosition().setUpdateFrequency(SwerveModule.SwerveModuleConstants.moduleThreadHz);
+    canCoder.getPosition().setUpdateFrequency(SwerveModule.moduleThreadHz);
     CANcoderConfiguration config = new CANcoderConfiguration();
     config.FutureProofConfigs = false;
 
@@ -92,7 +92,7 @@ public class SwerveModuleIODevBot implements SwerveModuleIO{
     config.MagnetSensor.SensorDirection = constants.isAbsEncoderInverted ? SensorDirectionValue.Clockwise_Positive : SensorDirectionValue.CounterClockwise_Positive;
     config.MagnetSensor.MagnetOffset = -constants.absoluteEncoderZeroOffset;
 
-    canCoder.getPosition().setUpdateFrequency(SwerveModule.SwerveModuleConstants.moduleThreadHz);
+    canCoder.getPosition().setUpdateFrequency(SwerveModule.moduleThreadHz);
     canCoder.setPosition(canCoder.getAbsolutePosition().getValueAsDouble());
 
     canCoder.getConfigurator().apply(config);
@@ -106,9 +106,9 @@ public class SwerveModuleIODevBot implements SwerveModuleIO{
 
     talonFX.getConfigurator().apply(config); //apply the given config
 
-    talonFX.getPosition().setUpdateFrequency(SwerveModule.SwerveModuleConstants.moduleThreadHz); //position is needed more for destroy
+    talonFX.getPosition().setUpdateFrequency(SwerveModule.moduleThreadHz); //position is needed more for destroy
 
-    talonFX.getVelocity().setUpdateFrequency(SwerveModule.SwerveModuleConstants.moduleThreadHz); //sets as default
+    talonFX.getVelocity().setUpdateFrequency(SwerveModule.moduleThreadHz); //sets as default
     talonFX.getMotorVoltage().setUpdateFrequency(50); //sets as default
     talonFX.getSupplyCurrent().setUpdateFrequency(50); //sets as default
     talonFX.getStatorCurrent().setUpdateFrequency(50); //sets as default
@@ -170,9 +170,9 @@ public class SwerveModuleIODevBot implements SwerveModuleIO{
     sparkMax.getPIDController().setD(DevBotConstants.steerMotorPID.getD()); //sets the D for the PID Controller
     sparkMax.getPIDController().setIZone(DevBotConstants.steerMotorPID.getIZone()); //sets the IZone for the PID Controller
 
-    sparkMax.setPeriodicFramePeriod(CANSparkMax.PeriodicFrame.kStatus2, (int)((1 / SwerveModule.SwerveModuleConstants.moduleThreadHz) * 1000)); //sets the status 0 frame to 10ms
-    sparkMax.setPeriodicFramePeriod(CANSparkMax.PeriodicFrame.kStatus1, (int)((1 / SwerveModule.SwerveModuleConstants.moduleThreadHz) * 1000)); //sets the status 0 frame to 10ms
-    sparkMax.setPeriodicFramePeriod(CANSparkMax.PeriodicFrame.kStatus0, (int)((1 / SwerveModule.SwerveModuleConstants.moduleThreadHz) * 1000));
+    sparkMax.setPeriodicFramePeriod(CANSparkMax.PeriodicFrame.kStatus2, (int)((1 / SwerveModule.moduleThreadHz) * 1000)); //sets the status 0 frame to 10ms
+    sparkMax.setPeriodicFramePeriod(CANSparkMax.PeriodicFrame.kStatus1, (int)((1 / SwerveModule.moduleThreadHz) * 1000)); //sets the status 0 frame to 10ms
+    sparkMax.setPeriodicFramePeriod(CANSparkMax.PeriodicFrame.kStatus0, (int)((1 / SwerveModule.moduleThreadHz) * 1000));
 
     sparkMax.getEncoder().setPositionConversionFactor(1); //sets the gear ratio for the module
 
