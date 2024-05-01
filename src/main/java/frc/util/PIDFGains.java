@@ -7,7 +7,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 
 public class PIDFGains {
-    private final double _kP, _kI, _kD, _kF, _tolerance, _iZone, _maxVelocity, _maxAcceleration;
+    private final double _kP, _kI, _kD, _kF, _tolerance, _iZone, _Period, _maxVelocity, _maxAcceleration;
   
     public PIDFGains(double kP, double kI, double kD, double kF, double tolerance, double iZone) {
       this._kP = kP;
@@ -18,6 +18,19 @@ public class PIDFGains {
       this._iZone = iZone;
       this._maxAcceleration = 0;
       this._maxVelocity = 0;
+      this._Period = 0.02;
+    }
+
+    public PIDFGains(double kP, double kI, double kD, double kF, double tolerance, double iZone, double period) {
+      this._kP = kP;
+      this._kI = kI;
+      this._kD = kD;
+      this._kF = kF;
+      this._tolerance = tolerance;
+      this._iZone = iZone;
+      this._maxAcceleration = 0;
+      this._maxVelocity = 0;
+      this._Period = period;
     }
   
     public PIDFGains(double kP, double kI, double kD) {
@@ -29,6 +42,19 @@ public class PIDFGains {
       this._iZone = 0;
       this._maxAcceleration = 0;
       this._maxVelocity = 0;
+      this._Period = 0.02;
+    }
+
+    public PIDFGains(double kP, double kI, double kD, double period) {
+      this._kP = kP;
+      this._kI = kI;
+      this._kD = kD;
+      this._kF = 0;
+      this._tolerance = 0;
+      this._iZone = 0;
+      this._maxAcceleration = 0;
+      this._maxVelocity = 0;
+      this._Period = period;
     }
 
     public PIDFGains(double kP, double kI, double kD, double maxVelocity, double maxAcceleration) {
@@ -40,6 +66,7 @@ public class PIDFGains {
       this._iZone = 0;
       this._maxVelocity = maxVelocity;
       this._maxAcceleration = maxAcceleration;
+      this._Period = 0.02;
     }
 
     public PIDFGains(double kP, double kI, double kD, double kF, double tolerance, double iZone, double maxVelocity, double maxAcceleration) {
@@ -51,6 +78,19 @@ public class PIDFGains {
       this._iZone = iZone;
       this._maxVelocity = maxVelocity;
       this._maxAcceleration = maxAcceleration;
+      this._Period = 0.02;
+    }
+
+    public PIDFGains(double kP, double kI, double kD, double kF, double tolerance, double iZone, double period, double maxVelocity, double maxAcceleration) {
+      this._kP = kP;
+      this._kI = kI;
+      this._kD = kD;
+      this._kF = kF;
+      this._tolerance = tolerance;
+      this._iZone = iZone;
+      this._maxVelocity = maxVelocity;
+      this._maxAcceleration = maxAcceleration;
+      this._Period = period;
     }
 
     public double getMaxVelocity() {
@@ -90,13 +130,13 @@ public class PIDFGains {
     }
 
     public PIDController createPIDController() {
-      var controller = new PIDController(_kP, _kI, _kD);
+      var controller = new PIDController(_kP, _kI, _kD, _Period);
       controller.setTolerance(_tolerance);
       controller.setIZone(_iZone);
       return controller;
     }
 
     public ProfiledPIDController createProfiledPIDController() {
-      return new ProfiledPIDController(_kP, _kI, _kD, new TrapezoidProfile.Constraints(_maxVelocity , _maxAcceleration));
+      return new ProfiledPIDController(_kP, _kI, _kD, new TrapezoidProfile.Constraints(_maxVelocity , _maxAcceleration), _Period);
     }
   }

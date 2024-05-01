@@ -22,8 +22,8 @@ public class SwerveModuleIOCompBot implements SwerveModuleIO{
 
     public static final double maxDriveVelocityMetersPerSecond = 4;
 
-    public static final PIDFGains driveMotorPID = new PIDFGains(3.5037 * 6.75, 0.00, 0.00, 0.0, 0.22, 0, 6, 12);
-    public static final PIDFGains steerMotorPID = new PIDFGains(14.042 * steerGearRatio, 0, 1.4 * steerGearRatio, 0, 0.1 * steerGearRatio, 0);
+    public static final PIDFGains driveMotorPID = new PIDFGains(3.5037 * 6.75, 0.00, 0.00, 0.0, 0.22, 0, 6, 12, 1 / SwerveModule.SwerveModuleConstants.moduleThreadHz);
+    public static final PIDFGains steerMotorPID = new PIDFGains(14.042 * steerGearRatio, 0, 1.4 * steerGearRatio, 0, 0.1 * steerGearRatio, 0, 1 / SwerveModule.SwerveModuleConstants.moduleThreadHz);
 
     public static final double keepDriveMotorSpeedVoltage = 1.2;
   }
@@ -151,6 +151,7 @@ public class SwerveModuleIOCompBot implements SwerveModuleIO{
     sparkMax.getPIDController().setIZone(CompBotConstants.steerMotorPID.getIZone()); //sets the IZone for the PID Controller
 
     sparkMax.setPeriodicFramePeriod(CANSparkMax.PeriodicFrame.kStatus2, (int)((1 / SwerveModule.SwerveModuleConstants.moduleThreadHz) * 1000)); //sets the status 0 frame to 10ms
+    sparkMax.setPeriodicFramePeriod(CANSparkMax.PeriodicFrame.kStatus1, (int)((1 / SwerveModule.SwerveModuleConstants.moduleThreadHz) * 1000)); //sets the status 0 frame to 10ms
 
     sparkMax.getEncoder().setPositionConversionFactor(1); //sets the gear ratio for the module
 

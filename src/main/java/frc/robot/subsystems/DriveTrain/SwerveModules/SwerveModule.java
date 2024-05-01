@@ -43,8 +43,8 @@ public class SwerveModule {
       steerPIDController = SwerveModuleIOCompBot.CompBotConstants.steerMotorPID.createPIDController();
     }
     else{
-      drivePIDController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(0, 0));
-      steerPIDController = new PIDController(0, 0, 0);
+      drivePIDController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(0, 0), 1 / SwerveModuleConstants.moduleThreadHz);
+      steerPIDController = new PIDController(0, 0, 0, 1 / SwerveModuleConstants.moduleThreadHz);
     }
 
     if(RobotBase.isSimulation()){
@@ -85,6 +85,7 @@ public class SwerveModule {
     try {
       lock.lock();
       Logger.processInputs("SwerveModule " + moduleName, inputs);
+      // Logger.processInputs(moduleName + " SwerveModule", inputs);
       return inputs.currentState;
     }
     finally {
