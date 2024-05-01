@@ -23,8 +23,8 @@ public class SwerveModuleIODevBot implements SwerveModuleIO{
 
     public static final double maxDriveVelocityMetersPerSecond = 4;
 
-    public static final PIDFGains driveMotorPID = new PIDFGains(0 * 6.75, 0.00, 0.00, 0.0, 0.22, 0, 6, 12, 1 / SwerveModule.SwerveModuleConstants.moduleThreadHz);
-    public static final PIDFGains steerMotorPID = new PIDFGains(10, 0, 0, 0, 0.1, 0, 1 / SwerveModule.SwerveModuleConstants.moduleThreadHz);
+    public static final PIDFGains driveMotorPID = new PIDFGains(10, 0.00, 0.00, 0.0, 0.22, 0, 6, 12, 1 / SwerveModule.SwerveModuleConstants.moduleThreadHz);
+    public static final PIDFGains steerMotorPID = new PIDFGains(10, 0, 0, 0.14, 0.1, 0, 1 / SwerveModule.SwerveModuleConstants.moduleThreadHz);
 
     public static final double keepDriveMotorSpeedVoltage = 1.2;
   }
