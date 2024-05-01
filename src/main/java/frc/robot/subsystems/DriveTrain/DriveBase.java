@@ -37,6 +37,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 
+import static edu.wpi.first.units.Units.Volts;
+
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -54,7 +56,7 @@ public class DriveBase extends SubsystemBase {
 
   private final GyroIO gyro; //the navx gyro of the robot
 
-  private final DriveBaseInputsAutoLogged inputs = new DriveBaseInputsAutoLogged(); //an object representing the logger class
+  private final DriveBaseaInputsAutoLogged inputs = new DriveBaseaInputsAutoLogged(); //an object representing the logger class
 
   private final ReentrantLock odometryLock = new ReentrantLock(); //a lock for the odometry and modules thread
 
@@ -66,7 +68,7 @@ public class DriveBase extends SubsystemBase {
 
 
   @AutoLog
-  public static class DriveBaseInputs{
+  public static class DriveBaseaInputs{
     protected double XspeedInput = 0; //the X speed input
     protected double YspeedInput = 0; //the Y speed input
 
@@ -505,7 +507,7 @@ public class DriveBase extends SubsystemBase {
               ),
               new SysIdRoutine.Mechanism(
                       (voltage) -> {
-                        for(int i = 0; i < 4; i++) driveBase.modules[i].runSysID(null, voltage);
+                        for(int i = 0; i < 4; i++) driveBase.modules[i].runSysIDSteer(voltage);
                       },
                       null,
                       driveBase,
@@ -514,12 +516,12 @@ public class DriveBase extends SubsystemBase {
 
       driveSysId = new SysIdRoutine(
         new SysIdRoutine.Config(
-          null, null, null, (state) -> Logger.recordOutput("SysIDDriveState", state.toString())
+          null, Volts.of(4), null, (state) -> Logger.recordOutput("SysIDDriveState", state.toString())
         ),
               new SysIdRoutine.Mechanism(
                       (voltage) -> {
                         for(int i = 0; i < 4; i++){
-                          driveBase.modules[i].runSysID(voltage, null);
+                          driveBase.modules[i].runSysIDDrive(voltage, new Rotation2d(RobotContainer.driveController.getLeftX(), RobotContainer.driveController.getLeftY()));
                         }
                       },
                       null,

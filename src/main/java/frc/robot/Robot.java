@@ -60,8 +60,8 @@ public class Robot extends LoggedRobot
             if(Constants.robotType == RobotType.DEVELOPMENT) Logger.addDataReceiver(new NT4Publisher());
 
             DataLogManager.start("U/logs/dataLogManager");
-            SignalLogger.enableAutoLogging(true);
             SignalLogger.setPath("U/logs/signalLogger");
+            SignalLogger.enableAutoLogging(true);
         }
         else{
             if(Constants.robotType == Constants.RobotType.REPLAY){

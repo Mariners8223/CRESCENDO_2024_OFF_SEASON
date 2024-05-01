@@ -23,8 +23,8 @@ public class SwerveModuleIODevBot implements SwerveModuleIO{
 
     public static final double maxDriveVelocityMetersPerSecond = 4;
 
-    public static final PIDFGains driveMotorPID = new PIDFGains(3.5037 * 6.75, 0.00, 0.00, 0.0, 0.22, 0, 6, 12, 1 / SwerveModule.SwerveModuleConstants.moduleThreadHz);
-    public static final PIDFGains steerMotorPID = new PIDFGains(14.042 * steerGearRatio, 0, 1.4 * steerGearRatio, 0, 0.1 * steerGearRatio, 0, 1 / SwerveModule.SwerveModuleConstants.moduleThreadHz);
+    public static final PIDFGains driveMotorPID = new PIDFGains(0 * 6.75, 0.00, 0.00, 0.0, 0.22, 0, 6, 12, 1 / SwerveModule.SwerveModuleConstants.moduleThreadHz);
+    public static final PIDFGains steerMotorPID = new PIDFGains(10, 0, 0, 0, 0.1, 0, 1 / SwerveModule.SwerveModuleConstants.moduleThreadHz);
 
     public static final double keepDriveMotorSpeedVoltage = 1.2;
   }
@@ -42,12 +42,13 @@ public class SwerveModuleIODevBot implements SwerveModuleIO{
 
   @Override
   public void updateInputs(SwerveModuleIOInputsAutoLogged inputs) {
-    steerMotor.getEncoder().setPosition(absEncoder.getPosition().getValueAsDouble() * DevBotConstants.steerGearRatio); //fix?
+    // steerMotor.getEncoder().setPosition(absEncoder.getPosition().getValueAsDouble() * DevBotConstants.steerGearRatio); //fix?
 
     inputs.currentState.angle = Rotation2d.fromRotations(steerMotor.getEncoder().getPosition() / DevBotConstants.steerGearRatio);
     inputs.currentState.speedMetersPerSecond = driveMotor.getVelocity().getValueAsDouble() * DevBotConstants.wheelCircumferenceMeters / DevBotConstants.steerGearRatio;
 
     inputs.steerPositionRadians = inputs.currentState.angle.getRadians();
+    inputs.absEncoderPosition = absEncoder.getAbsolutePosition().getValueAsDouble();
 
     inputs.steerVelocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(steerMotor.getEncoder().getVelocity() / DevBotConstants.steerGearRatio);
     inputs.drivePositionMeters = driveMotor.getPosition().getValueAsDouble() * DevBotConstants.driveGearRatio / DevBotConstants.driveGearRatio;
@@ -87,7 +88,7 @@ public class SwerveModuleIODevBot implements SwerveModuleIO{
 
     config.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
     config.MagnetSensor.SensorDirection = constants.isAbsEncoderInverted ? SensorDirectionValue.Clockwise_Positive : SensorDirectionValue.CounterClockwise_Positive;
-    config.MagnetSensor.MagnetOffset = constants.absoluteEncoderZeroOffset;
+    config.MagnetSensor.MagnetOffset = -constants.absoluteEncoderZeroOffset;
 
     canCoder.getPosition().setUpdateFrequency(SwerveModule.SwerveModuleConstants.moduleThreadHz);
     canCoder.setPosition(canCoder.getAbsolutePosition().getValueAsDouble());

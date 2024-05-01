@@ -48,10 +48,10 @@ public class Constants {
         }
 
         public static final class Steer{
-            public static final double front_left_absoluteEncoderZeroOffset = 0.59625; // the offset between the absolute encoder reading on the front left module, in degrees
-            public static final double front_right_absoluteEncoderZeroOffset = 0.9368611111111111; // the offset between the absolute encoder on the front left module, in degrees
-            public static final double back_left_absoluteEncoderZeroOffset = 0.2263055555555556; // the offset between the absolute encoder on the back left module, in degrees
-            public static final double back_right_absoluteEncoderZeroOffset = 0.7502777777777778; // the offset between the absolute encoder on the back right module, in degrees
+            public static final double front_left_absoluteEncoderZeroOffset = 0.198; // the offset between the absolute encoder reading on the front left module, in degrees
+            public static final double front_right_absoluteEncoderZeroOffset = -0.096; // the offset between the absolute encoder on the front left module, in degrees
+            public static final double back_left_absoluteEncoderZeroOffset = -0.371; // the offset between the absolute encoder on the back left module, in degrees
+            public static final double back_right_absoluteEncoderZeroOffset = 0.182; // the offset between the absolute encoder on the back right module, in degrees
 
             // public static final double front_left_absoluteEncoderZeroOffset = 0; // use this to calibrate zero offsets
             // public static final double front_right_absoluteEncoderZeroOffset = 0; // use this to calibrate zero offsets
@@ -117,13 +117,13 @@ public class Constants {
             }
         }
 
-        public static final SwerveModule front_left = new SwerveModule(ModuleName.Front_Left, 2, 3, 10, Steer.front_left_absoluteEncoderZeroOffset, false, false, false, true);
+        public static final SwerveModule front_left = new SwerveModule(ModuleName.Front_Left, 2, 3, 10, Steer.front_left_absoluteEncoderZeroOffset, false, false, false, false);
         //^the constants of the front left module
-        public static final SwerveModule front_right = new SwerveModule(ModuleName.Front_Right, 4, 5, 11, Steer.front_right_absoluteEncoderZeroOffset, false,false, false, true);
+        public static final SwerveModule front_right = new SwerveModule(ModuleName.Front_Right, 4, 5, 11, Steer.front_right_absoluteEncoderZeroOffset, false,false, false, false);
         //^the constants of the front right module
-        public static final SwerveModule back_left = new SwerveModule(ModuleName.Back_Left, 6, 7, 12, Steer.back_left_absoluteEncoderZeroOffset, false, false, false, true);
+        public static final SwerveModule back_left = new SwerveModule(ModuleName.Back_Left, 6, 7, 12, Steer.back_left_absoluteEncoderZeroOffset, false, false, false, false);
         //^the constants of the back left module
-        public static final SwerveModule back_right = new SwerveModule(ModuleName.Back_Right, 8, 9, 13, Steer.back_right_absoluteEncoderZeroOffset, false, false, false, true);
+        public static final SwerveModule back_right = new SwerveModule(ModuleName.Back_Right, 8, 9, 13, Steer.back_right_absoluteEncoderZeroOffset, false, false, false, false);
         //^the constants of the back right module
 
         public static final Map<Integer, String> sparkMaxNames = Map.of(
