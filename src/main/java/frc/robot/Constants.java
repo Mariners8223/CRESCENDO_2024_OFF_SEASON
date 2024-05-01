@@ -47,19 +47,6 @@ public class Constants {
             public static final double RobotHeightFromGround = 0.155; //the height of the top of the frame from the ground in meters
         }
 
-        public static final class Steer{
-            public static final double front_left_absoluteEncoderZeroOffset = 0.302; // the offset between the absolute encoder reading on the front left module, in degrees
-            public static final double front_right_absoluteEncoderZeroOffset = -0.44; // the offset between the absolute encoder on the front left module, in degrees
-            public static final double back_left_absoluteEncoderZeroOffset = -0.164; // the offset between the absolute encoder on the back left module, in degrees
-            public static final double back_right_absoluteEncoderZeroOffset = 0.303; // the offset between the absolute encoder on the back right module, in degrees
-
-            // public static final double front_left_absoluteEncoderZeroOffset = 0; // use this to calibrate zero offsets
-            // public static final double front_right_absoluteEncoderZeroOffset = 0; // use this to calibrate zero offsets
-            // public static final double back_left_absoluteEncoderZeroOffset = 0; // use this to calibrate zero offsets
-            // public static final double back_right_absoluteEncoderZeroOffset = 0; // use this to calibrate zero offsets
-
-        }
-
         public static final class PathPlanner{
             public static final boolean planPathToStartingPointIfNotAtIt = true; //if pathplanner should plan a path to the starting point if the robot is not there
             public static final boolean enableDynamicRePlanning = true; //if pathplanner should replan the path if the robot is beyond the tolerance or if the spike is too big
@@ -117,13 +104,21 @@ public class Constants {
             }
         }
 
-        public static final SwerveModule front_left = new SwerveModule(ModuleName.Front_Left, 2, 3, 10, Steer.front_left_absoluteEncoderZeroOffset, false, true, false, true);
+        public static final SwerveModule front_left = new SwerveModule(ModuleName.Front_Left, 2, 3, 10,
+            robotType == RobotType.DEVELOPMENT ? SwerveModuleIODevBot.DevBotConstants.front_left_zeroOffset : SwerveModuleIOCompBot.CompBotConstants.back_left_zeroOffset,
+            false, true, false, true);
         //^the constants of the front left module
-        public static final SwerveModule front_right = new SwerveModule(ModuleName.Front_Right, 4, 5, 11, Steer.front_right_absoluteEncoderZeroOffset, false,true, false, true);
+        public static final SwerveModule front_right = new SwerveModule(ModuleName.Front_Right, 4, 5, 11,
+                robotType == RobotType.DEVELOPMENT ? SwerveModuleIODevBot.DevBotConstants.front_right_zeroOffset : SwerveModuleIOCompBot.CompBotConstants.front_right_zeroOffset,
+                false,true, false, true);
         //^the constants of the front right module
-        public static final SwerveModule back_left = new SwerveModule(ModuleName.Back_Left, 6, 7, 12, Steer.back_left_absoluteEncoderZeroOffset, false, true, false, true);
+        public static final SwerveModule back_left = new SwerveModule(ModuleName.Back_Left, 6, 7, 12,
+                robotType == RobotType.DEVELOPMENT ? SwerveModuleIODevBot.DevBotConstants.back_left_zeroOffset : SwerveModuleIOCompBot.CompBotConstants.back_left_zeroOffset,
+                false, true, false, true);
         //^the constants of the back left module
-        public static final SwerveModule back_right = new SwerveModule(ModuleName.Back_Right, 8, 9, 13, Steer.back_right_absoluteEncoderZeroOffset, false, true, false, true);
+        public static final SwerveModule back_right = new SwerveModule(ModuleName.Back_Right, 8, 9, 13,
+                robotType == RobotType.DEVELOPMENT ? SwerveModuleIODevBot.DevBotConstants.back_right_zeroOffset : SwerveModuleIOCompBot.CompBotConstants.back_right_zeroOffset,
+                false, true, false, true);
         //^the constants of the back right module
 
         public static final Map<Integer, String> sparkMaxNames = Map.of(

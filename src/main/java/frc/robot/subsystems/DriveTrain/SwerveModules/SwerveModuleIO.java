@@ -9,7 +9,6 @@ public interface SwerveModuleIO {
     public SwerveModuleState currentState = new SwerveModuleState();
 
     public double steerVelocityRadPerSec = 0.0;
-    public double steerPositionRadians = 0.0;
     public double drivePositionMeters = 0.0;
 
     public double steerMotorAppliedVoltage = 0.0;

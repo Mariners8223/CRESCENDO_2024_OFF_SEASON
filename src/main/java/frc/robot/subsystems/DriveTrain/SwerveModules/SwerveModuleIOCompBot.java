@@ -22,10 +22,13 @@ public class SwerveModuleIOCompBot implements SwerveModuleIO{
 
     public static final double maxDriveVelocityMetersPerSecond = 4;
 
+    public static final double front_left_zeroOffset = 0.302; // the offset between the absolute encoder reading on the front left module, in degrees
+    public static final double front_right_zeroOffset = -0.44; // the offset between the absolute encoder on the front left module, in degrees
+    public static final double back_left_zeroOffset = -0.164; // the offset between the absolute encoder on the back left module, in degrees
+    public static final double back_right_zeroOffset = 0.303; // the offset between the absolute encoder on the back right module, in degrees
+
     public static final PIDFGains driveMotorPID = new PIDFGains(3.5037 * 6.75, 0.00, 0.00, 0.0, 0.22, 0, 6, 12, 1 / SwerveModule.SwerveModuleConstants.moduleThreadHz);
     public static final PIDFGains steerMotorPID = new PIDFGains(14.042 * steerGearRatio, 0, 1.4 * steerGearRatio, 0, 0.1 * steerGearRatio, 0, 1 / SwerveModule.SwerveModuleConstants.moduleThreadHz);
-
-    public static final double keepDriveMotorSpeedVoltage = 1.2;
   }
 
   private final TalonFX driveMotor;
@@ -45,6 +48,8 @@ public class SwerveModuleIOCompBot implements SwerveModuleIO{
 
     inputs.currentState.angle = Rotation2d.fromRotations(steerMotor.getEncoder().getPosition() / CompBotConstants.steerGearRatio);
     inputs.currentState.speedMetersPerSecond = driveMotor.getVelocity().getValueAsDouble() * CompBotConstants.wheelCircumferenceMeters / CompBotConstants.steerGearRatio;
+
+    inputs.absEncoderPosition = absEncoder.getAbsolutePosition() - absEncoder.getPositionOffset();
 
     inputs.steerVelocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(steerMotor.getEncoder().getVelocity() / CompBotConstants.steerGearRatio);
     inputs.drivePositionMeters = driveMotor.getPosition().getValueAsDouble() * CompBotConstants.driveGearRatio / CompBotConstants.driveGearRatio;
