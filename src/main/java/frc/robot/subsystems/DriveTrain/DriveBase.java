@@ -24,6 +24,7 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.ReplanningConfig;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -469,12 +470,18 @@ public class DriveBase extends SubsystemBase {
     public void execute() {
        driveBase.drive(
          //this basically takes the inputs from the controller and firsts checks if it's not drift or a mistake by checking if it is above a certain value then it multiplies it by the R2 axis that the driver uses to control the speed of the robot
-         (Math.abs(controller.getLeftY()) > 0.05 ? -controller.getLeftY() : 0) * (controller.getR2Axis() > 0.1 ? 1 + (driveBase.maxFreeWheelSpeed - 1) * (1 - controller.getR2Axis()) : 1),
+         (Math.abs(controller.getLeftY()) > 0.1 ? -controller.getLeftY() : 0) * lerp(1, driveBase.maxFreeWheelSpeed, (1 - (0.5 + controller.getR2Axis() / 2))),
 
-         (Math.abs(controller.getLeftX()) > 0.05 ? controller.getLeftX() : 0) * (controller.getR2Axis() > 0.1 ? 1 + (driveBase.maxFreeWheelSpeed- 1) * (1 - controller.getR2Axis()) : 1),
+         (Math.abs(controller.getLeftX()) > 0.1 ? -controller.getLeftX() : 0) * lerp(1, driveBase.maxFreeWheelSpeed, (1 - (0.5 + controller.getR2Axis() / 2))),
 
-         Math.abs(controller.getRightX()) > 0.05 ? controller.getRightX() : 0
+         Math.abs(controller.getRightX()) > 0.1 ? -controller.getRightX() : 0
          );
+
+
+    }
+
+    private double lerp(double start, double to, double p){
+      return start + (to - start) * p;
     }
 
     @Override
