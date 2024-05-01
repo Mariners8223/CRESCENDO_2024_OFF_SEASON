@@ -43,7 +43,7 @@ public class SwerveModule {
       steerPIDController = SwerveModuleIOCompBot.CompBotConstants.steerMotorPID.createPIDController();
     }
     else{
-      drivePIDController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(0, 0), 0);
+      drivePIDController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(0, 0));
       steerPIDController = new PIDController(0, 0, 0);
     }
 
