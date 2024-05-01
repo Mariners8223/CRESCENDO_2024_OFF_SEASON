@@ -169,6 +169,7 @@ public class SwerveModuleIODevBot implements SwerveModuleIO{
 
     sparkMax.setPeriodicFramePeriod(CANSparkMax.PeriodicFrame.kStatus2, (int)((1 / SwerveModule.SwerveModuleConstants.moduleThreadHz) * 1000)); //sets the status 0 frame to 10ms
     sparkMax.setPeriodicFramePeriod(CANSparkMax.PeriodicFrame.kStatus1, (int)((1 / SwerveModule.SwerveModuleConstants.moduleThreadHz) * 1000)); //sets the status 0 frame to 10ms
+    sparkMax.setPeriodicFramePeriod(CANSparkMax.PeriodicFrame.kStatus0, (int)((1 / SwerveModule.SwerveModuleConstants.moduleThreadHz) * 1000));
 
     sparkMax.getEncoder().setPositionConversionFactor(1); //sets the gear ratio for the module
 
