@@ -22,10 +22,13 @@ public class SwerveModuleIOCompBot implements SwerveModuleIO{
 
     public static final double maxDriveVelocityMetersPerSecond = 4;
 
-    public static final PIDFGains driveMotorPID = new PIDFGains(3.5037 * 6.75, 0.00, 0.00, 0.0, 0.22, 0, 6, 12);
-    public static final PIDFGains steerMotorPID = new PIDFGains(14.042 * steerGearRatio, 0, 1.4 * steerGearRatio, 0, 0.1 * steerGearRatio, 0);
+    public static final double front_left_zeroOffset = 0.302; // the offset between the absolute encoder reading on the front left module, in degrees
+    public static final double front_right_zeroOffset = -0.44; // the offset between the absolute encoder on the front left module, in degrees
+    public static final double back_left_zeroOffset = -0.164; // the offset between the absolute encoder on the back left module, in degrees
+    public static final double back_right_zeroOffset = 0.303; // the offset between the absolute encoder on the back right module, in degrees
 
-    public static final double keepDriveMotorSpeedVoltage = 1.2;
+    public static final PIDFGains driveMotorPID = new PIDFGains(3.5037 * 6.75, 0.00, 0.00, 0.0, 0.22, 0, 6, 12, 1 / SwerveModule.moduleThreadHz);
+    public static final PIDFGains steerMotorPID = new PIDFGains(14.042 * steerGearRatio, 0, 1.4 * steerGearRatio, 0, 0.1 * steerGearRatio, 0, 1 / SwerveModule.moduleThreadHz);
   }
 
   private final TalonFX driveMotor;
@@ -33,7 +36,7 @@ public class SwerveModuleIOCompBot implements SwerveModuleIO{
   private final DutyCycleEncoder absEncoder;
 
   public SwerveModuleIOCompBot(Constants.DriveTrain.SwerveModule constants){
-    absEncoder = configCANCoder(constants);
+    absEncoder = configDutyCycleEncoder(constants);
 
     driveMotor = configTalonFX(getTalonFXConfiguration(constants), constants);
     steerMotor = configCanSparkMax(constants);
@@ -41,10 +44,12 @@ public class SwerveModuleIOCompBot implements SwerveModuleIO{
 
   @Override
   public void updateInputs(SwerveModuleIOInputsAutoLogged inputs) {
-    steerMotor.getEncoder().setPosition(absEncoder.get() * CompBotConstants.steerGearRatio); //fix?
+    steerMotor.getEncoder().setPosition(absEncoder.getDistance() * CompBotConstants.steerGearRatio); //fix?
 
     inputs.currentState.angle = Rotation2d.fromRotations(steerMotor.getEncoder().getPosition() / CompBotConstants.steerGearRatio);
     inputs.currentState.speedMetersPerSecond = driveMotor.getVelocity().getValueAsDouble() * CompBotConstants.wheelCircumferenceMeters / CompBotConstants.steerGearRatio;
+
+    inputs.absEncoderPosition = absEncoder.getAbsolutePosition() - absEncoder.getPositionOffset();
 
     inputs.steerVelocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(steerMotor.getEncoder().getVelocity() / CompBotConstants.steerGearRatio);
     inputs.drivePositionMeters = driveMotor.getPosition().getValueAsDouble() * CompBotConstants.driveGearRatio / CompBotConstants.driveGearRatio;
@@ -74,8 +79,10 @@ public class SwerveModuleIOCompBot implements SwerveModuleIO{
     driveMotor.setPosition(0);
   }
 
-  private DutyCycleEncoder configCANCoder(Constants.DriveTrain.SwerveModule constants){
+  private DutyCycleEncoder configDutyCycleEncoder(Constants.DriveTrain.SwerveModule constants){
     DutyCycleEncoder encoder = new DutyCycleEncoder(constants.absEncoderID);
+    encoder.reset();
+    encoder.setDistancePerRotation(constants.isAbsEncoderInverted ? -1 : 1);
     encoder.setPositionOffset(constants.absoluteEncoderZeroOffset);
 
     return encoder;
@@ -86,10 +93,10 @@ public class SwerveModuleIOCompBot implements SwerveModuleIO{
 
     talonFX.getConfigurator().apply(config); //apply the given config
 
-    talonFX.getPosition().setUpdateFrequency(SwerveModule.SwerveModuleConstants.moduleThreadHz); //position is needed more for destroy
+    talonFX.getPosition().setUpdateFrequency(SwerveModule.moduleThreadHz); //position is needed more for destroy
 
-    talonFX.getVelocity().setUpdateFrequency(SwerveModule.SwerveModuleConstants.moduleThreadHz); //sets as default
-    talonFX.getMotorVoltage().setUpdateFrequency(50); //sets as default
+    talonFX.getVelocity().setUpdateFrequency(SwerveModule.moduleThreadHz); //sets as default
+    talonFX.getMotorVoltage().setUpdateFrequency(SwerveModule.moduleThreadHz); //sets as default
     talonFX.getSupplyCurrent().setUpdateFrequency(50); //sets as default
     talonFX.getStatorCurrent().setUpdateFrequency(50); //sets as default
     talonFX.getDeviceTemp().setUpdateFrequency(50);
@@ -150,11 +157,13 @@ public class SwerveModuleIOCompBot implements SwerveModuleIO{
     sparkMax.getPIDController().setD(CompBotConstants.steerMotorPID.getD()); //sets the D for the PID Controller
     sparkMax.getPIDController().setIZone(CompBotConstants.steerMotorPID.getIZone()); //sets the IZone for the PID Controller
 
-    sparkMax.setPeriodicFramePeriod(CANSparkMax.PeriodicFrame.kStatus2, (int)((1 / SwerveModule.SwerveModuleConstants.moduleThreadHz) * 1000)); //sets the status 0 frame to 10ms
+    sparkMax.setPeriodicFramePeriod(CANSparkMax.PeriodicFrame.kStatus2, (int)((1 / SwerveModule.moduleThreadHz) * 1000)); //sets the status 0 frame to 10ms
+    sparkMax.setPeriodicFramePeriod(CANSparkMax.PeriodicFrame.kStatus1, (int)((1 / SwerveModule.moduleThreadHz) * 1000)); //sets the status 0 frame to 10ms
+    sparkMax.setPeriodicFramePeriod(CANSparkMax.PeriodicFrame.kStatus0, (int)((1 / SwerveModule.moduleThreadHz) * 1000));
 
     sparkMax.getEncoder().setPositionConversionFactor(1); //sets the gear ratio for the module
 
-    sparkMax.getEncoder().setPosition(absEncoder.get() * CompBotConstants.steerGearRatio); //sets the position of the motor to the absolute encoder
+    sparkMax.getEncoder().setPosition(absEncoder.getDistance() * CompBotConstants.steerGearRatio); //sets the position of the motor to the absolute encoder
 
     sparkMax.setSmartCurrentLimit(35); //sets the current limit of the motor (thanks noga for reminding m)
     sparkMax.setSecondaryCurrentLimit(60);

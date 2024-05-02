@@ -35,31 +35,6 @@ public class Constants {
             Back_Right
         }
 
-        public static final class Global{
-            public static final double maxAcceleration = 40; //the max xy acceleration of the robot in meter per second squared //TODO find real value
-            public static final double maxAccelerationRotation = 40; //the max rotation acceleration of the robot in omega radians per second squared //TODO find real value
-
-            public static final double distanceBetweenWheels = 0.576; // the distance between each wheel in meters //TODO update based on new swerve maybe?
-
-            public static final double maxRotationSpeed = 6.27; //the max speed the robot can rotate in (radians per second) //TODO find real value
-
-            @SuppressWarnings("unused")
-            public static final double RobotHeightFromGround = 0.155; //the height of the top of the frame from the ground in meters
-        }
-
-        public static final class Steer{
-            public static final double front_left_absoluteEncoderZeroOffset = 0.59625; // the offset between the absolute encoder reading on the front left module, in degrees
-            public static final double front_right_absoluteEncoderZeroOffset = 0.9368611111111111; // the offset between the absolute encoder on the front left module, in degrees
-            public static final double back_left_absoluteEncoderZeroOffset = 0.2263055555555556; // the offset between the absolute encoder on the back left module, in degrees
-            public static final double back_right_absoluteEncoderZeroOffset = 0.7502777777777778; // the offset between the absolute encoder on the back right module, in degrees
-
-            // public static final double front_left_absoluteEncoderZeroOffset = 0; // use this to calibrate zero offsets
-            // public static final double front_right_absoluteEncoderZeroOffset = 0; // use this to calibrate zero offsets
-            // public static final double back_left_absoluteEncoderZeroOffset = 0; // use this to calibrate zero offsets
-            // public static final double back_right_absoluteEncoderZeroOffset = 0; // use this to calibrate zero offsets
-
-        }
-
         public static final class PathPlanner{
             public static final boolean planPathToStartingPointIfNotAtIt = true; //if pathplanner should plan a path to the starting point if the robot is not there
             public static final boolean enableDynamicRePlanning = true; //if pathplanner should replan the path if the robot is beyond the tolerance or if the spike is too big
@@ -68,18 +43,19 @@ public class Constants {
 
             public static final PathConstraints pathConstraints = new PathConstraints(
                     robotType == RobotType.DEVELOPMENT ? SwerveModuleIODevBot.DevBotConstants.maxDriveVelocityMetersPerSecond : SwerveModuleIOCompBot.CompBotConstants.maxDriveVelocityMetersPerSecond,
-                    Constants.DriveTrain.Global.maxAcceleration,
-                    Constants.DriveTrain.Global.maxRotationSpeed, Constants.DriveTrain.Global.maxAccelerationRotation); //the constraints for pathPlanner
-
+                    10,
+                    10,
+                    20); //the constraints for pathPlanner
 
             public static final PIDFGains thetaPID = new PIDFGains(1.4574, 0, 0); //the pid gains for the PID Controller of the robot angle, units are radians per second
             public static final PIDFGains XYPID = new PIDFGains(5.5, 0.055, 0.05); //the pid gains for the pid controller of the robot's velocity, units are meters per second
         }
 
         public static class SwerveModule{
+            public static final double distanceBetweenWheels = 0.576; // the distance between each wheel in meters //TODO update based on new swerve maybe?
             public static final Translation2d[] moduleTranslations = new Translation2d[]
-                {new Translation2d(Global.distanceBetweenWheels / 2, Global.distanceBetweenWheels / 2), new Translation2d(Global.distanceBetweenWheels / 2, -Global.distanceBetweenWheels / 2),
-                 new Translation2d(-Global.distanceBetweenWheels / 2, Global.distanceBetweenWheels / 2), new Translation2d(-Global.distanceBetweenWheels / 2, -Global.distanceBetweenWheels / 2)};
+                {new Translation2d(distanceBetweenWheels / 2, distanceBetweenWheels / 2), new Translation2d(distanceBetweenWheels / 2, -distanceBetweenWheels / 2),
+                 new Translation2d(-distanceBetweenWheels / 2, distanceBetweenWheels / 2), new Translation2d(-distanceBetweenWheels / 2, -distanceBetweenWheels / 2)};
             //^ places the translation of each module in the array in order of the enum (front left, front right, back left, back right)
 
             public final ModuleName moduleName; //the name of the module (enum)
@@ -92,13 +68,9 @@ public class Constants {
             public final boolean isDriveInverted; // if the drive motor output should be reversed
             public final boolean isAbsEncoderInverted; // if the reading of the absolute encoder should be inverted
 
-            public final boolean shouldSteerMotorBeResetedByAbsEncoder; // if the steer motor should be reseted by the absolute encoder
-
             public final double absoluteEncoderZeroOffset; //the offset between the magnets zero and the modules zero in degrees
 
-            public final Translation2d moduleTranslation; //the translation of the module relative to the center of the robot
-
-            public SwerveModule(ModuleName moduleName, int driveMotorID, int steerMotorID, int AbsEncoderID, double absoluteEncoderZeroOffset, boolean shouldSteerMotorBeResetByAbsEncoder, boolean isSteerInverted, boolean isDriveInverted, boolean isAbsEncoderInverted){
+            public SwerveModule(ModuleName moduleName, int driveMotorID, int steerMotorID, int AbsEncoderID, double absoluteEncoderZeroOffset, boolean isSteerInverted, boolean isDriveInverted, boolean isAbsEncoderInverted){
                 this.moduleName = moduleName;
 
                 this.driveMotorID = driveMotorID;
@@ -109,21 +81,25 @@ public class Constants {
                 this.isSteerInverted = isSteerInverted;
                 this.isAbsEncoderInverted = isAbsEncoderInverted;
 
-                this.shouldSteerMotorBeResetedByAbsEncoder = shouldSteerMotorBeResetByAbsEncoder;
-
                 this.absoluteEncoderZeroOffset = absoluteEncoderZeroOffset;
-
-                this.moduleTranslation = moduleTranslations[moduleName.ordinal()];
             }
         }
 
-        public static final SwerveModule front_left = new SwerveModule(ModuleName.Front_Left, 2, 3, 10, Steer.front_left_absoluteEncoderZeroOffset, false, false, false, true);
+        public static final SwerveModule front_left = new SwerveModule(ModuleName.Front_Left, 2, 3, 10,
+                robotType == RobotType.DEVELOPMENT ? SwerveModuleIODevBot.DevBotConstants.front_left_zeroOffset : SwerveModuleIOCompBot.CompBotConstants.back_left_zeroOffset,
+                true, false, true);
         //^the constants of the front left module
-        public static final SwerveModule front_right = new SwerveModule(ModuleName.Front_Right, 4, 5, 11, Steer.front_right_absoluteEncoderZeroOffset, false,false, false, true);
+        public static final SwerveModule front_right = new SwerveModule(ModuleName.Front_Right, 4, 5, 11,
+                robotType == RobotType.DEVELOPMENT ? SwerveModuleIODevBot.DevBotConstants.front_right_zeroOffset : SwerveModuleIOCompBot.CompBotConstants.front_right_zeroOffset,
+                true, false, true);
         //^the constants of the front right module
-        public static final SwerveModule back_left = new SwerveModule(ModuleName.Back_Left, 6, 7, 12, Steer.back_left_absoluteEncoderZeroOffset, false, false, false, true);
+        public static final SwerveModule back_left = new SwerveModule(ModuleName.Back_Left, 6, 7, 12,
+                robotType == RobotType.DEVELOPMENT ? SwerveModuleIODevBot.DevBotConstants.back_left_zeroOffset : SwerveModuleIOCompBot.CompBotConstants.back_left_zeroOffset,
+                true, false, true);
         //^the constants of the back left module
-        public static final SwerveModule back_right = new SwerveModule(ModuleName.Back_Right, 8, 9, 13, Steer.back_right_absoluteEncoderZeroOffset, false, false, false, true);
+        public static final SwerveModule back_right = new SwerveModule(ModuleName.Back_Right, 8, 9, 13,
+                robotType == RobotType.DEVELOPMENT ? SwerveModuleIODevBot.DevBotConstants.back_right_zeroOffset : SwerveModuleIOCompBot.CompBotConstants.back_right_zeroOffset,
+                true, false, true);
         //^the constants of the back right module
 
         public static final Map<Integer, String> sparkMaxNames = Map.of(

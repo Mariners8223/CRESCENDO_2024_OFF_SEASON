@@ -11,7 +11,7 @@ import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
 import frc.robot.Constants.RobotType;
-import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModule.SwerveModuleConstants;
+import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModule;
 import frc.util.LocalADStarAK;
 
 import org.littletonrobotics.junction.LogFileUtil;
@@ -23,7 +23,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
-import org.littletonrobotics.junction.rlog.RLOGServer;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import org.littletonrobotics.urcl.URCL;
@@ -61,8 +60,8 @@ public class Robot extends LoggedRobot
             if(Constants.robotType == RobotType.DEVELOPMENT) Logger.addDataReceiver(new NT4Publisher());
 
             DataLogManager.start("U/logs/dataLogManager");
-            SignalLogger.enableAutoLogging(true);
             SignalLogger.setPath("U/logs/signalLogger");
+            SignalLogger.enableAutoLogging(true);
         }
         else{
             if(Constants.robotType == Constants.RobotType.REPLAY){
@@ -89,7 +88,7 @@ public class Robot extends LoggedRobot
         Notifier notifier = RobotContainer.driveBase.getNotifier();
         notifier.setName("DriveBaseNotifier");
         System.out.println("Starting DriveBase Notifier");
-        notifier.startPeriodic(1 / SwerveModuleConstants.moduleThreadHz);
+        notifier.startPeriodic(1 / SwerveModule.moduleThreadHz);
     }
     
     

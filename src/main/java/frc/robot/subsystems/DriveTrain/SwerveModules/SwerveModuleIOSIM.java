@@ -16,8 +16,6 @@ public class SwerveModuleIOSIM implements SwerveModuleIO{
   private double steerMotorVoltage = 0;
 
   public SwerveModuleIOSIM(){
-
-
     if (Constants.robotType == Constants.RobotType.DEVELOPMENT) {
       steerMotor = new DCMotorSim(DCMotor.getNEO(1), SwerveModuleIODevBot.DevBotConstants.driveGearRatio, 0.25);
       driveMotor = new DCMotorSim(DCMotor.getFalcon500(1), SwerveModuleIODevBot.DevBotConstants.driveGearRatio * SwerveModuleIODevBot.DevBotConstants.wheelRadiusMeters, 0.25);
@@ -29,8 +27,8 @@ public class SwerveModuleIOSIM implements SwerveModuleIO{
 
   @Override
   public void updateInputs(SwerveModuleIOInputsAutoLogged inputs) {
-    driveMotor.update(1 / SwerveModule.SwerveModuleConstants.moduleThreadHz);
-    steerMotor.update(1 / SwerveModule.SwerveModuleConstants.moduleThreadHz);
+    driveMotor.update(1 / SwerveModule.moduleThreadHz);
+    steerMotor.update(1 / SwerveModule.moduleThreadHz);
 
     inputs.currentState.speedMetersPerSecond = driveMotor.getAngularVelocityRadPerSec();
     inputs.currentState.angle = Rotation2d.fromRadians(steerMotor.getAngularPositionRad());

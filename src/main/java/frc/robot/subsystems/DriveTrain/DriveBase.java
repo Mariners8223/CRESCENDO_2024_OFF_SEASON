@@ -37,6 +37,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 
+import static edu.wpi.first.units.Units.Volts;
+
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -100,7 +102,7 @@ public class DriveBase extends SubsystemBase {
       Constants.DriveTrain.PathPlanner.XYPID.createPIDConstants(),
       Constants.DriveTrain.PathPlanner.thetaPID.createPIDConstants(),
       maxFreeWheelSpeed,
-      Math.sqrt(Math.pow((Constants.DriveTrain.Global.distanceBetweenWheels / 2), 2) * 2),
+      Math.sqrt(Math.pow(Constants.DriveTrain.SwerveModule.distanceBetweenWheels, 2) * 2) / 2,
       replanConfig);
     //^creates path constraints for pathPlanner
 
@@ -140,9 +142,6 @@ public class DriveBase extends SubsystemBase {
 
         previousPositions[i] = positions[i].copy();
       }
-
-      // System.out.println(driveTrainKinematics.toTwist2d(moduleDeltas));
-      // System.out.println(moduleDeltas[0]);
       gyro.update();
 
       try {
@@ -467,12 +466,16 @@ public class DriveBase extends SubsystemBase {
     public void execute() {
        driveBase.drive(
          //this basically takes the inputs from the controller and firsts checks if it's not drift or a mistake by checking if it is above a certain value then it multiplies it by the R2 axis that the driver uses to control the speed of the robot
-         (Math.abs(controller.getLeftY()) > 0.05 ? -controller.getLeftY() : 0) * (controller.getR2Axis() > 0.1 ? 1 + (driveBase.maxFreeWheelSpeed - 1) * (1 - controller.getR2Axis()) : 1),
+         (Math.abs(controller.getLeftY()) > 0.1 ? -controller.getLeftY() : 0) * lerp(1 - (0.5 + controller.getR2Axis() / 2)),
 
-         (Math.abs(controller.getLeftX()) > 0.05 ? controller.getLeftX() : 0) * (controller.getR2Axis() > 0.1 ? 1 + (driveBase.maxFreeWheelSpeed- 1) * (1 - controller.getR2Axis()) : 1),
+         (Math.abs(controller.getLeftX()) > 0.1 ? -controller.getLeftX() : 0) * lerp(1 - (0.5 + controller.getR2Axis() / 2)),
 
-         Math.abs(controller.getRightX()) > 0.05 ? controller.getRightX() : 0
+         Math.abs(controller.getRightX()) > 0.1 ? -controller.getRightX() : 0
          );
+    }
+
+    private double lerp(double p){
+      return 1 + (driveBase.maxFreeWheelSpeed - 1) * p;
     }
 
     @Override
@@ -505,7 +508,7 @@ public class DriveBase extends SubsystemBase {
               ),
               new SysIdRoutine.Mechanism(
                       (voltage) -> {
-                        for(int i = 0; i < 4; i++) driveBase.modules[i].runSysID(null, voltage);
+                        for(int i = 0; i < 4; i++) driveBase.modules[i].runSysIDSteer(voltage);
                       },
                       null,
                       driveBase,
@@ -514,12 +517,12 @@ public class DriveBase extends SubsystemBase {
 
       driveSysId = new SysIdRoutine(
         new SysIdRoutine.Config(
-          null, null, null, (state) -> Logger.recordOutput("SysIDDriveState", state.toString())
+          null, Volts.of(3), null, (state) -> Logger.recordOutput("SysIDDriveState", state.toString())
         ),
               new SysIdRoutine.Mechanism(
                       (voltage) -> {
                         for(int i = 0; i < 4; i++){
-                          driveBase.modules[i].runSysID(voltage, null);
+                          driveBase.modules[i].runSysIDDrive(voltage, new Rotation2d(RobotContainer.driveController.getLeftX(), RobotContainer.driveController.getLeftY()));
                         }
                       },
                       null,

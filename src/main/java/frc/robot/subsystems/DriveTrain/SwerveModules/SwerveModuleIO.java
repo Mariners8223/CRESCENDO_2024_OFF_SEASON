@@ -13,6 +13,8 @@ public interface SwerveModuleIO {
 
     public double steerMotorAppliedVoltage = 0.0;
     public double driveMotorAppliedVoltage = 0.0;
+
+    public double absEncoderPosition = 0.0;
   }
 
   /**

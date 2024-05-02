@@ -2,6 +2,7 @@ package frc.robot.subsystems.DriveTrain.SwerveModules;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -18,9 +19,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import static edu.wpi.first.units.Units.Volts;
 
 public class SwerveModule {
-  public static class SwerveModuleConstants{
-    public static final double moduleThreadHz = 200;
-  }
+
+  public static final double moduleThreadHz = 200;
 
   private final String moduleName;
   private final SwerveModuleIO io;
@@ -29,7 +29,9 @@ public class SwerveModule {
   private final ProfiledPIDController drivePIDController;
   private final PIDController steerPIDController;
 
-  private SwerveModuleState targetState;
+  private boolean isRunningSysID = false;
+
+  private SwerveModuleState targetState = new SwerveModuleState();
 
   private final ReentrantLock lock = new ReentrantLock();
 
@@ -43,8 +45,8 @@ public class SwerveModule {
       steerPIDController = SwerveModuleIOCompBot.CompBotConstants.steerMotorPID.createPIDController();
     }
     else{
-      drivePIDController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(0, 0), 0);
-      steerPIDController = new PIDController(0, 0, 0);
+      drivePIDController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(0, 0), 1 / moduleThreadHz);
+      steerPIDController = new PIDController(0, 0, 0, 1 / moduleThreadHz);
     }
 
     if(RobotBase.isSimulation()){
@@ -65,14 +67,21 @@ public class SwerveModule {
       lock.lock();
       io.updateInputs(inputs);
 
-      if(targetState != null){
+      if(!isRunningSysID){
         targetState = SwerveModuleState.optimize(targetState, inputs.currentState.angle);
         targetState.speedMetersPerSecond *= Math.cos(targetState.angle.getRadians() - inputs.currentState.angle.getRadians());
 
-        double steerOutPut = steerPIDController.calculate(inputs.currentState.angle.getRotations(), targetState.angle.getRotations());
+        double steerOutPut = steerPIDController.calculate(inputs.currentState.angle.getRadians(), targetState.angle.getRadians());
 
         io.setDriveMotorVoltage(drivePIDController.calculate(inputs.currentState.speedMetersPerSecond, targetState.speedMetersPerSecond));
         io.setSteerMotorVoltage(steerPIDController.atSetpoint() ? 0 : steerOutPut);
+      }
+      else{
+        if(targetState != null){
+          double steerOutPut = steerPIDController.calculate(inputs.currentState.angle.getRadians(), targetState.angle.getRadians());
+
+          io.setSteerMotorVoltage(steerPIDController.atSetpoint() ? 0 : steerOutPut);
+        }
       }
       return new SwerveModulePosition(inputs.drivePositionMeters, inputs.currentState.angle);
     }
@@ -84,7 +93,8 @@ public class SwerveModule {
   public SwerveModuleState getCurrentState(){
     try {
       lock.lock();
-      Logger.processInputs("SwerveModule " + moduleName, inputs);
+      Logger.processInputs("SwerveModule_" + moduleName, inputs);
+      // Logger.processInputs(moduleName + " SwerveModule", inputs);
       return inputs.currentState;
     }
     finally {
@@ -95,6 +105,7 @@ public class SwerveModule {
   public SwerveModuleState run(SwerveModuleState targetState){
     try{
       lock.lock();
+      isRunningSysID = false;
       targetState = SwerveModuleState.optimize(targetState, inputs.currentState.angle);
       targetState.speedMetersPerSecond *= inputs.currentState.angle.minus(targetState.angle).getCos();
 
@@ -107,14 +118,27 @@ public class SwerveModule {
     }
   }
 
-  public void runSysID(Measure<Voltage> driveVoltage, Measure<Voltage> steerVoltage){
+  public void runSysIDSteer(Measure<Voltage> steerVoltage){
     try{
       lock.lock();
-      if(driveVoltage != null) io.setDriveMotorVoltage(driveVoltage.in(Volts));
-      if(steerVoltage != null) io.setSteerMotorVoltage(steerVoltage.in(Volts));
+      isRunningSysID = true;
+      io.setSteerMotorVoltage(steerVoltage.in(Volts));
       targetState = null;
     }
     finally {
+      lock.unlock();
+    }
+  }
+
+  public void runSysIDDrive(Measure<Voltage> driveVoltage, Rotation2d angle){
+    try{
+      lock.lock();
+      isRunningSysID = true;
+      io.setDriveMotorVoltage(driveVoltage.in(Volts));
+      targetState.angle = angle;
+    }
+    finally
+    {
       lock.unlock();
     }
   }

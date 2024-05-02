@@ -68,7 +68,7 @@ class NavxIO : GyroIO{
   override fun update(){
     try {
       lock.lock()
-      inputs.angle = navx.rotation2d.minus(inputs.rotationOffset)
+      inputs.angle = navx.rotation2d.minus(inputs.rotationOffset).unaryMinus()
 
       inputs.yaw = navx.yaw.toDouble()
       inputs.pitch = navx.pitch.toDouble()
