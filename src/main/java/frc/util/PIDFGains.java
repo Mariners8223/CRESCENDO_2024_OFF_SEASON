@@ -137,6 +137,9 @@ public class PIDFGains {
     }
 
     public ProfiledPIDController createProfiledPIDController() {
-      return new ProfiledPIDController(_kP, _kI, _kD, new TrapezoidProfile.Constraints(_maxVelocity , _maxAcceleration), _Period);
+      var controller = new ProfiledPIDController(_kP, _kI, _kD, new TrapezoidProfile.Constraints(_maxVelocity , _maxAcceleration), _Period);
+      controller.setTolerance(_tolerance);
+      controller.setIZone(_iZone);
+      return controller;
     }
   }
