@@ -67,8 +67,8 @@ class SimGyroIO(private val twistSupplier: Supplier<Twist2d>, private val chassi
       velocityX = chassisSpeeds.vxMetersPerSecond
       velocityY = chassisSpeeds.vyMetersPerSecond
 
-      accelerationX = (velocityX - prevVelocityX) / (1 / SwerveModule.SwerveModuleConstants.moduleThreadHz)
-      accelerationY = (velocityY - prevVelocityY) / (1 / SwerveModule.SwerveModuleConstants.moduleThreadHz)
+      accelerationX = (velocityX - prevVelocityX) / (1 / SwerveModule.moduleThreadHz)
+      accelerationY = (velocityY - prevVelocityY) / (1 / SwerveModule.moduleThreadHz)
 
       Logger.recordOutput("Gyro/PrevVelocityX", prevVelocityX)
       Logger.recordOutput("Gyro/PrevVelocityY", prevVelocityY)
