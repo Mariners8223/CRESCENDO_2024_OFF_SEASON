@@ -3,6 +3,7 @@ package frc.robot.subsystems.DriveTrain.SwerveModules;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -20,7 +21,21 @@ import static edu.wpi.first.units.Units.Volts;
 
 public class SwerveModule {
 
+  /**
+   * the name of the swerve modules by order
+   */
+  public  enum ModuleName{
+    Front_Left,
+    Front_Right,
+    Back_Left,
+    Back_Right
+  }
+
   public static final double moduleThreadHz = 200;
+  public static final double distanceBetweenWheels = 0.576; // the distance between each wheel in meters
+  public static final Translation2d[] moduleTranslations = new Translation2d[]
+          {new Translation2d(distanceBetweenWheels / 2, distanceBetweenWheels / 2), new Translation2d(distanceBetweenWheels / 2, -distanceBetweenWheels / 2),
+                  new Translation2d(-distanceBetweenWheels / 2, distanceBetweenWheels / 2), new Translation2d(-distanceBetweenWheels / 2, -distanceBetweenWheels / 2)};
 
   private final String moduleName;
   private final SwerveModuleIO io;
@@ -35,7 +50,7 @@ public class SwerveModule {
 
   private final ReentrantLock lock = new ReentrantLock();
 
-  public SwerveModule(Constants.DriveTrain.SwerveModule constants) {
+  public SwerveModule(ModuleName name) {
     if(Constants.robotType == Constants.RobotType.DEVELOPMENT){
       drivePIDController = SwerveModuleIODevBot.DevBotConstants.driveMotorPID.createProfiledPIDController();
       steerPIDController = SwerveModuleIODevBot.DevBotConstants.steerMotorPID.createPIDController();
@@ -56,10 +71,10 @@ public class SwerveModule {
       SmartDashboard.putData("drivePIDController", drivePIDController);
       SmartDashboard.putData("steerPIDController", steerPIDController);
     }
-    else if(Constants.robotType == Constants.RobotType.DEVELOPMENT) this.io = new SwerveModuleIODevBot(constants);
-    else this.io = new SwerveModuleIOCompBot(constants);
+    else if(Constants.robotType == Constants.RobotType.DEVELOPMENT) this.io = new SwerveModuleIODevBot(name);
+    else this.io = new SwerveModuleIOCompBot(name);
 
-    this.moduleName = constants.moduleName.name();
+    this.moduleName = name.toString();
   }
 
   public SwerveModulePosition modulePeriodic() {

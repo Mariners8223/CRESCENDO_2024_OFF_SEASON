@@ -11,6 +11,7 @@ import com.revrobotics.CANSparkMax;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
+import frc.robot.MotorMap;
 import frc.util.PIDFGains;
 
 public class SwerveModuleIODevBot implements SwerveModuleIO{
@@ -40,11 +41,22 @@ public class SwerveModuleIODevBot implements SwerveModuleIO{
   private final CANSparkMax steerMotor;
   private final CANcoder absEncoder;
 
-  public SwerveModuleIODevBot(Constants.DriveTrain.SwerveModule constants){
-    absEncoder = configCANCoder(constants);
+  public SwerveModuleIODevBot(SwerveModule.ModuleName name){
+    int driveMotorID = MotorMap.DriveBase.modules[name.ordinal()][0];
+    int steerMotorID = MotorMap.DriveBase.modules[name.ordinal()][1];
+    int absEncoderID = MotorMap.DriveBase.modules[name.ordinal()][2];
 
-    driveMotor = configTalonFX(getTalonFXConfiguration(constants), constants);
-    steerMotor = configCanSparkMax(constants);
+    double zeroOffset = switch (name){
+      case Front_Left -> DevBotConstants.front_left_zeroOffset;
+      case Front_Right -> DevBotConstants.front_right_zeroOffset;
+      case Back_Left -> DevBotConstants.back_left_zeroOffset;
+      case Back_Right -> DevBotConstants.back_right_zeroOffset;
+    };
+
+    absEncoder = configCANCoder(absEncoderID, zeroOffset);
+
+    driveMotor = configTalonFX(getTalonFXConfiguration(), driveMotorID);
+    steerMotor = configCanSparkMax(steerMotorID);
   }
 
   @Override
@@ -85,16 +97,16 @@ public class SwerveModuleIODevBot implements SwerveModuleIO{
   }
 
 
-  private CANcoder configCANCoder(Constants.DriveTrain.SwerveModule constants){
-    CANcoder canCoder = new CANcoder(constants.absEncoderID);
+  private CANcoder configCANCoder(int absEncoderID, double absoluteEncoderZeroOffset){
+    CANcoder canCoder = new CANcoder(absEncoderID);
 
     canCoder.getPosition().setUpdateFrequency(SwerveModule.moduleThreadHz);
     CANcoderConfiguration config = new CANcoderConfiguration();
     config.FutureProofConfigs = false;
 
     config.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
-    config.MagnetSensor.SensorDirection = constants.isAbsEncoderInverted ? SensorDirectionValue.Clockwise_Positive : SensorDirectionValue.CounterClockwise_Positive;
-    config.MagnetSensor.MagnetOffset = -constants.absoluteEncoderZeroOffset;
+    config.MagnetSensor.SensorDirection = DevBotConstants.isAbsEncoderInverted ? SensorDirectionValue.Clockwise_Positive : SensorDirectionValue.CounterClockwise_Positive;
+    config.MagnetSensor.MagnetOffset = -absoluteEncoderZeroOffset;
 
     canCoder.getPosition().setUpdateFrequency(SwerveModule.moduleThreadHz);
     canCoder.setPosition(canCoder.getAbsolutePosition().getValueAsDouble());
@@ -105,8 +117,8 @@ public class SwerveModuleIODevBot implements SwerveModuleIO{
     return canCoder;
   }
 
-  private TalonFX configTalonFX(TalonFXConfiguration config, Constants.DriveTrain.SwerveModule constants){
-    TalonFX talonFX = new TalonFX(constants.driveMotorID); //creates a new talon fx
+  private TalonFX configTalonFX(TalonFXConfiguration config, int driveMotorID){
+    TalonFX talonFX = new TalonFX(driveMotorID); //creates a new talon fx
 
     talonFX.getConfigurator().apply(config); //apply the given config
 
@@ -129,13 +141,13 @@ public class SwerveModuleIODevBot implements SwerveModuleIO{
    * creates a config for the talonFX
    * @return the new config
    */
-  private TalonFXConfiguration getTalonFXConfiguration(Constants.DriveTrain.SwerveModule constants){
+  private TalonFXConfiguration getTalonFXConfiguration(){
     TalonFXConfiguration config = new TalonFXConfiguration(); //creates a new talonFX config
 
     config.FutureProofConfigs = false; //disables future proofing
     config.Audio.AllowMusicDurDisable = false;
 
-    config.MotorOutput.Inverted = constants.isDriveInverted ? InvertedValue.CounterClockwise_Positive : InvertedValue.Clockwise_Positive; //sets the inverted value
+    config.MotorOutput.Inverted = DevBotConstants.isDriveInverted ? InvertedValue.CounterClockwise_Positive : InvertedValue.Clockwise_Positive; //sets the inverted value
 
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
     config.CurrentLimits.SupplyCurrentLimit = 50;
@@ -158,14 +170,13 @@ public class SwerveModuleIODevBot implements SwerveModuleIO{
   /**
    * use this to config the steer motor at the start of the program
    */
-  private CANSparkMax configCanSparkMax(Constants.DriveTrain.SwerveModule constants){
-    CANSparkMax sparkMax = new CANSparkMax(constants.steerMotorID, CANSparkLowLevel.MotorType.kBrushless);
+  private CANSparkMax configCanSparkMax(int steerMotorID){
+    CANSparkMax sparkMax = new CANSparkMax(steerMotorID, CANSparkLowLevel.MotorType.kBrushless);
 
     sparkMax.restoreFactoryDefaults();
 
     sparkMax.enableVoltageCompensation(12); //sets voltage compensation to 12V
-    sparkMax.setInverted(constants.isSteerInverted); //sets if the motor is inverted or not
-    sparkMax.setInverted(constants.isSteerInverted); //sets if the motor is inverted or not
+    sparkMax.setInverted(DevBotConstants.isSteerInverted); //sets if the motor is inverted or not
 
     sparkMax.setIdleMode(CANSparkBase.IdleMode.kCoast); //sets the idle mode to coat (automatically goes to brakes once the robot is enabled)
 

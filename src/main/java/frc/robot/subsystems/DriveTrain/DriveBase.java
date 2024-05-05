@@ -49,7 +49,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class DriveBase extends SubsystemBase {
   private final SwerveModule[] modules = new SwerveModule[4]; //the array of the modules
 
-  private final SwerveDriveKinematics driveTrainKinematics = new SwerveDriveKinematics(Constants.DriveTrain.SwerveModule.moduleTranslations); //the kinematics of the swerve drivetrain
+  private final SwerveDriveKinematics driveTrainKinematics = new SwerveDriveKinematics(SwerveModule.moduleTranslations); //the kinematics of the swerve drivetrain
 
   private final SwerveModulePosition[] moduleDeltas = new SwerveModulePosition[]{new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition()}; //the deltas of the modules
 
@@ -82,11 +82,10 @@ public class DriveBase extends SubsystemBase {
 
   /** Creates a new DriveBase. */
   public DriveBase() {
-    var moduleConstants = Constants.DriveTrain.createConstants();
-    modules[0] = new SwerveModule(moduleConstants[0]);
-    modules[1] = new SwerveModule(moduleConstants[1]);
-    modules[2] = new SwerveModule(moduleConstants[2]);
-    modules[3] = new SwerveModule(moduleConstants[3]);
+    modules[0] = new SwerveModule(SwerveModule.ModuleName.Front_Left);
+    modules[1] = new SwerveModule(SwerveModule.ModuleName.Front_Right);
+    modules[2] = new SwerveModule(SwerveModule.ModuleName.Back_Left);
+    modules[3] = new SwerveModule(SwerveModule.ModuleName.Back_Right);
 
     if(RobotBase.isReal()){
       gyro = new NavxIO(Constants.robotType == RobotType.DEVELOPMENT);
@@ -104,7 +103,7 @@ public class DriveBase extends SubsystemBase {
       Constants.DriveTrain.PathPlanner.XYPID.createPIDConstants(),
       Constants.DriveTrain.PathPlanner.thetaPID.createPIDConstants(),
       maxFreeWheelSpeed,
-      Math.sqrt(Math.pow(Constants.DriveTrain.SwerveModule.distanceBetweenWheels, 2) * 2) / 2,
+      Math.sqrt(Math.pow(SwerveModule.distanceBetweenWheels, 2) * 2) / 2,
       replanConfig);
     //^creates path constraints for pathPlanner
 
