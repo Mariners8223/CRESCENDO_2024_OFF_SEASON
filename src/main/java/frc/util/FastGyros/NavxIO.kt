@@ -9,14 +9,13 @@ import org.littletonrobotics.junction.Logger
 import org.littletonrobotics.junction.inputs.LoggableInputs
 import java.util.concurrent.locks.ReentrantLock
 
-class NavxIO : GyroIO{
+class NavxIO(private val isInverted: Boolean) : GyroIO{
 
   private val navx: AHRS = AHRS()
 
   private val inputs: NavxInputs = NavxInputs()
 
   private val lock : ReentrantLock = ReentrantLock()
-
 
   /**
    * Resets the gyro to the specified pose.
@@ -68,7 +67,8 @@ class NavxIO : GyroIO{
   override fun update(){
     try {
       lock.lock()
-      inputs.angle = navx.rotation2d.minus(inputs.rotationOffset).unaryMinus()
+      
+      inputs.angle = if(isInverted) Rotation2d.fromDegrees(navx.angle - inputs.rotationOffset.degrees) else Rotation2d.fromDegrees(-navx.angle + inputs.rotationOffset.degrees)
 
       inputs.yaw = navx.yaw.toDouble()
       inputs.pitch = navx.pitch.toDouble()

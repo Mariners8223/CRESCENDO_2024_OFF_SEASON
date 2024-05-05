@@ -36,6 +36,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
+import frc.robot.Constants.RobotType;
 
 import static edu.wpi.first.units.Units.Volts;
 
@@ -88,7 +89,7 @@ public class DriveBase extends SubsystemBase {
     modules[3] = new SwerveModule(moduleConstants[3]);
 
     if(RobotBase.isReal()){
-      gyro = new NavxIO();
+      gyro = new NavxIO(Constants.robotType == RobotType.DEVELOPMENT);
       gyro.reset(new Pose2d());
     }
     else gyro = new SimGyroIO(() -> driveTrainKinematics.toTwist2d(moduleDeltas), this::getChassisSpeeds);
