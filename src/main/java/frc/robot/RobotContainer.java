@@ -46,9 +46,9 @@ public class RobotContainer{
 
         SmartDashboard.putData(field);
 
-        configChooser();
+        // configChooser();
 
-        autoChooser.addOption("tesatast", driveBase.findPath(new Pose2d(14 , 6, new Rotation2d())));
+        // autoChooser.addOption("tesatast", driveBase.findPath(new Pose2d(14 , 6, new Rotation2d())));
     }
 
     private void configChooser(){

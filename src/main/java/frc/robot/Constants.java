@@ -27,7 +27,7 @@ public class Constants {
         REPLAY
     }
 
-    public static final RobotType robotType = RobotType.DEVELOPMENT; //the type of robot the code is running on
+    public static final RobotType robotType = RobotType.COMPETITION; //the type of robot the code is running on
 
 
     public static final class DriveTrain{
@@ -121,13 +121,13 @@ public class Constants {
             front_left_zeroOffset, steer_inverted, drive_inverted, absEncoder_inverted);
 
             modules[1] = new SwerveModule(ModuleName.Front_Right, Front_Right.driveMotor, Front_Right.steerMotor, Front_Right.absEncoder,
-            front_right_zeroOffset, drive_inverted, steer_inverted, absEncoder_inverted);
+            front_right_zeroOffset, steer_inverted, drive_inverted, absEncoder_inverted);
 
             modules[2] = new SwerveModule(ModuleName.Back_Left, Back_Left.driveMotor, Back_Left.steerMotor, Back_Left.absEncoder,
-            back_left_zeroOffset, drive_inverted, steer_inverted, absEncoder_inverted);
+            back_left_zeroOffset, steer_inverted, drive_inverted, absEncoder_inverted);
 
             modules[3] = new SwerveModule(ModuleName.Back_Right, Back_Right.driveMotor, Back_Right.steerMotor, Back_Right.absEncoder,
-            back_right_zeroOffset, drive_inverted, steer_inverted, absEncoder_inverted);
+            back_right_zeroOffset, steer_inverted, drive_inverted, absEncoder_inverted);
 
             return modules;
         }

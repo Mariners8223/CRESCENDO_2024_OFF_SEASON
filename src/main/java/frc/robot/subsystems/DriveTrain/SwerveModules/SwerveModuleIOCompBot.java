@@ -48,7 +48,7 @@ public class SwerveModuleIOCompBot implements SwerveModuleIO{
 
   @Override
   public void updateInputs(SwerveModuleIOInputsAutoLogged inputs) {
-    steerMotor.getEncoder().setPosition(absEncoder.getDistance() * CompBotConstants.steerGearRatio); //fix?
+    // steerMotor.getEncoder().setPosition(absEncoder.getDistance() * CompBotConstants.steerGearRatio); //fix?
 
     inputs.currentState.angle = Rotation2d.fromRotations(steerMotor.getEncoder().getPosition() / CompBotConstants.steerGearRatio);
     inputs.currentState.speedMetersPerSecond = driveMotor.getVelocity().getValueAsDouble() * CompBotConstants.wheelCircumferenceMeters / CompBotConstants.steerGearRatio;
@@ -88,6 +88,7 @@ public class SwerveModuleIOCompBot implements SwerveModuleIO{
     encoder.reset();
     encoder.setDistancePerRotation(constants.isAbsEncoderInverted ? -1 : 1);
     encoder.setPositionOffset(constants.absoluteEncoderZeroOffset);
+    System.out.println( "blablakbsabas" + encoder.getDistancePerRotation());
 
     return encoder;
   }
