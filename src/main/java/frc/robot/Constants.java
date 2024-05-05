@@ -100,29 +100,31 @@ public class Constants {
                 drive_inverted = DevBotConstants.isDriveInverted;
                 steer_inverted = DevBotConstants.isSteerInverted;
                 absEncoder_inverted = DevBotConstants.isAbsEncoderInverted;
+
+                front_left_zeroOffset = DevBotConstants.back_left_zeroOffset;
+                front_right_zeroOffset = DevBotConstants.front_right_zeroOffset;
+                back_left_zeroOffset = DevBotConstants.back_left_zeroOffset;
+                back_right_zeroOffset = DevBotConstants.back_right_zeroOffset;
             }
             else{
                 drive_inverted = CompBotConstants.isDriveInverted;
                 steer_inverted = CompBotConstants.isSteerInverted;
                 absEncoder_inverted = DevBotConstants.isAbsEncoderInverted;
-            }
 
-            front_left_zeroOffset = robotType == RobotType.DEVELOPMENT ? SwerveModuleIODevBot.DevBotConstants.front_left_zeroOffset : SwerveModuleIOCompBot.CompBotConstants.front_left_zeroOffset;
+                front_left_zeroOffset = CompBotConstants.back_left_zeroOffset;
+                front_right_zeroOffset = CompBotConstants.front_right_zeroOffset;
+                back_left_zeroOffset = CompBotConstants.back_left_zeroOffset;
+                back_right_zeroOffset = CompBotConstants.back_right_zeroOffset;
+            }
 
             modules[0] = new SwerveModule(ModuleName.Front_Left, Front_Left.driveMotor, Front_Left.steerMotor, Front_Left.absEncoder,
             front_left_zeroOffset, steer_inverted, drive_inverted, absEncoder_inverted);
 
-            front_right_zeroOffset = robotType == RobotType.DEVELOPMENT ? SwerveModuleIODevBot.DevBotConstants.front_right_zeroOffset : SwerveModuleIOCompBot.CompBotConstants.front_right_zeroOffset;
-
             modules[1] = new SwerveModule(ModuleName.Front_Right, Front_Right.driveMotor, Front_Right.steerMotor, Front_Right.absEncoder,
             front_right_zeroOffset, drive_inverted, steer_inverted, absEncoder_inverted);
 
-            back_left_zeroOffset = robotType == RobotType.DEVELOPMENT ? SwerveModuleIODevBot.DevBotConstants.back_left_zeroOffset : SwerveModuleIOCompBot.CompBotConstants.back_left_zeroOffset;
-
             modules[2] = new SwerveModule(ModuleName.Back_Left, Back_Left.driveMotor, Back_Left.steerMotor, Back_Left.absEncoder,
             back_left_zeroOffset, drive_inverted, steer_inverted, absEncoder_inverted);
-
-            back_right_zeroOffset = robotType == RobotType.DEVELOPMENT ? SwerveModuleIODevBot.DevBotConstants.back_right_zeroOffset : SwerveModuleIOCompBot.CompBotConstants.back_right_zeroOffset;
 
             modules[3] = new SwerveModule(ModuleName.Back_Right, Back_Right.driveMotor, Back_Right.steerMotor, Back_Right.absEncoder,
             back_right_zeroOffset, drive_inverted, steer_inverted, absEncoder_inverted);
