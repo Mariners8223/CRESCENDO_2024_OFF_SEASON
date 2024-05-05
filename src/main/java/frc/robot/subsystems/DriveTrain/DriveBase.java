@@ -81,10 +81,11 @@ public class DriveBase extends SubsystemBase {
 
   /** Creates a new DriveBase. */
   public DriveBase() {
-    modules[0] = new SwerveModule(Constants.DriveTrain.front_left);
-    modules[1] = new SwerveModule(Constants.DriveTrain.front_right);
-    modules[2] = new SwerveModule(Constants.DriveTrain.back_left);
-    modules[3] = new SwerveModule(Constants.DriveTrain.back_right);
+    var moduleConstants = Constants.DriveTrain.createConstants();
+    modules[0] = new SwerveModule(moduleConstants[0]);
+    modules[1] = new SwerveModule(moduleConstants[1]);
+    modules[2] = new SwerveModule(moduleConstants[2]);
+    modules[3] = new SwerveModule(moduleConstants[3]);
 
     if(RobotBase.isReal()){
       gyro = new NavxIO();

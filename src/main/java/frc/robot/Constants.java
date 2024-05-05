@@ -7,8 +7,14 @@ package frc.robot;
 
 import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Translation2d;
+import frc.robot.MotorMap.DriveBase.Back_Left;
+import frc.robot.MotorMap.DriveBase.Back_Right;
+import frc.robot.MotorMap.DriveBase.Front_Left;
+import frc.robot.MotorMap.DriveBase.Front_Right;
 import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleIOCompBot;
 import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleIODevBot;
+import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleIOCompBot.CompBotConstants;
+import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleIODevBot.DevBotConstants;
 import frc.util.PIDFGains;
 
 import java.util.Map;
@@ -85,28 +91,50 @@ public class Constants {
             }
         }
 
-        public static final SwerveModule front_left = new SwerveModule(ModuleName.Front_Left, 2, 3, 10,
-                robotType == RobotType.DEVELOPMENT ? SwerveModuleIODevBot.DevBotConstants.front_left_zeroOffset : SwerveModuleIOCompBot.CompBotConstants.back_left_zeroOffset,
-                true, false, true);
-        //^the constants of the front left module
-        public static final SwerveModule front_right = new SwerveModule(ModuleName.Front_Right, 4, 5, 11,
-                robotType == RobotType.DEVELOPMENT ? SwerveModuleIODevBot.DevBotConstants.front_right_zeroOffset : SwerveModuleIOCompBot.CompBotConstants.front_right_zeroOffset,
-                true, false, true);
-        //^the constants of the front right module
-        public static final SwerveModule back_left = new SwerveModule(ModuleName.Back_Left, 6, 7, 12,
-                robotType == RobotType.DEVELOPMENT ? SwerveModuleIODevBot.DevBotConstants.back_left_zeroOffset : SwerveModuleIOCompBot.CompBotConstants.back_left_zeroOffset,
-                true, false, true);
-        //^the constants of the back left module
-        public static final SwerveModule back_right = new SwerveModule(ModuleName.Back_Right, 8, 9, 13,
-                robotType == RobotType.DEVELOPMENT ? SwerveModuleIODevBot.DevBotConstants.back_right_zeroOffset : SwerveModuleIOCompBot.CompBotConstants.back_right_zeroOffset,
-                true, false, true);
-        //^the constants of the back right module
+        public static SwerveModule[] createConstants(){
+            SwerveModule[] modules = new SwerveModule[4];
+
+            boolean drive_inverted, steer_inverted, absEncoder_inverted;
+            double front_left_zeroOffset, front_right_zeroOffset, back_left_zeroOffset, back_right_zeroOffset = 0;
+            if(robotType == RobotType.DEVELOPMENT){
+                drive_inverted = DevBotConstants.isDriveInverted;
+                steer_inverted = DevBotConstants.isSteerInverted;
+                absEncoder_inverted = DevBotConstants.isAbsEncoderInverted;
+            }
+            else{
+                drive_inverted = CompBotConstants.isDriveInverted;
+                steer_inverted = CompBotConstants.isSteerInverted;
+                absEncoder_inverted = DevBotConstants.isAbsEncoderInverted;
+            }
+
+            front_left_zeroOffset = robotType == RobotType.DEVELOPMENT ? SwerveModuleIODevBot.DevBotConstants.front_left_zeroOffset : SwerveModuleIOCompBot.CompBotConstants.front_left_zeroOffset;
+
+            modules[0] = new SwerveModule(ModuleName.Front_Left, Front_Left.driveMotor, Front_Left.steerMotor, Front_Left.absEncoder,
+            front_left_zeroOffset, steer_inverted, drive_inverted, absEncoder_inverted);
+
+            front_right_zeroOffset = robotType == RobotType.DEVELOPMENT ? SwerveModuleIODevBot.DevBotConstants.front_right_zeroOffset : SwerveModuleIOCompBot.CompBotConstants.front_right_zeroOffset;
+
+            modules[1] = new SwerveModule(ModuleName.Front_Right, Front_Right.driveMotor, Front_Right.steerMotor, Front_Right.absEncoder,
+            front_right_zeroOffset, drive_inverted, steer_inverted, absEncoder_inverted);
+
+            back_left_zeroOffset = robotType == RobotType.DEVELOPMENT ? SwerveModuleIODevBot.DevBotConstants.back_left_zeroOffset : SwerveModuleIOCompBot.CompBotConstants.back_left_zeroOffset;
+
+            modules[2] = new SwerveModule(ModuleName.Back_Left, Back_Left.driveMotor, Back_Left.steerMotor, Back_Left.absEncoder,
+            back_left_zeroOffset, drive_inverted, steer_inverted, absEncoder_inverted);
+
+            back_right_zeroOffset = robotType == RobotType.DEVELOPMENT ? SwerveModuleIODevBot.DevBotConstants.back_right_zeroOffset : SwerveModuleIOCompBot.CompBotConstants.back_right_zeroOffset;
+
+            modules[3] = new SwerveModule(ModuleName.Back_Right, Back_Right.driveMotor, Back_Right.steerMotor, Back_Right.absEncoder,
+            back_right_zeroOffset, drive_inverted, steer_inverted, absEncoder_inverted);
+
+            return modules;
+        }
 
         public static final Map<Integer, String> sparkMaxNames = Map.of(
-            front_left.steerMotorID, front_left.moduleName.name(),
-            front_right.steerMotorID, front_right.moduleName.name(),
-            back_left.steerMotorID, back_left.moduleName.name(),
-            back_right.steerMotorID, back_right.moduleName.name()
+            Front_Left.steerMotor, "Front_Left",
+            Front_Right.steerMotor, "Front_Right",
+            Back_Left.steerMotor, "Back_Left",
+            Back_Right.steerMotor, "Back_Right"
         );
         
     } 
