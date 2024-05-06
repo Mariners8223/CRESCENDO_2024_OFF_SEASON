@@ -10,7 +10,6 @@ import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
-import frc.robot.Constants;
 import frc.robot.MotorMap;
 import frc.util.PIDFGains;
 
