@@ -471,7 +471,7 @@ public class DriveBase extends SubsystemBase {
 
          (Math.abs(controller.getLeftX()) > 0.1 ? -controller.getLeftX() : 0) * lerp(1 - (0.5 + controller.getR2Axis() / 2)),
 
-         Math.abs(controller.getRightX()) > 0.1 ? -controller.getRightX() : 0
+         (Math.abs(controller.getRightX()) > 0.1 ? -controller.getRightX() : 0) * lerp(1 - (0.5 + controller.getR2Axis() / 2))
          );
     }
 

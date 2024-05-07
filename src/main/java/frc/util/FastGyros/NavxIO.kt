@@ -68,7 +68,7 @@ class NavxIO(private val isInverted: Boolean) : GyroIO{
     try {
       lock.lock()
       
-      inputs.angle = if(isInverted) Rotation2d.fromDegrees(navx.angle - inputs.rotationOffset.degrees) else Rotation2d.fromDegrees(-navx.angle + inputs.rotationOffset.degrees)
+      inputs.angle = if(isInverted) Rotation2d.fromDegrees(navx.angle - inputs.rotationOffset.degrees) else Rotation2d.fromDegrees(-navx.angle - inputs.rotationOffset.degrees)
 
       inputs.yaw = navx.yaw.toDouble()
       inputs.pitch = navx.pitch.toDouble()

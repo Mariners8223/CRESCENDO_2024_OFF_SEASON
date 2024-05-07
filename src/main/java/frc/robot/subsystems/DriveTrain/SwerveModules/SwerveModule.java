@@ -2,6 +2,7 @@ package frc.robot.subsystems.DriveTrain.SwerveModules;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -12,6 +13,8 @@ import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
+import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleIOCompBot.CompBotConstants;
+import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleIODevBot.DevBotConstants;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -42,6 +45,7 @@ public class SwerveModule {
   private final SwerveModuleIOInputsAutoLogged inputs = new SwerveModuleIOInputsAutoLogged();
 
   private final ProfiledPIDController drivePIDController;
+  public final SimpleMotorFeedforward driveFeedforward;
   private final PIDController steerPIDController;
 
   private boolean isRunningSysID = false;
@@ -54,14 +58,19 @@ public class SwerveModule {
     if(Constants.robotType == Constants.RobotType.DEVELOPMENT){
       drivePIDController = SwerveModuleIODevBot.DevBotConstants.driveMotorPID.createProfiledPIDController();
       steerPIDController = SwerveModuleIODevBot.DevBotConstants.steerMotorPID.createPIDController();
+      driveFeedforward = new SimpleMotorFeedforward(0, DevBotConstants.driveMotorPID.getF());
     }
     else if(Constants.robotType == Constants.RobotType.COMPETITION){
       drivePIDController = SwerveModuleIOCompBot.CompBotConstants.driveMotorPID.createProfiledPIDController();
       steerPIDController = SwerveModuleIOCompBot.CompBotConstants.steerMotorPID.createPIDController();
+      driveFeedforward = new SimpleMotorFeedforward(0, CompBotConstants.driveMotorPID.getF());
+
     }
     else{
       drivePIDController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(0, 0), 1 / moduleThreadHz);
       steerPIDController = new PIDController(0, 0, 0, 1 / moduleThreadHz);
+      driveFeedforward = new SimpleMotorFeedforward(0, 0);
+
     }
 
     if(RobotBase.isSimulation()){
@@ -87,9 +96,9 @@ public class SwerveModule {
         targetState.speedMetersPerSecond *= Math.cos(targetState.angle.getRadians() - inputs.currentState.angle.getRadians());
 
         double steerOutPut = steerPIDController.calculate(inputs.currentState.angle.getRadians(), targetState.angle.getRadians());
-        
 
-        io.setDriveMotorVoltage(drivePIDController.calculate(inputs.currentState.speedMetersPerSecond, targetState.speedMetersPerSecond));
+
+        io.setDriveMotorVoltage(drivePIDController.calculate(inputs.currentState.speedMetersPerSecond, targetState.speedMetersPerSecond) + driveFeedforward.calculate(targetState.speedMetersPerSecond));
         io.setSteerMotorVoltage(steerPIDController.atSetpoint() ? 0 : steerOutPut);
       }
       else{

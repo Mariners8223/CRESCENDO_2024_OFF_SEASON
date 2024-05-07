@@ -11,6 +11,7 @@ import com.revrobotics.CANSparkMax;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.MotorMap;
+import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleIOCompBot.CompBotConstants;
 import frc.util.PIDFGains;
 
 public class SwerveModuleIODevBot implements SwerveModuleIO{
@@ -21,7 +22,7 @@ public class SwerveModuleIODevBot implements SwerveModuleIO{
     public static final double wheelRadiusMeters = 0.0508;
     public static final double wheelCircumferenceMeters = 2 * Math.PI * wheelRadiusMeters;
 
-    public static final double maxDriveVelocityMetersPerSecond = 4;
+    public static final double maxDriveVelocityMetersPerSecond = 2;
 
     public static final boolean isDriveInverted = false;
     public static final boolean isSteerInverted = true;
@@ -32,7 +33,7 @@ public class SwerveModuleIODevBot implements SwerveModuleIO{
     public static final double back_left_zeroOffset = -0.164; // the offset between the absolute encoder on the back left module, in degrees
     public static final double back_right_zeroOffset = 0.303; // the offset between the absolute encoder on the back right module, in degrees
 
-    public static final PIDFGains driveMotorPID = new PIDFGains(10, 0, 0, 0, 0.22, 0, 1 / SwerveModule.moduleThreadHz, 12, 6);
+    public static final PIDFGains driveMotorPID = new PIDFGains(2.89, 0, 0, 1.2, 0.1, 0, 1 / SwerveModule.moduleThreadHz, 1, 100);
     public static final PIDFGains steerMotorPID = new PIDFGains(10, 0, 0, 0.14, 0.1, 0, 1 / SwerveModule.moduleThreadHz);
   }
 
@@ -63,12 +64,12 @@ public class SwerveModuleIODevBot implements SwerveModuleIO{
     // steerMotor.getEncoder().setPosition(absEncoder.getPosition().getValueAsDouble() * DevBotConstants.steerGearRatio); //fix?
 
     inputs.currentState.angle = Rotation2d.fromRotations(steerMotor.getEncoder().getPosition() / DevBotConstants.steerGearRatio);
-    inputs.currentState.speedMetersPerSecond = driveMotor.getVelocity().getValueAsDouble() * DevBotConstants.wheelCircumferenceMeters / DevBotConstants.steerGearRatio;
+    inputs.currentState.speedMetersPerSecond = (driveMotor.getVelocity().getValueAsDouble() / CompBotConstants.driveGearRatio) * CompBotConstants.wheelCircumferenceMeters;
 
     inputs.absEncoderPosition = absEncoder.getAbsolutePosition().getValueAsDouble();
 
     inputs.steerVelocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(steerMotor.getEncoder().getVelocity() / DevBotConstants.steerGearRatio);
-    inputs.drivePositionMeters = driveMotor.getPosition().getValueAsDouble() * DevBotConstants.driveGearRatio / DevBotConstants.driveGearRatio;
+    inputs.drivePositionMeters = (driveMotor.getPosition().getValueAsDouble() / CompBotConstants.driveGearRatio) * CompBotConstants.wheelCircumferenceMeters;
 
     inputs.driveMotorAppliedVoltage = driveMotor.getMotorVoltage().getValueAsDouble();
     inputs.steerMotorAppliedVoltage = steerMotor.getAppliedOutput() * steerMotor.getBusVoltage();

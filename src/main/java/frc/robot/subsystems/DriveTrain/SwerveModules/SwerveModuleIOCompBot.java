@@ -1,5 +1,7 @@
 package frc.robot.subsystems.DriveTrain.SwerveModules;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.*;
@@ -20,7 +22,7 @@ public class SwerveModuleIOCompBot implements SwerveModuleIO{
     public static final double wheelRadiusMeters = 0.0508;
     public static final double wheelCircumferenceMeters = 2 * Math.PI * wheelRadiusMeters;
 
-    public static final double maxDriveVelocityMetersPerSecond = 4;
+    public static final double maxDriveVelocityMetersPerSecond = 2;
 
     public static final boolean isDriveInverted = false;
     public static final boolean isSteerInverted = false;
@@ -36,7 +38,7 @@ public class SwerveModuleIOCompBot implements SwerveModuleIO{
     public static final double back_left_zeroOffset = 0.226; // the offset between the absolute encoder on the back left module, in degrees
     public static final double back_right_zeroOffset = 0.750; // the offset between the absolute encoder on the back right module, in degrees
 
-    public static final PIDFGains driveMotorPID = new PIDFGains(3.5037, 0.00, 0.00, 0.0, 0.22, 0, 6, 12, 1 / SwerveModule.moduleThreadHz);
+    public static final PIDFGains driveMotorPID = new PIDFGains(2.89, 0.00, 0, 1.2, 0.1, 0, 1 / SwerveModule.moduleThreadHz, 3, 100);
     public static final PIDFGains steerMotorPID = new PIDFGains(10, 0, 0.5, 0, 0.1, 0, 1 / SwerveModule.moduleThreadHz);
   }
 
@@ -69,12 +71,12 @@ public class SwerveModuleIOCompBot implements SwerveModuleIO{
     steerMotor.getEncoder().setPosition(absEncoder.get() * CompBotConstants.steerGearRatio * absEncoderMultiplier); //fix?
 
     inputs.currentState.angle = Rotation2d.fromRotations(steerMotor.getEncoder().getPosition() / CompBotConstants.steerGearRatio);
-    inputs.currentState.speedMetersPerSecond = driveMotor.getVelocity().getValueAsDouble() * CompBotConstants.wheelCircumferenceMeters / CompBotConstants.steerGearRatio;
+    inputs.currentState.speedMetersPerSecond = (driveMotor.getVelocity().getValueAsDouble() / CompBotConstants.driveGearRatio) * CompBotConstants.wheelCircumferenceMeters;
 
     inputs.absEncoderPosition = (absEncoder.getAbsolutePosition() - absEncoder.getPositionOffset()) * absEncoderMultiplier;
 
     inputs.steerVelocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(steerMotor.getEncoder().getVelocity() / CompBotConstants.steerGearRatio);
-    inputs.drivePositionMeters = driveMotor.getPosition().getValueAsDouble() * CompBotConstants.driveGearRatio / CompBotConstants.driveGearRatio;
+    inputs.drivePositionMeters = (driveMotor.getPosition().getValueAsDouble() / CompBotConstants.driveGearRatio) * CompBotConstants.wheelCircumferenceMeters;
 
     inputs.driveMotorAppliedVoltage = driveMotor.getMotorVoltage().getValueAsDouble();
     inputs.steerMotorAppliedVoltage = steerMotor.getAppliedOutput() * steerMotor.getBusVoltage();
@@ -154,7 +156,7 @@ public class SwerveModuleIOCompBot implements SwerveModuleIO{
     config.Slot0.kS = CompBotConstants.driveMotorPID.getF(); //sets the feedForward
 
     config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor; //just in case sets the built-in sensor
-    config.Feedback.SensorToMechanismRatio = CompBotConstants.driveGearRatio / CompBotConstants.wheelCircumferenceMeters; //changes the units to m/s
+    config.Feedback.SensorToMechanismRatio = 1; //changes the units to m/s
 
     return config; //returns the new config
   }
