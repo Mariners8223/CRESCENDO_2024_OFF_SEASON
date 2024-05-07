@@ -7,21 +7,26 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.Constants;
+import frc.robot.Constants.RobotType;
+import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleIODevBot.DevBotConstants;
 
 public class SwerveModuleIOSIM implements SwerveModuleIO{
   private final DCMotorSim driveMotor;
   private final DCMotorSim steerMotor;
 
+  private final double driveMotorGearRatio = Constants.robotType == RobotType.DEVELOPMENT ? DevBotConstants.driveGearRatio : SwerveModuleIOCompBot.CompBotConstants.driveGearRatio;
+  private final double driveWheelRadiusMeters = Constants.robotType == RobotType.DEVELOPMENT ? DevBotConstants.wheelRadiusMeters : SwerveModuleIOCompBot.CompBotConstants.wheelRadiusMeters;
+  private final double steerMotorGearRatio = Constants.robotType == RobotType.DEVELOPMENT ? DevBotConstants.steerGearRatio : SwerveModuleIOCompBot.CompBotConstants.steerGearRatio;
+
   private double driveMotorVoltage = 0;
   private double steerMotorVoltage = 0;
 
   public SwerveModuleIOSIM(){
+    driveMotor = new DCMotorSim(DCMotor.getFalcon500(1), 1, 0.25);
     if (Constants.robotType == Constants.RobotType.DEVELOPMENT) {
-      steerMotor = new DCMotorSim(DCMotor.getNEO(1), SwerveModuleIODevBot.DevBotConstants.driveGearRatio, 0.25);
-      driveMotor = new DCMotorSim(DCMotor.getFalcon500(1), SwerveModuleIODevBot.DevBotConstants.driveGearRatio * SwerveModuleIODevBot.DevBotConstants.wheelRadiusMeters, 0.25);
+      steerMotor = new DCMotorSim(DCMotor.getNEO(1), 1, 0.25);
     } else {
-      steerMotor = new DCMotorSim(DCMotor.getNeo550(1), SwerveModuleIOCompBot.CompBotConstants.steerGearRatio, 0.25);
-      driveMotor = new DCMotorSim(DCMotor.getFalcon500(1), SwerveModuleIOCompBot.CompBotConstants.driveGearRatio * SwerveModuleIOCompBot.CompBotConstants.wheelRadiusMeters, 0.25);
+      steerMotor = new DCMotorSim(DCMotor.getNeo550(1), 1, 0.25);
     }
   }
 
@@ -30,11 +35,11 @@ public class SwerveModuleIOSIM implements SwerveModuleIO{
     driveMotor.update(1 / SwerveModule.moduleThreadHz);
     steerMotor.update(1 / SwerveModule.moduleThreadHz);
 
-    inputs.currentState.speedMetersPerSecond = driveMotor.getAngularVelocityRadPerSec();
-    inputs.currentState.angle = Rotation2d.fromRadians(steerMotor.getAngularPositionRad());
+    inputs.currentState.speedMetersPerSecond = (driveMotor.getAngularVelocityRadPerSec() / driveMotorGearRatio) * driveWheelRadiusMeters;
+    inputs.currentState.angle = Rotation2d.fromRadians(steerMotor.getAngularPositionRad() / steerMotorGearRatio);
 
-    inputs.steerVelocityRadPerSec = steerMotor.getAngularVelocityRadPerSec();
-    inputs.drivePositionMeters = driveMotor.getAngularPositionRad();
+    inputs.steerVelocityRadPerSec = steerMotor.getAngularVelocityRadPerSec() / steerMotorGearRatio;
+    inputs.drivePositionMeters = driveMotor.getAngularPositionRad() * driveWheelRadiusMeters;
 
     inputs.driveMotorAppliedVoltage = driveMotorVoltage;
     inputs.steerMotorAppliedVoltage = steerMotorVoltage;

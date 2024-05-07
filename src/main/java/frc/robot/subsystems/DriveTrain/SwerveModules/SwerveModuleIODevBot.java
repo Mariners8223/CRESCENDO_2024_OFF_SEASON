@@ -11,7 +11,6 @@ import com.revrobotics.CANSparkMax;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.MotorMap;
-import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleIOCompBot.CompBotConstants;
 import frc.util.PIDFGains;
 
 public class SwerveModuleIODevBot implements SwerveModuleIO{
@@ -61,15 +60,15 @@ public class SwerveModuleIODevBot implements SwerveModuleIO{
 
   @Override
   public void updateInputs(SwerveModuleIOInputsAutoLogged inputs) {
-    // steerMotor.getEncoder().setPosition(absEncoder.getPosition().getValueAsDouble() * DevBotConstants.steerGearRatio); //fix?
-
+    // inputs.currentState.angle = Rotation2d.fromRotations(absEncoder.getPosition().getValueAsDouble());
     inputs.currentState.angle = Rotation2d.fromRotations(steerMotor.getEncoder().getPosition() / DevBotConstants.steerGearRatio);
-    inputs.currentState.speedMetersPerSecond = (driveMotor.getVelocity().getValueAsDouble() / CompBotConstants.driveGearRatio) * CompBotConstants.wheelCircumferenceMeters;
 
-    inputs.absEncoderPosition = absEncoder.getAbsolutePosition().getValueAsDouble();
+    inputs.currentState.speedMetersPerSecond = (driveMotor.getVelocity().getValueAsDouble() / DevBotConstants.driveGearRatio) * DevBotConstants.wheelCircumferenceMeters;
+
+    inputs.absEncoderPosition = (absEncoder.getAbsolutePosition().getValueAsDouble());
 
     inputs.steerVelocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(steerMotor.getEncoder().getVelocity() / DevBotConstants.steerGearRatio);
-    inputs.drivePositionMeters = (driveMotor.getPosition().getValueAsDouble() / CompBotConstants.driveGearRatio) * CompBotConstants.wheelCircumferenceMeters;
+    inputs.drivePositionMeters = (driveMotor.getPosition().getValueAsDouble() / DevBotConstants.driveGearRatio) * DevBotConstants.wheelCircumferenceMeters;
 
     inputs.driveMotorAppliedVoltage = driveMotor.getMotorVoltage().getValueAsDouble();
     inputs.steerMotorAppliedVoltage = steerMotor.getAppliedOutput() * steerMotor.getBusVoltage();
@@ -162,7 +161,7 @@ public class SwerveModuleIODevBot implements SwerveModuleIO{
     config.Slot0.kS = DevBotConstants.driveMotorPID.getF(); //sets the feedForward
 
     config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor; //just in case sets the built-in sensor
-    config.Feedback.SensorToMechanismRatio = DevBotConstants.driveGearRatio / DevBotConstants.wheelCircumferenceMeters; //changes the units to m/s
+    config.Feedback.SensorToMechanismRatio = 1; //changes the units to m/s
 
     return config; //returns the new config
   }
@@ -190,6 +189,7 @@ public class SwerveModuleIODevBot implements SwerveModuleIO{
     sparkMax.setPeriodicFramePeriod(CANSparkMax.PeriodicFrame.kStatus0, (int)((1 / SwerveModule.moduleThreadHz) * 1000));
 
     sparkMax.getEncoder().setPositionConversionFactor(1); //sets the gear ratio for the module
+    sparkMax.getEncoder().setVelocityConversionFactor(1); //sets the velocity to rad per sec of the module
 
     sparkMax.getEncoder().setPosition(absEncoder.getPosition().getValueAsDouble() * DevBotConstants.steerGearRatio); //sets the position of the motor to the absolute encoder
 

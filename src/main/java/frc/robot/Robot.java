@@ -64,7 +64,7 @@ public class Robot extends LoggedRobot
 
             DataLogManager.start("U/logs/dataLogManager");
             SignalLogger.setPath("U/logs/signalLogger");
-            SignalLogger.enableAutoLogging(true);
+            SignalLogger.start();
         }
         else{
             if(Constants.robotType == Constants.RobotType.REPLAY){
@@ -73,7 +73,6 @@ public class Robot extends LoggedRobot
                 Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
                 Logger.setReplaySource(new WPILOGReader(logPath));
             }
-            // Logger.addDataReceiver(new WPILOGWriter("F:/downloads"));
             Logger.addDataReceiver(new NT4Publisher());
         }
 

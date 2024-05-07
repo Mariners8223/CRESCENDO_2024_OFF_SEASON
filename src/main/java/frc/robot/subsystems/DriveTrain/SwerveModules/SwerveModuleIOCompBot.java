@@ -1,7 +1,4 @@
 package frc.robot.subsystems.DriveTrain.SwerveModules;
-
-import org.littletonrobotics.junction.Logger;
-
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.*;
@@ -28,15 +25,10 @@ public class SwerveModuleIOCompBot implements SwerveModuleIO{
     public static final boolean isSteerInverted = false;
     public static final boolean isAbsEncoderInverted = false;
 
-    public static final double front_left_absoluteEncoderZeroOffset = 214.65;//212.8; // the offset between the absolute encoder reading on the front left module, in degrees
-    public static final double front_right_absoluteEncoderZeroOffset = 337.27;//253.1; // the offset between the absolute encoder on the front left module, in degrees
-    public static final double back_left_absoluteEncoderZeroOffset = 81.47;//320.2; // the offset between the absolute encoder on the back left module, in degrees
-    public static final double back_right_absoluteEncoderZeroOffset = 270.1;//205;
-
-    public static final double front_left_zeroOffset = 0.59625; // the offset between the absolute encoder reading on the front left module, in degrees
-    public static final double front_right_zeroOffset = 0.9368; // the offset between the absolute encoder on the front left module, in degrees
-    public static final double back_left_zeroOffset = 0.226; // the offset between the absolute encoder on the back left module, in degrees
-    public static final double back_right_zeroOffset = 0.750; // the offset between the absolute encoder on the back right module, in degrees
+    public static final double front_left_zeroOffset = 0.59625; // the offset between the absolute encoder reading on the front left module, in rotations
+    public static final double front_right_zeroOffset = 0.9368; // the offset between the absolute encoder on the front left module, in rotations
+    public static final double back_left_zeroOffset = 0.226; // the offset between the absolute encoder on the back left module, in rotations
+    public static final double back_right_zeroOffset = 0.750; // the offset between the absolute encoder on the back right module, in rotations
 
     public static final PIDFGains driveMotorPID = new PIDFGains(2.89, 0.00, 0, 1.2, 0.1, 0, 1 / SwerveModule.moduleThreadHz, 3, 100);
     public static final PIDFGains steerMotorPID = new PIDFGains(10, 0, 0.5, 0, 0.1, 0, 1 / SwerveModule.moduleThreadHz);
@@ -68,9 +60,9 @@ public class SwerveModuleIOCompBot implements SwerveModuleIO{
 
   @Override
   public void updateInputs(SwerveModuleIOInputsAutoLogged inputs) {
-    steerMotor.getEncoder().setPosition(absEncoder.get() * CompBotConstants.steerGearRatio * absEncoderMultiplier); //fix?
+    inputs.currentState.angle = Rotation2d.fromRotations(absEncoder.get() * absEncoderMultiplier);
+    // inputs.currentState.angle = Rotation2d.fromRotations(steerMotor.getEncoder().getPosition() / DevBotConstants.steerGearRatio);
 
-    inputs.currentState.angle = Rotation2d.fromRotations(steerMotor.getEncoder().getPosition() / CompBotConstants.steerGearRatio);
     inputs.currentState.speedMetersPerSecond = (driveMotor.getVelocity().getValueAsDouble() / CompBotConstants.driveGearRatio) * CompBotConstants.wheelCircumferenceMeters;
 
     inputs.absEncoderPosition = (absEncoder.getAbsolutePosition() - absEncoder.getPositionOffset()) * absEncoderMultiplier;
@@ -179,13 +171,14 @@ public class SwerveModuleIOCompBot implements SwerveModuleIO{
     sparkMax.getPIDController().setD(CompBotConstants.steerMotorPID.getD()); //sets the D for the PID Controller
     sparkMax.getPIDController().setIZone(CompBotConstants.steerMotorPID.getIZone()); //sets the IZone for the PID Controller
 
-    sparkMax.setPeriodicFramePeriod(CANSparkMax.PeriodicFrame.kStatus2, (int)((1 / SwerveModule.moduleThreadHz) * 1000)); //sets the status 0 frame to 10ms
-    sparkMax.setPeriodicFramePeriod(CANSparkMax.PeriodicFrame.kStatus1, (int)((1 / SwerveModule.moduleThreadHz) * 1000)); //sets the status 0 frame to 10ms
-    sparkMax.setPeriodicFramePeriod(CANSparkMax.PeriodicFrame.kStatus0, (int)((1 / SwerveModule.moduleThreadHz) * 1000));
+    sparkMax.setPeriodicFramePeriod(CANSparkMax.PeriodicFrame.kStatus2, (int)(1000 / SwerveModule.moduleThreadHz)); //sets the status 0 frame to 10ms
+    sparkMax.setPeriodicFramePeriod(CANSparkMax.PeriodicFrame.kStatus1, (int)(1000 / SwerveModule.moduleThreadHz)); //sets the status 0 frame to 10ms
+    sparkMax.setPeriodicFramePeriod(CANSparkMax.PeriodicFrame.kStatus0, (int)(1000 / SwerveModule.moduleThreadHz));
 
     sparkMax.getEncoder().setPositionConversionFactor(1); //sets the gear ratio for the module
+    sparkMax.getEncoder().setVelocityConversionFactor(1); //sets the velocity to rad per sec of the module
 
-    sparkMax.getEncoder().setPosition(absEncoder.get() * CompBotConstants.steerGearRatio * absEncoderMultiplier); //sets the position of the motor to the absolute encoder
+    sparkMax.getEncoder().setPosition(absEncoder.get()* absEncoderMultiplier); //sets the position of the motor to the absolute encoder
 
     sparkMax.setSmartCurrentLimit(35); //sets the current limit of the motor (thanks noga for reminding m)
     sparkMax.setSecondaryCurrentLimit(60);
