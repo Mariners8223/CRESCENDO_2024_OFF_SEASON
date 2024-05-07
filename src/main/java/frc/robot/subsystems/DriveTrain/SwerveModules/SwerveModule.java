@@ -31,7 +31,7 @@ public class SwerveModule {
     Back_Right
   }
 
-  public static final double moduleThreadHz = 200;
+  public static final double moduleThreadHz = 100;
   public static final double distanceBetweenWheels = 0.576; // the distance between each wheel in meters
   public static final Translation2d[] moduleTranslations = new Translation2d[]
           {new Translation2d(distanceBetweenWheels / 2, distanceBetweenWheels / 2), new Translation2d(distanceBetweenWheels / 2, -distanceBetweenWheels / 2),
@@ -87,6 +87,7 @@ public class SwerveModule {
         targetState.speedMetersPerSecond *= Math.cos(targetState.angle.getRadians() - inputs.currentState.angle.getRadians());
 
         double steerOutPut = steerPIDController.calculate(inputs.currentState.angle.getRadians(), targetState.angle.getRadians());
+        
 
         io.setDriveMotorVoltage(drivePIDController.calculate(inputs.currentState.speedMetersPerSecond, targetState.speedMetersPerSecond));
         io.setSteerMotorVoltage(steerPIDController.atSetpoint() ? 0 : steerOutPut);

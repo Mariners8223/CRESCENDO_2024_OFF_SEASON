@@ -26,13 +26,18 @@ public class SwerveModuleIOCompBot implements SwerveModuleIO{
     public static final boolean isSteerInverted = false;
     public static final boolean isAbsEncoderInverted = false;
 
-    public static final double front_left_zeroOffset = 0.302; // the offset between the absolute encoder reading on the front left module, in degrees
-    public static final double front_right_zeroOffset = -0.44; // the offset between the absolute encoder on the front left module, in degrees
-    public static final double back_left_zeroOffset = -0.164; // the offset between the absolute encoder on the back left module, in degrees
-    public static final double back_right_zeroOffset = 0.303; // the offset between the absolute encoder on the back right module, in degrees
+    public static final double front_left_absoluteEncoderZeroOffset = 214.65;//212.8; // the offset between the absolute encoder reading on the front left module, in degrees
+    public static final double front_right_absoluteEncoderZeroOffset = 337.27;//253.1; // the offset between the absolute encoder on the front left module, in degrees
+    public static final double back_left_absoluteEncoderZeroOffset = 81.47;//320.2; // the offset between the absolute encoder on the back left module, in degrees
+    public static final double back_right_absoluteEncoderZeroOffset = 270.1;//205;
 
-    public static final PIDFGains driveMotorPID = new PIDFGains(3.5037 * 6.75, 0.00, 0.00, 0.0, 0.22, 0, 6, 12, 1 / SwerveModule.moduleThreadHz);
-    public static final PIDFGains steerMotorPID = new PIDFGains(14.042 * steerGearRatio, 0, 1.4 * steerGearRatio, 0, 0.1 * steerGearRatio, 0, 1 / SwerveModule.moduleThreadHz);
+    public static final double front_left_zeroOffset = 0.59625; // the offset between the absolute encoder reading on the front left module, in degrees
+    public static final double front_right_zeroOffset = 0.9368; // the offset between the absolute encoder on the front left module, in degrees
+    public static final double back_left_zeroOffset = 0.226; // the offset between the absolute encoder on the back left module, in degrees
+    public static final double back_right_zeroOffset = 0.750; // the offset between the absolute encoder on the back right module, in degrees
+
+    public static final PIDFGains driveMotorPID = new PIDFGains(3.5037, 0.00, 0.00, 0.0, 0.22, 0, 6, 12, 1 / SwerveModule.moduleThreadHz);
+    public static final PIDFGains steerMotorPID = new PIDFGains(10, 0, 0.5, 0, 0.1, 0, 1 / SwerveModule.moduleThreadHz);
   }
 
   private final TalonFX driveMotor;
@@ -61,7 +66,7 @@ public class SwerveModuleIOCompBot implements SwerveModuleIO{
 
   @Override
   public void updateInputs(SwerveModuleIOInputsAutoLogged inputs) {
-//     steerMotor.getEncoder().setPosition(absEncoder.getDistance() * CompBotConstants.steerGearRatio * absEncoderMultiplier); //fix?
+    steerMotor.getEncoder().setPosition(absEncoder.get() * CompBotConstants.steerGearRatio * absEncoderMultiplier); //fix?
 
     inputs.currentState.angle = Rotation2d.fromRotations(steerMotor.getEncoder().getPosition() / CompBotConstants.steerGearRatio);
     inputs.currentState.speedMetersPerSecond = driveMotor.getVelocity().getValueAsDouble() * CompBotConstants.wheelCircumferenceMeters / CompBotConstants.steerGearRatio;

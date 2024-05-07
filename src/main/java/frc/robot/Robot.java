@@ -38,6 +38,8 @@ public class Robot extends LoggedRobot
     public void robotInit() {
         new RobotContainer();
 
+        Logger.recordMetadata("Robot Type", Constants.robotType.name());
+
         Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
         Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
         Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
