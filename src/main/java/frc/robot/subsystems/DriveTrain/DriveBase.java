@@ -59,8 +59,6 @@ public class DriveBase extends SubsystemBase {
 
   private final DriveBaseInputsAutoLogged inputs = new DriveBaseInputsAutoLogged(); //an object representing the logger class
 
-  private final ReentrantLock odometryLock = new ReentrantLock(); //a lock for the odometry and modules thread
-
   private final double maxFreeWheelSpeed = Constants.robotType == Constants.RobotType.DEVELOPMENT ? SwerveModuleIODevBot.DevBotConstants.maxDriveVelocityMetersPerSecond : SwerveModuleIOCompBot.CompBotConstants.maxDriveVelocityMetersPerSecond; //the max speed the wheels can spin when the robot is not moving
 
   private SwerveModuleState[] targetStates = new SwerveModuleState[]{new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState()};
@@ -128,34 +126,6 @@ public class DriveBase extends SubsystemBase {
     this.setDefaultCommand(new DriveCommand()), this::removeDefaultCommand).ignoringDisable(true));
     }
 
-  public @NotNull Notifier getNotifier() {
-    SwerveModulePosition[] previousPositions = new SwerveModulePosition[]{new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition()};
-    SwerveModulePosition[] positions = new SwerveModulePosition[]{new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition()};
-
-    Runnable odometryAndModulesRunnable = () -> {
-      for (int i = 0; i < 4; i++) {
-        positions[i] = modules[i].modulePeriodic();
-
-        moduleDeltas[i] = new SwerveModulePosition(
-          positions[i].distanceMeters - previousPositions[i].distanceMeters,
-          positions[i].angle
-        );
-
-        previousPositions[i] = positions[i].copy();
-      }
-      gyro.update();
-
-      try {
-        odometryLock.lock();
-        poseEstimator.updateWithTime(Logger.getTimestamp(), gyro.getRotation2d(), positions);
-      } finally {
-        odometryLock.unlock();
-      }
-    };
-
-    return new Notifier(odometryAndModulesRunnable);
-  }
-
 
   /**
    * resets the robot to 0, 0 and a rotation of 0 (towards red alliance)
@@ -168,12 +138,7 @@ public class DriveBase extends SubsystemBase {
     SwerveModulePosition[] positions = new SwerveModulePosition[4];
     for(int i = 0; i < 4; i++) positions[i] = modules[i].modulePeriodic();
 
-    try {
-      odometryLock.lock();
-      poseEstimator.resetPosition(new Rotation2d(), positions, currentPose);
-    } finally {
-      odometryLock.unlock();
-    }
+    poseEstimator.resetPosition(new Rotation2d(), positions, currentPose);
 
     gyro.reset(currentPose);
   }
@@ -191,12 +156,7 @@ public class DriveBase extends SubsystemBase {
     SwerveModulePosition[] positions = new SwerveModulePosition[4];
     for(int i = 0; i < 4; i++) positions[i] = modules[i].modulePeriodic();
 
-    try {
-      odometryLock.lock();
-      poseEstimator.resetPosition(new Rotation2d(), positions, newPose);
-    } finally {
-      odometryLock.unlock();
-    }
+    poseEstimator.resetPosition(new Rotation2d(), positions, newPose);
 
     gyro.reset(newPose);
     currentPose = newPose;
@@ -415,20 +375,28 @@ public class DriveBase extends SubsystemBase {
     return AutoBuilder.pathfindThenFollowPath(targetPath, Constants.DriveTrain.PathPlanner.pathConstraints, rotationDelay);
   }
 
+  SwerveModulePosition[] previousPositions = new SwerveModulePosition[]{new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition()};
+  SwerveModulePosition[] positions = new SwerveModulePosition[]{new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition()};
+
   /**
    * this updates the states of the modules, call this function periodically
    */
   public void update(){
-      for(int i = 0; i < 4; i++){
+    for(int i = 0; i < 4; i++){
         inputs.currentStates[i] = modules[i].getCurrentState();
-      }
+        positions[i] = modules[i].modulePeriodic();
 
-    try {
-      odometryLock.lock();
-      currentPose = poseEstimator.getEstimatedPosition();
-    } finally {
-      odometryLock.unlock();
+        moduleDeltas[i] = new SwerveModulePosition(
+                positions[i].distanceMeters - previousPositions[i].distanceMeters,
+                positions[i].angle
+        );
+
+        previousPositions[i] = positions[i].copy();
     }
+
+    gyro.update();
+    poseEstimator.updateWithTime(Logger.getTimestamp(), gyro.getRotation2d(), positions);
+    currentPose = poseEstimator.getEstimatedPosition();
 
     Logger.recordOutput("DriveBase/estimatedPose", currentPose);
     Logger.recordOutput("DriveBase/ChassisSpeeds", getChassisSpeeds());

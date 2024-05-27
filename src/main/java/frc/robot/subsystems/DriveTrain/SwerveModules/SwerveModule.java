@@ -34,7 +34,7 @@ public class SwerveModule {
     Back_Right
   }
 
-  public static final double moduleThreadHz = 100;
+  public static final double moduleThreadHz = 50;
   public static final double distanceBetweenWheels = 0.576; // the distance between each wheel in meters
   public static final Translation2d[] moduleTranslations = new Translation2d[]
           {new Translation2d(distanceBetweenWheels / 2, distanceBetweenWheels / 2), new Translation2d(distanceBetweenWheels / 2, -distanceBetweenWheels / 2),
@@ -52,7 +52,22 @@ public class SwerveModule {
 
   private SwerveModuleState targetState = new SwerveModuleState();
 
-  private final ReentrantLock lock = new ReentrantLock();
+  private double driveMotorVoltageOutput = 0;
+  private double steerMotorVoltageOutput = 0;
+
+  private final Runnable driveMotorSetRunnable = new Runnable() {
+    @Override
+    public void run() {
+      io.setDriveMotorVoltage(driveMotorVoltageOutput);
+    }
+  };
+
+  private final Runnable steerMotorSetRunnable = new Runnable() {
+    @Override
+    public void run() {
+      io.setSteerMotorVoltage(steerMotorVoltageOutput);
+    }
+  };
 
   public SwerveModule(ModuleName name) {
     if(Constants.robotType == Constants.RobotType.DEVELOPMENT){
@@ -87,19 +102,18 @@ public class SwerveModule {
   }
 
   public SwerveModulePosition modulePeriodic() {
-    try{
-      lock.lock();
       io.updateInputs(inputs);
 
       if(!isRunningSysID){
         targetState = SwerveModuleState.optimize(targetState, inputs.currentState.angle);
         targetState.speedMetersPerSecond *= Math.cos(targetState.angle.getRadians() - inputs.currentState.angle.getRadians());
 
-        double steerOutPut = steerPIDController.calculate(inputs.currentState.angle.getRadians(), targetState.angle.getRadians());
+        driveMotorVoltageOutput = drivePIDController.calculate(inputs.currentState.speedMetersPerSecond, targetState.speedMetersPerSecond) + driveFeedforward.calculate(targetState.speedMetersPerSecond);
+        steerMotorVoltageOutput = steerPIDController.calculate(inputs.currentState.angle.getRadians(), targetState.angle.getRadians());
+        steerMotorVoltageOutput = steerPIDController.atSetpoint() ? 0 : steerMotorVoltageOutput;
 
-
-        io.setDriveMotorVoltage(drivePIDController.calculate(inputs.currentState.speedMetersPerSecond, targetState.speedMetersPerSecond) + driveFeedforward.calculate(targetState.speedMetersPerSecond));
-        io.setSteerMotorVoltage(steerPIDController.atSetpoint() ? 0 : steerOutPut);
+        driveMotorSetRunnable.run();
+        steerMotorSetRunnable.run();
       }
       else{
         if(targetState != null){
@@ -108,27 +122,16 @@ public class SwerveModule {
           io.setSteerMotorVoltage(steerPIDController.atSetpoint() ? 0 : steerOutPut);
         }
       }
+      Logger.processInputs("SwerveModule/" + moduleName, inputs);
+
       return new SwerveModulePosition(inputs.drivePositionMeters, inputs.currentState.angle);
-    }
-    finally {
-      lock.unlock();
-    }
   }
 
   public SwerveModuleState getCurrentState(){
-    try {
-      lock.lock();
-      Logger.processInputs("SwerveModule/" + moduleName, inputs);
       return inputs.currentState;
-    }
-    finally {
-      lock.unlock();
-    }
   }
 
   public SwerveModuleState run(SwerveModuleState targetState){
-    try{
-      lock.lock();
       isRunningSysID = false;
       targetState = SwerveModuleState.optimize(targetState, inputs.currentState.angle);
       targetState.speedMetersPerSecond *= inputs.currentState.angle.minus(targetState.angle).getCos();
@@ -136,35 +139,18 @@ public class SwerveModule {
       this.targetState = targetState;
 
       return targetState;
-    }
-    finally {
-      lock.unlock();
-    }
   }
 
   public void runSysIDSteer(Measure<Voltage> steerVoltage){
-    try{
-      lock.lock();
       isRunningSysID = true;
       io.setSteerMotorVoltage(steerVoltage.in(Volts));
       targetState = null;
-    }
-    finally {
-      lock.unlock();
-    }
   }
 
   public void runSysIDDrive(Measure<Voltage> driveVoltage, Rotation2d angle){
-    try{
-      lock.lock();
       isRunningSysID = true;
       io.setDriveMotorVoltage(driveVoltage.in(Volts));
       targetState.angle = angle;
-    }
-    finally
-    {
-      lock.unlock();
-    }
   }
 
   public void setIdleMode(boolean isBrakeMode){
