@@ -5,7 +5,6 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import java.util.concurrent.locks.ReentrantLock;
 import kotlin.Metadata;
 import kotlin.jvm.internal.Intrinsics;
 import org.jetbrains.annotations.NotNull;
@@ -43,38 +42,26 @@ public final class NavxIO implements GyroIO {
     private final boolean isInverted;
     private final AHRS navx;
     private final NavxInputsAutoLogged inputs;
-    private final ReentrantLock lock;
 
     public NavxIO(boolean isInverted) {
         this.isInverted = isInverted;
         this.navx = new AHRS();
         this.inputs = new NavxInputsAutoLogged();
-        this.lock = new ReentrantLock();
-    }
+   }
 
     public void reset(Pose2d newPose) {
         Intrinsics.checkNotNullParameter(newPose, "newPose");
 
-        try {
-            this.lock.lock();
-            this.navx.reset();
-            this.inputs.angle = newPose.getRotation();
-            this.inputs.rotationOffset = newPose.getRotation().unaryMinus();
-            this.inputs.estimatedPose = newPose;
-        } finally {
-            this.lock.unlock();
-        }
+        this.navx.reset();
+        this.inputs.angle = newPose.getRotation();
+        this.inputs.rotationOffset = newPose.getRotation().unaryMinus();
+        this.inputs.estimatedPose = newPose;
 
     }
 
     public double getAngleDegrees() {
         double var1;
-        try {
-            this.lock.lock();
-            var1 = this.inputs.angle.getDegrees();
-        } finally {
-            this.lock.unlock();
-        }
+        var1 = this.inputs.angle.getDegrees();
 
         return var1;
     }
@@ -82,20 +69,12 @@ public final class NavxIO implements GyroIO {
     @NotNull
     public Rotation2d getRotation2d() {
         Rotation2d var1;
-        try {
-            this.lock.lock();
             var1 = this.inputs.angle;
-        } finally {
-            this.lock.unlock();
-        }
 
         return var1;
     }
 
     public void update() {
-        try {
-            lock.lock();
-      
             // inputs.angle = if(isInverted) Rotation2d.fromDegrees(navx.angle - inputs.rotationOffset.degrees) else Rotation2d.fromDegrees(-navx.angle - inputs.rotationOffset.degrees);
             inputs.angle = isInverted ? Rotation2d.fromDegrees(navx.getAngle() - inputs.rotationOffset.getDegrees()) : Rotation2d.fromDegrees(-navx.getAngle() - inputs.rotationOffset.getDegrees());
       
@@ -116,93 +95,55 @@ public final class NavxIO implements GyroIO {
             inputs.prevVelocityX = inputs.velocityX;
             inputs.prevVelocityY = inputs.velocityY;
             inputs.prevTimeStamp = navx.getLastSensorTimestamp();
-        } finally {
-            this.lock.unlock();
-        }
 
         Logger.processInputs("FastNavx", (LoggableInputs)this.inputs);
     }
 
     public double getYaw() {
         double var1;
-        try {
-            this.lock.lock();
             var1 = this.inputs.yaw;
-        } finally {
-            this.lock.unlock();
-        }
 
         return var1;
     }
 
     public double getPitch() {
         double var1;
-        try {
-            this.lock.lock();
             var1 = this.inputs.pitch;
-        } finally {
-            this.lock.unlock();
-        }
 
         return var1;
     }
 
     public double getRoll() {
         double var1;
-        try {
-            this.lock.lock();
             var1 = this.inputs.roll;
-        } finally {
-            this.lock.unlock();
-        }
 
         return var1;
     }
 
     public double getVelocityX() {
         double var1;
-        try {
-            this.lock.lock();
             var1 = this.inputs.velocityX;
-        } finally {
-            this.lock.unlock();
-        }
 
         return var1;
     }
 
     public double getVelocityY() {
         double var1;
-        try {
-            this.lock.lock();
             var1 = this.inputs.velocityY;
-        } finally {
-            this.lock.unlock();
-        }
 
         return var1;
     }
 
     public double getAccelerationX() {
         double var1;
-        try {
-            this.lock.lock();
             var1 = this.inputs.accelerationX;
-        } finally {
-            this.lock.unlock();
-        }
 
         return var1;
     }
 
     public double getAccelerationY() {
         double var1;
-        try {
-            this.lock.lock();
             var1 = this.inputs.accelerationY;
-        } finally {
-            this.lock.unlock();
-        }
 
         return var1;
     }

@@ -6,7 +6,6 @@ import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.struct.StructSerializable;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 import kotlin.Metadata;
 import kotlin.jvm.internal.Intrinsics;
@@ -24,7 +23,6 @@ import org.littletonrobotics.junction.Logger;
 public final class SimGyroIO implements GyroIO {
     private final Supplier<Twist2d> twistSupplier;
     private final Supplier<ChassisSpeeds> chassisSpeedsSupplier;
-    private final ReentrantLock lock;
     private Rotation2d angle;
     private double velocityX;
     private double velocityY;
@@ -40,18 +38,12 @@ public final class SimGyroIO implements GyroIO {
         Intrinsics.checkNotNullParameter(chassisSpeedsSupplier, "chassisSpeedsSupplier");
         this.twistSupplier = twistSupplier;
         this.chassisSpeedsSupplier = chassisSpeedsSupplier;
-        this.lock = new ReentrantLock();
         this.angle = new Rotation2d();
     }
 
     public double getAngleDegrees() {
         double var1;
-        try {
-            this.lock.lock();
             var1 = this.angle.getDegrees();
-        } finally {
-            this.lock.unlock();
-        }
 
         return var1;
     }
@@ -59,19 +51,12 @@ public final class SimGyroIO implements GyroIO {
     @NotNull
     public Rotation2d getRotation2d() {
         Rotation2d var1;
-        try {
-            this.lock.lock();
             var1 = this.angle;
-        } finally {
-            this.lock.unlock();
-        }
 
         return var1;
     }
 
     public void update() {
-        try {
-            this.lock.lock();
             Object var2 = this.twistSupplier.get();
             Intrinsics.checkNotNullExpressionValue(var2, "get(...)");
             Twist2d twist = (Twist2d)var2;
@@ -99,20 +84,12 @@ public final class SimGyroIO implements GyroIO {
             Logger.recordOutput("Gyro/velocityY", this.velocityY);
             Logger.recordOutput("Gyro/accelerationX", this.accelerationX);
             Logger.recordOutput("Gyro/accelerationY", this.accelerationY);
-        } finally {
-            this.lock.unlock();
-        }
 
     }
 
     public double getYaw() {
         double var1;
-        try {
-            this.lock.lock();
             var1 = -this.angle.getDegrees();
-        } finally {
-            this.lock.unlock();
-        }
 
         return var1;
     }
@@ -127,65 +104,38 @@ public final class SimGyroIO implements GyroIO {
 
     public double getVelocityX() {
         double var1;
-        try {
-            this.lock.lock();
             var1 = this.velocityX;
-        } finally {
-            this.lock.unlock();
-        }
 
         return var1;
     }
 
     public double getVelocityY() {
         double var1;
-        try {
-            this.lock.lock();
             var1 = this.velocityY;
-        } finally {
-            this.lock.unlock();
-        }
-
         return var1;
     }
 
     public double getAccelerationX() {
         double var1;
-        try {
-            this.lock.lock();
             var1 = this.accelerationX;
-        } finally {
-            this.lock.unlock();
-        }
 
         return var1;
     }
 
     public double getAccelerationY() {
         double var1;
-        try {
-            this.lock.lock();
             var1 = this.accelerationY;
-        } finally {
-            this.lock.unlock();
-        }
 
         return var1;
     }
 
     public void reset(@NotNull Pose2d newPose) {
         Intrinsics.checkNotNullParameter(newPose, "newPose");
-
-        try {
-            this.lock.lock();
             Rotation2d var2 = newPose.getRotation();
             Intrinsics.checkNotNullExpressionValue(var2, "getRotation(...)");
             this.angle = var2;
             this.displacementX = newPose.getTranslation().getX();
             this.displacementY = newPose.getTranslation().getY();
-        } finally {
-            this.lock.unlock();
-        }
 
     }
 

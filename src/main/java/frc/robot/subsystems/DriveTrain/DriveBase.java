@@ -15,7 +15,6 @@ import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleIODevBot;
 import frc.util.FastGyros.GyroIO;
 import frc.util.FastGyros.NavxIO;
 import frc.util.FastGyros.SimGyroIO;
-import org.jetbrains.annotations.NotNull;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
@@ -39,8 +38,6 @@ import frc.robot.RobotContainer;
 import frc.robot.Constants.RobotType;
 
 import static edu.wpi.first.units.Units.Volts;
-
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * The DriveBase class represents the drivetrain of the robot.

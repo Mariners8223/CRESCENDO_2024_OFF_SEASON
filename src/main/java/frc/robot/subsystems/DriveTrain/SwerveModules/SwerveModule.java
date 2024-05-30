@@ -18,8 +18,6 @@ import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleIODevBot.DevBot
 
 import org.littletonrobotics.junction.Logger;
 
-import java.util.concurrent.locks.ReentrantLock;
-
 import static edu.wpi.first.units.Units.Volts;
 
 public class SwerveModule {

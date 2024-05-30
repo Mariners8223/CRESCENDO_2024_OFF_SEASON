@@ -11,14 +11,12 @@ import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
 import frc.robot.Constants.RobotType;
-import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModule;
 import frc.util.LocalADStarAK;
 
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 
 import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.Logger;
@@ -86,11 +84,6 @@ public class Robot extends LoggedRobot
                 Logger.recordOutput("PathPlanner/TargetPose", targetPose));
 
         PathfindingCommand.warmupCommand().schedule();
-
-        Notifier notifier = RobotContainer.driveBase.getNotifier();
-        notifier.setName("DriveBaseNotifier");
-        System.out.println("Starting DriveBase Notifier");
-        notifier.startPeriodic(1 / SwerveModule.moduleThreadHz);
     }
     
     
