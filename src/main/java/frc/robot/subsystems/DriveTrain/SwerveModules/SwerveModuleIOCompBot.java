@@ -30,8 +30,11 @@ public class SwerveModuleIOCompBot implements SwerveModuleIO{
     public static final double back_left_zeroOffset = 0.226; // the offset between the absolute encoder on the back left module, in rotations
     public static final double back_right_zeroOffset = 0.750; // the offset between the absolute encoder on the back right module, in rotations
 
-    public static final PIDFGains driveMotorPID = new PIDFGains(2.89, 0.00, 0, 1.2, 0.1, 0, 1 / SwerveModule.moduleThreadHz, 3, 100);
-    public static final PIDFGains steerMotorPID = new PIDFGains(10, 0, 0.5, 0, 0.1, 0, 1 / SwerveModule.moduleThreadHz);
+    public static final PIDFGains driveMotorPID = new PIDFGains(0, 0.00, 0, 0, 0.1, 0, 1 / SwerveModule.moduleThreadHz, 3, 100);
+    public static final PIDFGains steerMotorPID = new PIDFGains(0, 0, 0, 0, 0.1, 0, 1 / SwerveModule.moduleThreadHz);
+
+    // public static final PIDFGains driveMotorPID = new PIDFGains(2.89, 0.00, 0, 1.2, 0.1, 0, 1 / SwerveModule.moduleThreadHz, 3, 100);
+    // public static final PIDFGains steerMotorPID = new PIDFGains(10, 0, 0.5, 0, 0.1, 0, 1 / SwerveModule.moduleThreadHz);
   }
 
   private final TalonFX driveMotor;
