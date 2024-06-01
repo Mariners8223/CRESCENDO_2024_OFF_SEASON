@@ -22,9 +22,9 @@ public class SwerveModuleIOSIM implements SwerveModuleIO{
   private double steerMotorVoltage = 0;
 
   public SwerveModuleIOSIM(){
-    driveMotor = new DCMotorSim(DCMotor.getFalcon500(1), 1, 0.25);
+    driveMotor = new DCMotorSim(DCMotor.getFalcon500(1), 1, 0.25 / steerMotorGearRatio);
     if (Constants.robotType == Constants.RobotType.DEVELOPMENT) {
-      steerMotor = new DCMotorSim(DCMotor.getNEO(1), 1, 0.25);
+      steerMotor = new DCMotorSim(DCMotor.getNEO(1), 1, 0.25 / steerMotorGearRatio);
     } else {
       steerMotor = new DCMotorSim(DCMotor.getNeo550(1), 1, 0.25);
     }
