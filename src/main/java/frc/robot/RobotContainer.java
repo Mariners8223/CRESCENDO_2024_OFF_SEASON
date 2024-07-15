@@ -17,9 +17,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.DriveTrain.DriveBase;
-import frc.robot.subsystems.DriveTrain.DriveBase.SysID;
-import frc.robot.subsystems.DriveTrain.DriveBase.SysID.SysIDType;
-
+import frc.robot.subsystems.DriveTrain.SysID;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import java.util.ArrayList;
@@ -90,10 +88,10 @@ public class RobotContainer{
     
     private void configureBindings(SysID drivebaseSysID) {
         driveController.options().onTrue(new InstantCommand(driveBase::resetOnlyDirection));
-        driveController.cross().whileTrue(drivebaseSysID.getSysIDCommand(SysIDType.Steer, true, true));
-        driveController.square().whileTrue(drivebaseSysID.getSysIDCommand(SysIDType.Steer, false, true));
-        driveController.triangle().whileTrue(drivebaseSysID.getSysIDCommand(SysIDType.Steer, true, false));
-        driveController.circle().whileTrue(drivebaseSysID.getSysIDCommand(SysIDType.Steer, false, false));
+        driveController.cross().whileTrue(drivebaseSysID.getSysIDCommand(SysID.SysIDType.Steer, true, true));
+        driveController.square().whileTrue(drivebaseSysID.getSysIDCommand(SysID.SysIDType.Steer, false, true));
+        driveController.triangle().whileTrue(drivebaseSysID.getSysIDCommand(SysID.SysIDType.Steer, true, false));
+        driveController.circle().whileTrue(drivebaseSysID.getSysIDCommand(SysID.SysIDType.Steer, false, false));
     }
     
     

@@ -5,10 +5,13 @@
 package frc.robot.subsystems.DriveTrain;
 
 import edu.wpi.first.math.kinematics.*;
+import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Units;
+import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.commands.Drive.DriveCommand;
 import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModule;
 import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleIOCompBot;
 import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleIODevBot;
@@ -56,7 +59,7 @@ public class DriveBase extends SubsystemBase {
 
   private final DriveBaseInputsAutoLogged inputs = new DriveBaseInputsAutoLogged(); //an object representing the logger class
 
-  private final double maxFreeWheelSpeed = Constants.robotType == Constants.RobotType.DEVELOPMENT ? SwerveModuleIODevBot.DevBotConstants.maxDriveVelocityMetersPerSecond : SwerveModuleIOCompBot.CompBotConstants.maxDriveVelocityMetersPerSecond; //the max speed the wheels can spin when the robot is not moving
+  public final double maxFreeWheelSpeed = Constants.robotType == Constants.RobotType.DEVELOPMENT ? SwerveModuleIODevBot.DevBotConstants.maxDriveVelocityMetersPerSecond : SwerveModuleIOCompBot.CompBotConstants.maxDriveVelocityMetersPerSecond; //the max speed the wheels can spin when the robot is not moving
 
   private SwerveModuleState[] targetStates = new SwerveModuleState[]{new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState()};
 
@@ -120,7 +123,7 @@ public class DriveBase extends SubsystemBase {
     ).ignoringDisable(true));
 
     new Trigger(RobotState::isTeleop).and(RobotState::isEnabled).whileTrue(new StartEndCommand(() ->
-    this.setDefaultCommand(new DriveCommand()), this::removeDefaultCommand).ignoringDisable(true));
+    this.setDefaultCommand(new DriveCommand(this, RobotContainer.driveController)), this::removeDefaultCommand).ignoringDisable(true));
     }
 
 
@@ -225,24 +228,22 @@ public class DriveBase extends SubsystemBase {
   }
 
   /**
-   * drives the robot with angle PID fix
-   * @param Xspeed the speed in the X direction (positive is away from the driver station)
-   * @param Yspeed the speed in the Y direction (positive is left)
-   * @param rotation the change in the angle of the robot (Positive is to rotate left)
-   * @param centerOfRotation the center that the robot rotates about
+   * drives the robot relative to itself
+   * @param Xspeed the X speed of the robot (forward is positive) m/s
+   * @param Yspeed the Y speed of the robot (left is positive) m/s
+   * @param rotationSpeed  the rotation of the robot (left is positive) rad/s
    */
-  public void drive(double Xspeed, double Yspeed, double rotation, Translation2d centerOfRotation){
-
-    targetStates = driveTrainKinematics.toSwerveModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(Xspeed, Yspeed, rotation, getRotation2d()), centerOfRotation); //calculates the target states
-    SwerveDriveKinematics.desaturateWheelSpeeds(targetStates, maxFreeWheelSpeed); //desaturates the wheel speeds (to make sure none of the wheel exceed the max speed)
+  public void drive(double Xspeed, double Yspeed, double rotationSpeed){
+    targetStates = driveTrainKinematics.toSwerveModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(Xspeed, Yspeed, rotationSpeed, getRotation2d()));
+    SwerveDriveKinematics.desaturateWheelSpeeds(targetStates, maxFreeWheelSpeed);
 
     for(int i = 0; i < 4; i++){
-      targetStates[i] = modules[i].run(targetStates[i]); //sets the module state
+      targetStates[i] = modules[i].run(targetStates[i]);
     }
 
-    inputs.XspeedInput = Xspeed; //logs the X speed before PID
-    inputs.YspeedInput = Yspeed; //logs the Y speed before PID
-    inputs.rotationSpeedInput = rotation; //logs the rotation speed before PID
+    inputs.XspeedInput = Xspeed;
+    inputs.YspeedInput = Yspeed;
+    inputs.rotationSpeedInput = rotationSpeed;
     Logger.processInputs(getName(), inputs);
   }
 
@@ -250,11 +251,11 @@ public class DriveBase extends SubsystemBase {
    * drives the robot relative to itself
    * @param Xspeed the X speed of the robot (forward is positive) m/s
    * @param Yspeed the Y speed of the robot (left is positive) m/s
-   * @param rotation  the rotation of the robot (left is positive) rad/s
+   * @param rotationSpeed  the rotation of the robot (left is positive) rad/s
    */
-  public void robotRelativeDrive(double Xspeed, double Yspeed, double rotation){
+  public void robotRelativeDrive(double Xspeed, double Yspeed, double rotationSpeed){
 
-    targetStates = driveTrainKinematics.toSwerveModuleStates(new ChassisSpeeds(Xspeed, Yspeed, rotation));
+    targetStates = driveTrainKinematics.toSwerveModuleStates(new ChassisSpeeds(Xspeed, Yspeed, rotationSpeed));
     SwerveDriveKinematics.desaturateWheelSpeeds(inputs.currentStates, maxFreeWheelSpeed);
 
     for(int i = 0; i < 4; i++){
@@ -263,17 +264,9 @@ public class DriveBase extends SubsystemBase {
 
     inputs.XspeedInput = Xspeed;
     inputs.YspeedInput = Yspeed;
-    inputs.rotationSpeedInput = rotation;
+    inputs.rotationSpeedInput = rotationSpeed;
     Logger.processInputs(getName(), inputs);
   }
-
-  /**
-   * drives the robot with angle PID fix
-   * @param Xspeed the speed in the X direction (positive is away from the driver station)
-   * @param Yspeed the speed in the Y direction (positive is left)
-   * @param rotation the change in the angle of the robot (Positive is to rotate left)
-   */
-  public void drive(double Xspeed, double Yspeed, double rotation){drive(Xspeed, Yspeed, rotation, new Translation2d());}
 
   /**
    * drives the robot without built in pid fixes
@@ -293,35 +286,13 @@ public class DriveBase extends SubsystemBase {
     Logger.processInputs(getName(), inputs);
   }
 
-  /**
-   * drives the robot without any PID control at all
-   * @param Xspeed the speed in the X direction (positive is away from the driver station)
-   * @param Yspeed the speed in the Y direction (positive is left)
-   * @param rotation the change in the angle of the robot (Positive is to rotate left)
-   * @param centerOfRotation the center that the robot rotates about
-   */
-  public void driveWithOutPID(double Xspeed, double Yspeed, double rotation, Translation2d centerOfRotation){
-    targetStates = driveTrainKinematics.toSwerveModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(Xspeed, Yspeed, rotation, getRotation2d()), centerOfRotation);
-    SwerveDriveKinematics.desaturateWheelSpeeds(targetStates, maxFreeWheelSpeed);
-
-    for(int i = 0; i < 4; i++){
-      targetStates[i] = modules[i].run(targetStates[i]);
-    }
-
-    inputs.XspeedInput = Xspeed;
-    inputs.YspeedInput = Yspeed;
-    inputs.rotationSpeedInput = rotation;
-    Logger.processInputs(getName(), inputs);
+  public void runVoltageSteer(Measure<Voltage> voltage, SwerveModule.ModuleName name){
+    modules[name.ordinal()].runSysIDSteer(voltage);
   }
 
-  /**
-   * drives the robot without any PID control at all
-   * @param Xspeed the speed in the X direction (positive is away from the driver station)
-   * @param Yspeed the speed in the Y direction (positive is left)
-   * @param rotation the change in the angle of the robot (Positive is to rotate left)
-   */
-  public void driveWithOutPID(double Xspeed, double Yspeed, double rotation){ driveWithOutPID(Xspeed, Yspeed, rotation, new Translation2d());}
-
+  public void runVoltageDrive(Measure<Voltage> voltage, SwerveModule.ModuleName name, Rotation2d rotation){
+    modules[name.ordinal()].runSysIDDrive(voltage, rotation);
+  }
 
   /**
    * path finds a path from the current pose to the target pose
@@ -375,20 +346,18 @@ public class DriveBase extends SubsystemBase {
   SwerveModulePosition[] previousPositions = new SwerveModulePosition[]{new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition()};
   SwerveModulePosition[] positions = new SwerveModulePosition[]{new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition()};
 
-  /**
-   * this updates the states of the modules, call this function periodically
-   */
-  public void update(){
+  @Override
+  public void periodic() {
     for(int i = 0; i < 4; i++){
-        inputs.currentStates[i] = modules[i].getCurrentState();
-        positions[i] = modules[i].modulePeriodic();
+      inputs.currentStates[i] = modules[i].getCurrentState();
+      positions[i] = modules[i].modulePeriodic();
 
-        moduleDeltas[i] = new SwerveModulePosition(
-                positions[i].distanceMeters - previousPositions[i].distanceMeters,
-                positions[i].angle
-        );
+      moduleDeltas[i] = new SwerveModulePosition(
+              positions[i].distanceMeters - previousPositions[i].distanceMeters,
+              positions[i].angle
+      );
 
-        previousPositions[i] = positions[i].copy();
+      previousPositions[i] = positions[i].copy();
     }
 
     gyro.update();
@@ -404,135 +373,5 @@ public class DriveBase extends SubsystemBase {
     inputs.activeCommand = this.getCurrentCommand() != null ? this.getCurrentCommand().getName() : "None";
 
     Logger.processInputs(getName(), inputs);
-  }
-
-  @Override
-  public void periodic() {
-    update();
-  }
-
-
-  private static class DriveCommand extends Command{
-    DriveBase driveBase;
-    CommandPS5Controller controller;
-
-    public DriveCommand(){
-      controller = RobotContainer.driveController;
-      driveBase = RobotContainer.driveBase;
-
-      addRequirements(driveBase);
-    }
-
-    @Override
-    public void initialize() {
-      driveBase.drive(0, 0, 0);
-    }
-
-    @Override
-    public void execute() {
-       driveBase.drive(
-         //this basically takes the inputs from the controller and firsts checks if it's not drift or a mistake by checking if it is above a certain value then it multiplies it by the R2 axis that the driver uses to control the speed of the robot
-         (Math.abs(controller.getLeftY()) > 0.1 ? -controller.getLeftY() : 0) * lerp(1 - (0.5 + controller.getR2Axis() / 2)),
-
-         (Math.abs(controller.getLeftX()) > 0.1 ? -controller.getLeftX() : 0) * lerp(1 - (0.5 + controller.getR2Axis() / 2)),
-
-         (Math.abs(controller.getRightX()) > 0.1 ? -controller.getRightX() : 0) * lerp(1 - (0.5 + controller.getR2Axis() / 2))
-         );
-    }
-
-    private double lerp(double p){
-      return 1 + (driveBase.maxFreeWheelSpeed - 1) * p;
-    }
-
-    @Override
-    public void end(boolean interrupted) {
-      driveBase.drive(0, 0, 0);
-    }
-
-    @Override
-    public boolean isFinished() {
-      return RobotState.isDisabled();
-    }
-  }
-
-  public static class SysID{
-    public enum SysIDType{
-      Steer,
-      Drive,
-      X,
-      Y,
-    }
-    SysIdRoutine steerSysId;
-    SysIdRoutine driveSysId;
-    SysIdRoutine xSpeedSysId;
-    SysIdRoutine ySpeedSYSId;
-
-    public SysID(DriveBase driveBase){
-      steerSysId = new SysIdRoutine(
-              new SysIdRoutine.Config(
-                null, null, null, (state) -> Logger.recordOutput("SysIDSteerState", state.toString())
-              ),
-              new SysIdRoutine.Mechanism(
-                      (voltage) -> {
-                        for(int i = 0; i < 4; i++) driveBase.modules[i].runSysIDSteer(voltage);
-                      },
-                      null,
-                      driveBase,
-                      "steerSysId"
-              ));
-
-      driveSysId = new SysIdRoutine(
-        new SysIdRoutine.Config(
-          null, Volts.of(3), null, (state) -> Logger.recordOutput("SysIDDriveState", state.toString())
-        ),
-              new SysIdRoutine.Mechanism(
-                      (voltage) -> {
-                        for(int i = 0; i < 4; i++){
-                          driveBase.modules[i].runSysIDDrive(voltage, new Rotation2d(RobotContainer.driveController.getLeftX(), RobotContainer.driveController.getLeftY()));
-                        }
-                      },
-                      null,
-                      driveBase,
-                      "driveSysId"
-              ));
-
-      xSpeedSysId = new SysIdRoutine(
-        new SysIdRoutine.Config(
-          Units.Volts.of(0.5).per(Units.Seconds), Units.Volts.of(3), null, (state) -> Logger.recordOutput("SysIDXYState", state.toString())
-        ),
-              new SysIdRoutine.Mechanism(
-                      (voltage) -> driveBase.drive(voltage.in(Units.Volts), 0, 0),
-                      (log) -> Logger.recordOutput("/SysID/velocityX", driveBase.getChassisSpeeds().vxMetersPerSecond),
-                      driveBase,
-                      "xySpeedSysId"
-              ));
-
-      ySpeedSYSId = new SysIdRoutine(
-              new SysIdRoutine.Config(
-                null, null, null, (state) -> Logger.recordOutput("SysIDYState", state.toString())
-              ),
-              new SysIdRoutine.Mechanism(
-                      (voltage) -> driveBase.drive(0, voltage.in(Units.Volts), 0),
-                      (log) -> Logger.recordOutput("/SysID/velocityY", driveBase.getAbsoluteChassisSpeeds().vyMetersPerSecond),
-                      driveBase,
-                      "ySpeedSysId"
-              )
-      );
-    }
-
-    public Command getSysIDCommand(SysIDType type, boolean isDynamic, boolean isForward){
-      return isDynamic ? switch (type) {
-        case Steer -> steerSysId.dynamic(isForward ? SysIdRoutine.Direction.kForward : SysIdRoutine.Direction.kReverse);
-        case Drive -> driveSysId.dynamic(isForward ? SysIdRoutine.Direction.kForward : SysIdRoutine.Direction.kReverse);
-        case X -> xSpeedSysId.dynamic(isForward ? SysIdRoutine.Direction.kForward : SysIdRoutine.Direction.kReverse);
-        case Y -> ySpeedSYSId.dynamic(isForward ? SysIdRoutine.Direction.kForward : SysIdRoutine.Direction.kReverse);
-      }
-      : switch (type) {
-        case Steer -> steerSysId.quasistatic(isForward ? SysIdRoutine.Direction.kForward : SysIdRoutine.Direction.kReverse);
-        case Drive -> driveSysId.quasistatic(isForward ? SysIdRoutine.Direction.kForward : SysIdRoutine.Direction.kReverse);
-        case X -> xSpeedSysId.quasistatic(isForward ? SysIdRoutine.Direction.kForward : SysIdRoutine.Direction.kReverse);
-        case Y -> ySpeedSYSId.quasistatic(isForward ? SysIdRoutine.Direction.kForward : SysIdRoutine.Direction.kReverse);
-      };
-    }
   }
 }
