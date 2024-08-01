@@ -5,8 +5,15 @@
 
 package frc.robot;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BooleanSupplier;
+
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotState;
@@ -18,10 +25,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.DriveTrain.DriveBase;
 import frc.robot.subsystems.DriveTrain.SysID;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class RobotContainer{
     public static DriveBase driveBase;
@@ -44,9 +47,22 @@ public class RobotContainer{
         SmartDashboard.putData(field);
 
         configChooser();
-
-        // autoChooser.addOption("tesatast", driveBase.findPath(new Pose2d(14 , 6, new Rotation2d())));
     }
+
+    private static BooleanSupplier checkForPathChoiseUpdate = new BooleanSupplier() {
+        private String lastAutoName = "InstantCommand"; 
+        @Override
+        public boolean getAsBoolean() {
+            String currentAutoName = autoChooser.get().getName();
+            try{
+                return lastAutoName != autoChooser.get().getName();
+            }
+            finally{
+                lastAutoName = currentAutoName;
+            }
+            
+        };
+    };
 
     private void configChooser(){
         List<String> namesOfAutos = AutoBuilder.getAllAutoNames();
@@ -61,14 +77,13 @@ public class RobotContainer{
         autosOfAutos.forEach(auto -> autoChooser.addOption(auto.getName(), auto));
 
         autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
-        // autoChooser.addOption("Shoot Note", new ShootNote());
         SmartDashboard.putData("chooser", autoChooser.getSendableChooser());
 
         new Trigger(RobotState::isEnabled).and(RobotState::isTeleop).onTrue(new InstantCommand(() -> field.getObject("AutoPath").setPoses()).ignoringDisable(true));
+        new Trigger(RobotState::isDisabled).and(checkForPathChoiseUpdate).onTrue(new InstantCommand(() -> updateFieldFromAuto(autoChooser.get().getName())).ignoringDisable(true));
     }
 
-
-    public static void updateFieldFromAuto(String autoName){
+    private static void updateFieldFromAuto(String autoName){
         List<Pose2d> poses = new ArrayList<>();
         boolean DoesExsit = false;
         for (String name : AutoBuilder.getAllAutoNames()) {

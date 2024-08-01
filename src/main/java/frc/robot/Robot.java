@@ -27,10 +27,7 @@ import org.littletonrobotics.urcl.URCL;
 
 public class Robot extends LoggedRobot
 {
-    private Command autonomousCommand;
-    
-    String lastAutoName = "InstantCommand";
-    
+    private Command autonomousCommand;    
     
     @Override
     public void robotInit() {
@@ -100,10 +97,6 @@ public class Robot extends LoggedRobot
     
     @Override
     public void disabledPeriodic() {
-        // if(RobotContainer.getAutoCommand() != null && RobotContainer.getAutoCommand().getName() != lastAutoName){
-        //     lastAutoName = RobotContainer.getAutoCommand().getName();
-        //     RobotContainer.updateFieldFromAuto(lastAutoName);
-        // }
     }
     
     
