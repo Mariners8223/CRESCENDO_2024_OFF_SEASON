@@ -13,38 +13,35 @@ public class DriveCommand extends Command {
         this.driveBase = driveBase;
         this.controller = controller;
         addRequirements(this.driveBase);
-    }
-
-    private double lerp(double p){
-      return 1 + (driveBase.maxFreeWheelSpeed - 1) * p;
+        setName("DriveCommand");
     }
 
     @Override
     public void initialize() {
-       driveBase.drive(0, 0, 0);
+        driveBase.drive(0, 0, 0);
     }
 
 
     @Override
     public void execute() {
-       driveBase.drive(
-               //this basically takes the inputs from the controller and firsts checks if it's not drift or a mistake by checking if it is above a certain value then it multiplies it by the R2 axis that the driver uses to control the speed of the robot
-               (Math.abs(controller.getLeftY()) > 0.1 ? -controller.getLeftY() : 0) * lerp(1 - (0.5 + controller.getR2Axis() / 2)),
+        //calculates a value from 0 to the max wheel speed based on the R2 axis
+        double R2Axis = 1 + (driveBase.maxFreeWheelSpeed - 1) * (1 - (0.5 + controller.getR2Axis() / 2));
 
-               (Math.abs(controller.getLeftX()) > 0.1 ? -controller.getLeftX() : 0) * lerp(1 - (0.5 + controller.getR2Axis() / 2)),
+        //sets the value of the 3 axis we need (accounting for drift)
+        double leftX = Math.abs(controller.getLeftX()) > 0.1 ? -controller.getLeftX() : 0;
+        double leftY = Math.abs(controller.getLeftY()) > 0.1 ? -controller.getLeftY() : 0;
+        double rightX = Math.abs(controller.getRightX()) > 0.1 ? -controller.getRightX() : 0;
 
-               (Math.abs(controller.getRightX()) > 0.1 ? -controller.getRightX() : 0) * lerp(1 - (0.5 + controller.getR2Axis() / 2))
-       );
-    }
-
-
-    @Override
-    public boolean isFinished() {
-        return false;
+        //drives the robot with the values
+        driveBase.drive(
+                leftX * R2Axis,
+                leftY * R2Axis,
+                rightX * R2Axis
+        );
     }
 
     @Override
     public void end(boolean interrupted) {
-      driveBase.drive(0, 0, 0);
+        driveBase.drive(0, 0, 0);
     }
 }
