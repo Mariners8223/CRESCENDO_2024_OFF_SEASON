@@ -5,8 +5,6 @@
 package frc.robot.subsystems.DriveTrain;
 
 import edu.wpi.first.math.kinematics.*;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.*;
 import frc.robot.commands.Drive.DriveCommand;
 import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModule;
@@ -39,6 +37,7 @@ import frc.robot.Constants.RobotType;
  * The DriveBase class represents the drivetrain of the robot.
  * It controls the movement and positioning of the robot using swerve drive.
  */
+@SuppressWarnings("unused")
 public class DriveBase extends SubsystemBase {
     /**
      * the array of the modules themselves
@@ -57,19 +56,19 @@ public class DriveBase extends SubsystemBase {
             new SwerveModulePosition[]{new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition()};
 
     /**
-     * the pose estimator of the drivebase (takes the odometry (which is wheel distance and gyro)
+     * the pose estimator of the drive base (takes the odometry (which is wheel distance and gyro)
      * and calculates the pose of the robot and also can take vision measurements)
      */
     private final SwerveDrivePoseEstimator poseEstimator =
             new SwerveDrivePoseEstimator(driveTrainKinematics, new Rotation2d(), moduleDeltas, new Pose2d());
 
     /**
-     * the gyro of the robot, can be navx or pigeon 2
+     * the gyro of the robot. it can be navx or pigeon 2
      */
     private final GyroIO gyro;
 
     /**
-     * the inputs of the drivebase (all the motor voltages, angles, speeds, etc.) to be logged
+     * the inputs of the drive base (all the motor voltages, angles, speeds, etc.) to be logged
      */
     private final DriveBaseInputsAutoLogged inputs = new DriveBaseInputsAutoLogged();
 
@@ -246,7 +245,7 @@ public class DriveBase extends SubsystemBase {
     }
 
     /**
-     * gets the current absolute (field relative ) speeds of the robot
+     * gets the current absolute (field relative) speeds of the robot
      *
      * @return the current chassis speeds
      */
@@ -402,7 +401,7 @@ public class DriveBase extends SubsystemBase {
     /**
      * path finds to a given path then follows that path
      *
-     * @param targetPath the path to path find to and follow
+     * @param targetPath the path to path finds to and follow
      * @return a command that path finds to a given path then follows that path
      */
     public Command pathFindToPathAndFollow(PathPlannerPath targetPath) {
@@ -412,7 +411,7 @@ public class DriveBase extends SubsystemBase {
     /**
      * path finds to a given path then follows that path
      *
-     * @param targetPath    the path to path find to and follow
+     * @param targetPath    the path to path finds to and follow
      * @param rotationDelay the delay in meters in which the robot does not change it's holonomic angle
      * @return a command that path finds to a given path then follows that path
      */

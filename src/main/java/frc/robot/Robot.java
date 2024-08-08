@@ -10,7 +10,6 @@ import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
-import frc.robot.Constants.RobotType;
 import frc.util.LocalADStarAK;
 
 import org.littletonrobotics.junction.LogFileUtil;
@@ -40,6 +39,7 @@ public class Robot extends LoggedRobot
         Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
         Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
         switch (BuildConstants.DIRTY) {
+            //noinspection DataFlowIssue
             case 0:
                 Logger.recordMetadata("GitDirty", "All changes committed");
                 break;
@@ -91,6 +91,7 @@ public class Robot extends LoggedRobot
     }
     
     
+    @SuppressWarnings("RedundantMethodOverride")
     @Override
     public void disabledInit() {}
     
@@ -99,7 +100,7 @@ public class Robot extends LoggedRobot
     public void disabledPeriodic() {
     }
     
-    
+    @SuppressWarnings("RedundantMethodOverride")
     @Override
     public void disabledExit() {}
     
@@ -119,7 +120,7 @@ public class Robot extends LoggedRobot
     @Override
     public void autonomousPeriodic() {}
     
-    
+    @SuppressWarnings("RedundantMethodOverride")
     @Override
     public void autonomousExit() {}
     
@@ -137,7 +138,7 @@ public class Robot extends LoggedRobot
     @Override
     public void teleopPeriodic() {}
     
-    
+    @SuppressWarnings("RedundantMethodOverride")
     @Override
     public void teleopExit() {}
     
@@ -152,7 +153,7 @@ public class Robot extends LoggedRobot
     @Override
     public void testPeriodic() {}
     
-    
+    @SuppressWarnings("RedundantMethodOverride")
     @Override
     public void testExit() {}
 }

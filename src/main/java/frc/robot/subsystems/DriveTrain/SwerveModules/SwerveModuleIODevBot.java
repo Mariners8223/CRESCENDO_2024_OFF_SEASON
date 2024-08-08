@@ -16,9 +16,9 @@ public class SwerveModuleIODevBot extends SwerveModuleIO {
     private final CANcoder absEncoder;
 
     public SwerveModuleIODevBot(SwerveModule.ModuleName name) {
-        int driveMotorID = MotorMap.DriveBase.modules[name.ordinal()][0];
-        int steerMotorID = MotorMap.DriveBase.modules[name.ordinal()][1];
-        int absEncoderID = MotorMap.DriveBase.modules[name.ordinal()][2];
+        int driveMotorID = MotorMap.DriveBase.MODULES[name.ordinal()][0];
+        int steerMotorID = MotorMap.DriveBase.MODULES[name.ordinal()][1];
+        int absEncoderID = MotorMap.DriveBase.MODULES[name.ordinal()][2];
 
         double zeroOffset = constants.abs_zeroOffsets[name.ordinal()];
 

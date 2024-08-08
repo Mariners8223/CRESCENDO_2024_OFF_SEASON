@@ -86,7 +86,7 @@ public abstract class SwerveModuleIO implements Runnable{
     /**
      * configures the absolute encoder (duty cycle encoder)
      * @param absEncoderID the port of the abs encoder on the rio
-     * @param zeroOffset the zero offset of the abs encoder
+     * @param zeroOffset the zero offsets of the abs encoder
      * @return the configured abs encoder
      */
     protected DutyCycleEncoder configDutyCycleEncoder(int absEncoderID, double zeroOffset) {
@@ -100,7 +100,7 @@ public abstract class SwerveModuleIO implements Runnable{
     /**
      * configures the absolute encoder (CANCoder)
      * @param absEncoderID the port of the abs encoder on the CAN bus
-     * @param absoluteEncoderZeroOffset the zero offset of the abs encoder
+     * @param absoluteEncoderZeroOffset the zero offsets of the abs encoder
      * @return the configured CANCoder
      */
     protected CANcoder configCANCoder(int absEncoderID, double absoluteEncoderZeroOffset) {
@@ -134,7 +134,8 @@ public abstract class SwerveModuleIO implements Runnable{
 
         talonFX.getConfigurator().apply(config); //apply the given config
 
-        talonFX.getPosition().setUpdateFrequency(SwerveModule.moduleThreadHz); //position is needed more for destroy
+        talonFX.getPosition().setUpdateFrequency(SwerveModule.moduleThreadHz); //I have no Idea what I wrote here
+        // (not the code, the comment)
 
         talonFX.getVelocity().setUpdateFrequency(SwerveModule.moduleThreadHz); //sets as default
         talonFX.getMotorVoltage().setUpdateFrequency(SwerveModule.moduleThreadHz); //sets as default
@@ -142,7 +143,7 @@ public abstract class SwerveModuleIO implements Runnable{
         talonFX.getStatorCurrent().setUpdateFrequency(50); //sets as default
         talonFX.getDeviceTemp().setUpdateFrequency(50);
 
-        talonFX.optimizeBusUtilization(); //optimizes canbus util
+        talonFX.optimizeBusUtilization(); //optimizes CAN BUS util
 
         talonFX.setPosition(0);
 

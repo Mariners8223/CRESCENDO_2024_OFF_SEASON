@@ -7,6 +7,7 @@ package frc.robot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
@@ -47,7 +48,7 @@ public class RobotContainer{
         configChooser();
     }
 
-    private static final BooleanSupplier checkForPathChoiseUpdate = new BooleanSupplier() {
+    private static final BooleanSupplier checkForPathChoiceUpdate = new BooleanSupplier() {
         private String lastAutoName = "InstantCommand"; 
         @Override
         public boolean getAsBoolean() {
@@ -56,13 +57,13 @@ public class RobotContainer{
             String currentAutoName = autoChooser.get().getName();
 
             try{ 
-                return lastAutoName != currentAutoName;
+                return !Objects.equals(lastAutoName, currentAutoName);
             }
             finally{
                 lastAutoName = currentAutoName;
             }
             
-        };
+        }
     };
 
     private void configChooser(){
@@ -81,23 +82,25 @@ public class RobotContainer{
         SmartDashboard.putData("chooser", autoChooser.getSendableChooser());
 
         new Trigger(RobotState::isEnabled).and(RobotState::isTeleop).onTrue(new InstantCommand(() -> field.getObject("AutoPath").setPoses()).ignoringDisable(true));
-        new Trigger(RobotState::isDisabled).and(checkForPathChoiseUpdate).onTrue(new InstantCommand(() -> updateFieldFromAuto(autoChooser.get().getName())).ignoringDisable(true));
+        new Trigger(RobotState::isDisabled).and(checkForPathChoiceUpdate).onTrue(new InstantCommand(() -> updateFieldFromAuto(autoChooser.get().getName())).ignoringDisable(true));
     }
 
     private static void updateFieldFromAuto(String autoName){
         List<Pose2d> poses = new ArrayList<>();
-        boolean DoesExsit = false;
-        for (String name : AutoBuilder.getAllAutoNames()) {
-            if(name.equals(autoName)) DoesExsit = true;
+
+        try {
+            boolean invert =
+                    DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == DriverStation.Alliance.Red;
+
+            PathPlannerAuto.getPathGroupFromAutoFile(autoName).forEach(path -> {
+                path = invert ? path.flipPath() : path;
+
+                poses.addAll(path.getPathPoses());
+            });
         }
-        if(!DoesExsit){
-            field.getObject("AutoPath").setPoses();
-            return;
+        catch (RuntimeException ignored){
         }
-        PathPlannerAuto.getPathGroupFromAutoFile(autoName).forEach(path -> {
-            if(DriverStation.getAlliance().get() == DriverStation.Alliance.Red) path = path.flipPath();
-            path.getPathPoses().forEach(pose -> poses.add(pose));
-        });
+
         field.getObject("AutoPath").setPoses(poses);
     }
     

@@ -4,7 +4,7 @@ import frc.robot.Constants.RobotType;
 
 public class MotorMap {
     public static class DriveBase{
-        public static int[][] modules = new int[][]{
+        public static int[][] MODULES = new int[][]{
                 //Front Left
             {2, 3, Constants.robotType == RobotType.DEVELOPMENT ? 10 : 3}, //drive, steer, absEncoder
                 //Front Right

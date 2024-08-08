@@ -45,10 +45,10 @@ public class Constants {
         }
 
         public static final Map<Integer, String> sparkMaxNames = Map.of(
-                MotorMap.DriveBase.modules[SwerveModule.ModuleName.Front_Left.ordinal()][1], "Front_Left",
-                MotorMap.DriveBase.modules[SwerveModule.ModuleName.Front_Right.ordinal()][1], "Front_Right",
-                MotorMap.DriveBase.modules[SwerveModule.ModuleName.Back_Left.ordinal()][1], "Back_Left",
-                MotorMap.DriveBase.modules[SwerveModule.ModuleName.Back_Right.ordinal()][1], "Back_Right"
+                MotorMap.DriveBase.MODULES[SwerveModule.ModuleName.Front_Left.ordinal()][1], "Front_Left",
+                MotorMap.DriveBase.MODULES[SwerveModule.ModuleName.Front_Right.ordinal()][1], "Front_Right",
+                MotorMap.DriveBase.MODULES[SwerveModule.ModuleName.Back_Left.ordinal()][1], "Back_Left",
+                MotorMap.DriveBase.MODULES[SwerveModule.ModuleName.Back_Right.ordinal()][1], "Back_Right"
         );
         
     } 

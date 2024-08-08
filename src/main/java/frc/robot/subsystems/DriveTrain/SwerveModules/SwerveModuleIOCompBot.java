@@ -17,9 +17,9 @@ public class SwerveModuleIOCompBot extends SwerveModuleIO {
 
 
     public SwerveModuleIOCompBot(SwerveModule.ModuleName name) {
-        int driveMotorID = MotorMap.DriveBase.modules[name.ordinal()][0];
-        int steerMotorID = MotorMap.DriveBase.modules[name.ordinal()][1];
-        int absEncoderID = MotorMap.DriveBase.modules[name.ordinal()][2];
+        int driveMotorID = MotorMap.DriveBase.MODULES[name.ordinal()][0];
+        int steerMotorID = MotorMap.DriveBase.MODULES[name.ordinal()][1];
+        int absEncoderID = MotorMap.DriveBase.MODULES[name.ordinal()][2];
 
         double zeroOffset = constants.abs_zeroOffsets[name.ordinal()];
 
