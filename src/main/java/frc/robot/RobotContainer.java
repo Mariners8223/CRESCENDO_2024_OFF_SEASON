@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
+import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -21,10 +22,8 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.DriveTrain.DriveBase;
-import frc.robot.subsystems.DriveTrain.SysID;
 
 public class RobotContainer{
     public static DriveBase driveBase;
@@ -38,9 +37,8 @@ public class RobotContainer{
     {
         driveController = new CommandPS5Controller(0);
         driveBase = new DriveBase();
-        SysID drivebaseSysID = new SysID(driveBase);
 
-        configureBindings(drivebaseSysID);
+        configureBindings();
 
         field = new Field2d();
 
@@ -49,13 +47,16 @@ public class RobotContainer{
         configChooser();
     }
 
-    private static BooleanSupplier checkForPathChoiseUpdate = new BooleanSupplier() {
+    private static final BooleanSupplier checkForPathChoiseUpdate = new BooleanSupplier() {
         private String lastAutoName = "InstantCommand"; 
         @Override
         public boolean getAsBoolean() {
+            if(autoChooser.get() == null) return false;
+
             String currentAutoName = autoChooser.get().getName();
-            try{
-                return lastAutoName != autoChooser.get().getName();
+
+            try{ 
+                return lastAutoName != currentAutoName;
             }
             finally{
                 lastAutoName = currentAutoName;
@@ -101,12 +102,10 @@ public class RobotContainer{
     }
     
     
-    private void configureBindings(SysID drivebaseSysID) {
-        driveController.options().onTrue(new InstantCommand(driveBase::resetOnlyDirection));
-        driveController.cross().whileTrue(drivebaseSysID.getSysIDCommand(SysID.SysIDType.Steer, true, true));
-        driveController.square().whileTrue(drivebaseSysID.getSysIDCommand(SysID.SysIDType.Steer, false, true));
-        driveController.triangle().whileTrue(drivebaseSysID.getSysIDCommand(SysID.SysIDType.Steer, true, false));
-        driveController.circle().whileTrue(drivebaseSysID.getSysIDCommand(SysID.SysIDType.Steer, false, false));
+    private void configureBindings() {
+        driveController.options().onTrue(new InstantCommand(() -> driveBase.resetOnlyDirection()));
+        driveController.cross().onTrue(new InstantCommand(() -> driveBase.runModuleDriveCalibration()));
+        driveController.triangle().onTrue(new InstantCommand(() -> driveBase.stopModuleDriveCalibration()));
     }
     
     

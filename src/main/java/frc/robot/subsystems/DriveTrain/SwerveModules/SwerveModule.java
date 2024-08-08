@@ -1,5 +1,6 @@
 package frc.robot.subsystems.DriveTrain.SwerveModules;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -7,155 +8,173 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Voltage;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
-import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleIOCompBot.CompBotConstants;
-import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleIODevBot.DevBotConstants;
 
 import org.littletonrobotics.junction.Logger;
 
 import static edu.wpi.first.units.Units.Volts;
+import static frc.robot.Constants.robotType;
 
 public class SwerveModule {
 
-  /**
-   * the name of the swerve modules by order
-   */
-  public  enum ModuleName{
-    Front_Left,
-    Front_Right,
-    Back_Left,
-    Back_Right
-  }
-
-  public static final double moduleThreadHz = 50;
-  public static final double distanceBetweenWheels = 0.576; // the distance between each wheel in meters
-  public static final Translation2d[] moduleTranslations = new Translation2d[]
-          {new Translation2d(distanceBetweenWheels / 2, distanceBetweenWheels / 2), new Translation2d(distanceBetweenWheels / 2, -distanceBetweenWheels / 2),
-                  new Translation2d(-distanceBetweenWheels / 2, distanceBetweenWheels / 2), new Translation2d(-distanceBetweenWheels / 2, -distanceBetweenWheels / 2)};
-
-  private final String moduleName;
-  private final SwerveModuleIO io;
-  private final SwerveModuleIOInputsAutoLogged inputs = new SwerveModuleIOInputsAutoLogged();
-
-  private final ProfiledPIDController drivePIDController;
-  public final SimpleMotorFeedforward driveFeedforward;
-  private final PIDController steerPIDController;
-
-  private boolean isRunningSysID = false;
-
-  private SwerveModuleState targetState = new SwerveModuleState();
-
-  private double driveMotorVoltageOutput = 0;
-  private double steerMotorVoltageOutput = 0;
-
-  private final Runnable driveMotorSetRunnable = new Runnable() {
-    @Override
-    public void run() {
-      io.setDriveMotorVoltage(driveMotorVoltageOutput);
-    }
-  };
-
-  private final Runnable steerMotorSetRunnable = new Runnable() {
-    @Override
-    public void run() {
-      io.setSteerMotorVoltage(steerMotorVoltageOutput);
-    }
-  };
-
-  public SwerveModule(ModuleName name) {
-    if(Constants.robotType == Constants.RobotType.DEVELOPMENT){
-      drivePIDController = SwerveModuleIODevBot.DevBotConstants.driveMotorPID.createProfiledPIDController();
-      steerPIDController = SwerveModuleIODevBot.DevBotConstants.steerMotorPID.createPIDController();
-      driveFeedforward = new SimpleMotorFeedforward(0, DevBotConstants.driveMotorPID.getF());
-    }
-    else if(Constants.robotType == Constants.RobotType.COMPETITION){
-      drivePIDController = SwerveModuleIOCompBot.CompBotConstants.driveMotorPID.createProfiledPIDController();
-      steerPIDController = SwerveModuleIOCompBot.CompBotConstants.steerMotorPID.createPIDController();
-      driveFeedforward = new SimpleMotorFeedforward(0, CompBotConstants.driveMotorPID.getF());
-
-    }
-    else{
-      drivePIDController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(0, 0), 1 / moduleThreadHz);
-      steerPIDController = new PIDController(0, 0, 0, 1 / moduleThreadHz);
-      driveFeedforward = new SimpleMotorFeedforward(0, 0);
-
+    /**
+     * the name of the swerve modules by order
+     */
+    public enum ModuleName {
+        Front_Left,
+        Front_Right,
+        Back_Left,
+        Back_Right
     }
 
-    if(RobotBase.isSimulation()){
-      if(Constants.robotType == Constants.RobotType.REPLAY) this.io = new SwerveModuleIO() {};
-      else this.io = new SwerveModuleIOSIM();
+    public static final double moduleThreadHz = 50;
+    public static final double distanceBetweenWheels = 0.576; // the distance between each wheel in meters
+    public static final Translation2d[] moduleTranslations = new Translation2d[]{
+            new Translation2d(distanceBetweenWheels / 2, distanceBetweenWheels / 2),
+            new Translation2d(distanceBetweenWheels / 2, -distanceBetweenWheels / 2),
+            new Translation2d(-distanceBetweenWheels / 2, distanceBetweenWheels / 2),
+            new Translation2d(-distanceBetweenWheels / 2, -distanceBetweenWheels / 2)};
 
-      SmartDashboard.putData("drivePIDController", drivePIDController);
-      SmartDashboard.putData("steerPIDController", steerPIDController);
-    }
-    else if(Constants.robotType == Constants.RobotType.DEVELOPMENT) this.io = new SwerveModuleIODevBot(name);
-    else this.io = new SwerveModuleIOCompBot(name);
+    private final String moduleName;
+    private final SwerveModuleIO io;
+    private final SwerveModuleIOInputsAutoLogged inputs = new SwerveModuleIOInputsAutoLogged();
 
-    this.moduleName = name.toString();
-  }
+    private final ProfiledPIDController drivePIDController;
+    public SimpleMotorFeedforward driveFeedforward;
+    private final PIDController steerPIDController;
 
-  public SwerveModulePosition modulePeriodic() {
-      io.updateInputs(inputs);
+    private boolean runningCalibration = false;
+    private boolean runningDriveCalibration = false;
 
-      if(!isRunningSysID){
-        targetState = SwerveModuleState.optimize(targetState, inputs.currentState.angle);
-        targetState.speedMetersPerSecond *= Math.cos(targetState.angle.getRadians() - inputs.currentState.angle.getRadians());
+    private SwerveModuleState targetState = new SwerveModuleState();
 
-        driveMotorVoltageOutput = drivePIDController.calculate(inputs.currentState.speedMetersPerSecond, targetState.speedMetersPerSecond) + driveFeedforward.calculate(targetState.speedMetersPerSecond);
-        steerMotorVoltageOutput = steerPIDController.calculate(inputs.currentState.angle.getRadians(), targetState.angle.getRadians());
-        steerMotorVoltageOutput = steerPIDController.atSetpoint() ? 0 : steerMotorVoltageOutput;
+    public SwerveModule(ModuleName name) {
+        this.moduleName = name.toString();
+        SwerveModuleConstants constants =
+                robotType == Constants.RobotType.DEVELOPMENT ? SwerveModuleConstants.DEVBOT : SwerveModuleConstants.COMPBOT;
 
-        driveMotorSetRunnable.run();
-        steerMotorSetRunnable.run();
-      }
-      else{
-        if(targetState != null){
-          double steerOutPut = steerPIDController.calculate(inputs.currentState.angle.getRadians(), targetState.angle.getRadians());
+        drivePIDController = constants.driveMotorPID[name.ordinal()].createProfiledPIDController();
+        driveFeedforward = new SimpleMotorFeedforward(0, constants.driveMotorPID[name.ordinal()].getF());
+        steerPIDController = constants.steerMotorPID[name.ordinal()].createPIDController();
 
-          io.setSteerMotorVoltage(steerPIDController.atSetpoint() ? 0 : steerOutPut);
+        if (RobotBase.isReal()) {
+            io = switch (robotType) {
+                case DEVELOPMENT -> new SwerveModuleIODevBot(name);
+                case COMPETITION -> new SwerveModuleIOCompBot(name);
+                case REPLAY -> throw new IllegalArgumentException("Robot cannot be replay if it's real");
+            };
+        } else {
+            io = robotType == Constants.RobotType.REPLAY ? new SwerveModuleIOSIM.SwerveModuleIOReplay() : new SwerveModuleIOSIM();
+
         }
-      }
-      Logger.processInputs("SwerveModule/" + moduleName, inputs);
 
-      return new SwerveModulePosition(inputs.drivePositionMeters, inputs.currentState.angle);
-  }
+    }
 
-  public SwerveModuleState getCurrentState(){
-      return inputs.currentState;
-  }
+    public SwerveModulePosition modulePeriodic() {
+        io.updateInputs(inputs);
 
-  public SwerveModuleState run(SwerveModuleState targetState){
-      isRunningSysID = false;
-      targetState = SwerveModuleState.optimize(targetState, inputs.currentState.angle);
-      targetState.speedMetersPerSecond *= inputs.currentState.angle.minus(targetState.angle).getCos();
+        if (!runningCalibration) {
+            targetState = SwerveModuleState.optimize(targetState, inputs.currentState.angle);
+            targetState.speedMetersPerSecond *= Math.cos(targetState.angle.getRadians() - inputs.currentState.angle.getRadians());
 
-      this.targetState = targetState;
+            double driveMotorVoltageOutput =
+                    drivePIDController.calculate(inputs.currentState.speedMetersPerSecond, targetState.speedMetersPerSecond);
 
-      return targetState;
-  }
+            driveMotorVoltageOutput += driveFeedforward.calculate(targetState.speedMetersPerSecond);
 
-  public void runSysIDSteer(Measure<Voltage> steerVoltage){
-      isRunningSysID = true;
-      io.setSteerMotorVoltage(steerVoltage.in(Volts));
-      targetState = null;
-  }
+            double steerMotorVoltageOutput =
+                    steerPIDController.calculate(inputs.currentState.angle.getRadians(), targetState.angle.getRadians());
+            steerMotorVoltageOutput = steerPIDController.atSetpoint() ? 0 : steerMotorVoltageOutput;
 
-  public void runSysIDDrive(Measure<Voltage> driveVoltage, Rotation2d angle){
-      isRunningSysID = true;
-      io.setDriveMotorVoltage(driveVoltage.in(Volts));
-      targetState.angle = angle;
-  }
+            io.setDriveMotorVoltage(driveMotorVoltageOutput);
+            io.setSteerMotorVoltage(steerMotorVoltageOutput);
 
-  public void setIdleMode(boolean isBrakeMode){
-    io.setIdleMode(isBrakeMode);
-  }
+            io.run();
+        } else {
+            if (runningDriveCalibration) {
+                drivePIDController.setP(SmartDashboard.getNumber("drive P", drivePIDController.getP()));
+                drivePIDController.setI(SmartDashboard.getNumber("drive I", drivePIDController.getI()));
+                drivePIDController.setD(SmartDashboard.getNumber("drive D", drivePIDController.getD()));
 
-  public void resetDriveEncoder(){
-    io.resetDriveEncoder();
-  }
+                drivePIDController.setGoal(SmartDashboard.getNumber("drive setPoint", 0));
+
+                driveFeedforward = new SimpleMotorFeedforward(0, SmartDashboard.getNumber("drive kS", driveFeedforward.ks));
+
+                double driveOut = drivePIDController.calculate(inputs.currentState.speedMetersPerSecond);
+
+                driveOut += driveFeedforward.calculate(drivePIDController.getGoal().position);
+                driveOut = MathUtil.clamp(driveOut, -12, 12);
+
+                io.setDriveMotorVoltage(driveOut);
+
+                double steerOut = steerPIDController.calculate(inputs.currentState.angle.getRadians(), targetState.angle.getRadians());
+
+                steerOut = steerPIDController.atSetpoint() ? 0 : steerOut;
+
+                io.setSteerMotorVoltage(steerOut);
+            } else {
+                double steerOut = steerPIDController.calculate(inputs.currentState.angle.getRadians());
+
+
+                steerOut = MathUtil.clamp(steerOut, -12, 12);
+
+
+                io.setSteerMotorVoltage(steerOut);
+                io.setDriveMotorVoltage(0);
+            }
+
+            io.run();
+        }
+        Logger.processInputs("SwerveModule/" + moduleName, inputs);
+
+        return new SwerveModulePosition(inputs.drivePositionMeters, inputs.currentState.angle);
+    }
+
+    public SwerveModuleState getCurrentState() {
+        return inputs.currentState;
+    }
+
+    public SwerveModuleState run(SwerveModuleState targetState) {
+        targetState = SwerveModuleState.optimize(targetState, inputs.currentState.angle);
+        targetState.speedMetersPerSecond *= inputs.currentState.angle.minus(targetState.angle).getCos();
+
+        this.targetState = targetState;
+
+        return targetState;
+    }
+
+    public void runSteerCalibration() {
+        runningCalibration = true;
+
+        SendableRegistry.setName(steerPIDController, moduleName + " steer Controller");
+
+        SmartDashboard.putData(steerPIDController);
+    }
+
+    public void stopSteerCalibration() {
+        runningCalibration = false;
+    }
+
+    public void runDriveCalibration(){
+        runningDriveCalibration = true;
+        runningCalibration = true;
+    }
+
+    public void stopDriveCalibration(){
+        runningCalibration = false;
+        runningDriveCalibration = false;
+    }
+
+    public void setIdleMode(boolean isBrakeMode) {
+        io.setIdleMode(isBrakeMode);
+    }
+
+    public void resetDriveEncoder() {
+        io.resetDriveEncoder();
+    }
 }
