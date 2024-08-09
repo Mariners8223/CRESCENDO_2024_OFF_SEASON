@@ -27,7 +27,7 @@ public enum SwerveModuleConstants {
     /**
      * usually the final robot
      */
-    COMPBOT(6.75, 12.5 * 3, 0.0508, 4.75,
+    COMPBOT(6.75, 12.5 * 3, 0.0508, 3.2,
             false, false, false,
 
             0.59625, 0.9368, 0.226, 0.750,
@@ -39,10 +39,10 @@ public enum SwerveModuleConstants {
                 new PIDFGains(6.5, 0, 0.03, 0, 0.2, 0, 1 / SwerveModule.moduleThreadHz)  //BR
             },
             new PIDFGains[]{
-                    new PIDFGains(2.7, 0, 0,1,0,0),
-                    new PIDFGains(2.7, 0, 0,1,0,0),
-                    new PIDFGains(2.7, 0, 0,1,0,0),
-                    new PIDFGains(2.7, 0, 0,1,0,0)
+                    new PIDFGains(2.8, 0, 0,1.5,0,0),
+                    new PIDFGains(2.8, 0, 0,1.5,0,0),
+                    new PIDFGains(2.8, 0, 0,1.5,0,0),
+                    new PIDFGains(2.8, 0, 0,1.5,0,0)
             });
 
     /**
