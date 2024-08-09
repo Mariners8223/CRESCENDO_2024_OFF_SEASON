@@ -140,6 +140,8 @@ public class SwerveModule {
         targetState = SwerveModuleState.optimize(targetState, inputs.currentState.angle);
         targetState.speedMetersPerSecond *= inputs.currentState.angle.minus(targetState.angle).getCos();
 
+        Logger.recordOutput("SwerveModule/" + moduleName + "/actual target state", targetState);
+
         this.targetState = targetState;
 
         return targetState;
