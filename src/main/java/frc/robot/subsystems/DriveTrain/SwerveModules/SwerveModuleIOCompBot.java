@@ -37,7 +37,7 @@ public class SwerveModuleIOCompBot extends SwerveModuleIO {
         inputs.currentState.speedMetersPerSecond =
                 (driveMotor.getVelocity().getValueAsDouble() / constants.driveGearRatio) * constants.wheelCircumferenceMeters;
 
-        inputs.driveRPM = driveMotor.getVelocity().getValueAsDouble();
+        inputs.driveMotorRPM = driveMotor.getVelocity().getValueAsDouble() * 60;
 
         inputs.absEncoderPosition = (absEncoder.getAbsolutePosition() - absEncoder.getPositionOffset()) * absEncoderMultiplier;
 
@@ -49,6 +49,8 @@ public class SwerveModuleIOCompBot extends SwerveModuleIO {
 
         inputs.driveMotorAppliedVoltage = driveMotor.getMotorVoltage().getValueAsDouble();
         inputs.steerMotorAppliedVoltage = steerMotor.getAppliedOutput() * steerMotor.getBusVoltage();
+
+        inputs.driveMotorTemperature = driveMotor.getDeviceTemp().getValueAsDouble();
     }
 
     @Override

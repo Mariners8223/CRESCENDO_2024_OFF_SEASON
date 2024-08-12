@@ -23,12 +23,14 @@ public abstract class SwerveModuleIO implements Runnable{
         public double steerVelocityRadPerSec = 0.0;
         public double drivePositionMeters = 0.0;
 
-        public double driveRPM = 0.0;
+        public double driveMotorRPM = 0.0;
 
         public double steerMotorAppliedVoltage = 0.0;
         public double driveMotorAppliedVoltage = 0.0;
 
         public double absEncoderPosition = 0.0;
+
+        public double driveMotorTemperature = 0.0;
     }
 
     /**

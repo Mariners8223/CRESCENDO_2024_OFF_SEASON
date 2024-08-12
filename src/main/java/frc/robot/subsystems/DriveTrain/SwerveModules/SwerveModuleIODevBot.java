@@ -38,6 +38,9 @@ public class SwerveModuleIODevBot extends SwerveModuleIO {
 
         inputs.absEncoderPosition = (absEncoder.getAbsolutePosition().getValueAsDouble());
 
+        inputs.driveMotorRPM = driveMotor.getVelocity().getValueAsDouble() * 60;
+        inputs.driveMotorTemperature = driveMotor.getDeviceTemp().getValueAsDouble();
+
         inputs.steerVelocityRadPerSec =
                 Units.rotationsPerMinuteToRadiansPerSecond(steerMotor.getEncoder().getVelocity() / constants.steerGearRatio);
 
