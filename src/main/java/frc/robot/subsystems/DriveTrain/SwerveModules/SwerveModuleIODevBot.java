@@ -1,13 +1,16 @@
 package frc.robot.subsystems.DriveTrain.SwerveModules;
 
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.*;
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.MotorMap;
+import frc.util.PIDFGains;
 
 public class SwerveModuleIODevBot extends SwerveModuleIO {
 
@@ -68,5 +71,25 @@ public class SwerveModuleIODevBot extends SwerveModuleIO {
         driveMotor.setPosition(0);
     }
 
+    void setDriveMotorPID(PIDFGains pidGains) {
+        Slot0Configs config = new Slot0Configs();
+
+        config.kP = pidGains.getP();
+        config.kI = pidGains.getI();
+        config.kD = pidGains.getD();
+        config.kV = pidGains.getF();
+
+        driveMotor.getConfigurator().apply(config);
+    }
+
+    @Override
+    void setSteerMotorPID(PIDFGains pidGains) {
+        SparkPIDController pidController = steerMotor.getPIDController();
+
+        pidController.setP(pidGains.getP());
+        pidController.setI(pidGains.getI());
+        pidController.setD(pidGains.getD());
+        pidController.setFF(pidGains.getF());
+    }
 
 }

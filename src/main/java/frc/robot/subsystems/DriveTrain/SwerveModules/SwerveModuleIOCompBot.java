@@ -1,15 +1,17 @@
 package frc.robot.subsystems.DriveTrain.SwerveModules;
 
-import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.*;
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import frc.robot.MotorMap;
+import frc.util.PIDFGains;
 
 public class SwerveModuleIOCompBot extends SwerveModuleIO {
     private final TalonFX driveMotor;
@@ -48,15 +50,15 @@ public class SwerveModuleIOCompBot extends SwerveModuleIO {
 
         inputs.steerVelocityRadPerSec =
                 Units.rotationsPerMinuteToRadiansPerSecond(steerMotor.getEncoder().getVelocity() / constants.steerGearRatio);
-        
+
         inputs.drivePositionMeters =
                 (driveMotor.getPosition().getValueAsDouble() / constants.driveGearRatio) * constants.wheelCircumferenceMeters;
 
         inputs.driveMotorAppliedOutput = driveMotor.getDutyCycle().getValueAsDouble();
-        inputs.steerMotorAplliedOutput = steerMotor.getAppliedOutput();
+        inputs.steerMotorAppliedOutput = steerMotor.getAppliedOutput();
 
         inputs.driveMotorAppliedVoltage = driveMotor.getMotorVoltage().getValueAsDouble();
-        inputs.steerMotorAppliedVoltage = inputs.steerMotorAplliedOutput * steerMotor.getBusVoltage();
+        inputs.steerMotorAppliedVoltage = inputs.steerMotorAppliedOutput * steerMotor.getBusVoltage();
 
         inputs.driveMotorTemperature = driveMotor.getDeviceTemp().getValueAsDouble();
     }
@@ -79,6 +81,28 @@ public class SwerveModuleIOCompBot extends SwerveModuleIO {
     @Override
     public void resetDriveEncoder() {
         driveMotor.setPosition(0);
+    }
+
+    @Override
+    void setDriveMotorPID(PIDFGains pidGains) {
+        Slot0Configs config = new Slot0Configs();
+
+        config.kP = pidGains.getP();
+        config.kI = pidGains.getI();
+        config.kD = pidGains.getD();
+        config.kV = pidGains.getF();
+
+        driveMotor.getConfigurator().apply(config);
+    }
+
+    @Override
+    void setSteerMotorPID(PIDFGains pidGains) {
+        SparkPIDController pidController = steerMotor.getPIDController();
+
+        pidController.setP(pidGains.getP());
+        pidController.setI(pidGains.getI());
+        pidController.setD(pidGains.getD());
+        pidController.setFF(pidGains.getF());
     }
 
 }

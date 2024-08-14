@@ -1,7 +1,6 @@
 package frc.robot.subsystems.DriveTrain.SwerveModules;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -11,6 +10,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 
+import frc.util.PIDFGains;
 import org.littletonrobotics.junction.Logger;
 
 import static frc.robot.Constants.robotType;
@@ -46,12 +46,6 @@ public class SwerveModule {
 
     public SwerveModule(ModuleName name) {
         this.moduleName = name.toString();
-        SwerveModuleConstants constants =
-                robotType == Constants.RobotType.DEVELOPMENT ? SwerveModuleConstants.DEVBOT : SwerveModuleConstants.COMPBOT;
-
-        drivePIDController = constants.driveMotorPID[name.ordinal()].createProfiledPIDController();
-        driveFeedforward = new SimpleMotorFeedforward(0, constants.driveMotorPID[name.ordinal()].getF());
-        steerPIDController = constants.steerMotorPID[name.ordinal()].createPIDController();
 
         if (RobotBase.isReal()) {
             io = switch (robotType) {
@@ -79,34 +73,24 @@ public class SwerveModule {
             io.run();
         } else {
             if (runningDriveCalibration) {
-                drivePIDController.setP(SmartDashboard.getNumber("drive P", drivePIDController.getP()));
-                drivePIDController.setI(SmartDashboard.getNumber("drive I", drivePIDController.getI()));
-                drivePIDController.setD(SmartDashboard.getNumber("drive D", drivePIDController.getD()));
+                double driveKp = SmartDashboard.getNumber("drive kP", 0);
+                double driveKi = SmartDashboard.getNumber("drive kI", 0);
+                double driveKd = SmartDashboard.getNumber("drive kD", 0);
+                double driveKf = SmartDashboard.getNumber("drive kF", 0);
 
-                drivePIDController.setGoal(SmartDashboard.getNumber("drive setPoint", 0));
+                io.setDriveMotorPID(new PIDFGains(driveKp, driveKi, driveKd, driveKf, 0, 0));
 
-                driveFeedforward = new SimpleMotorFeedforward(0, SmartDashboard.getNumber("drive kS", driveFeedforward.ks));
+                double driveReference = SmartDashboard.getNumber("drive setPoint", 0);
 
-                double driveOut = drivePIDController.calculate(inputs.currentState.speedMetersPerSecond);
+                io.setDriveMotorReference(driveReference);
 
-                driveOut += driveFeedforward.calculate(drivePIDController.getGoal().position);
-                driveOut = MathUtil.clamp(driveOut, -12, 12);
+                io.setSteerMotorReference(targetState.angle.getRotations());
 
-                io.setDriveMotorReference(driveOut);
-
-                double steerOut = steerPIDController.calculate(inputs.currentState.angle.getRadians(), targetState.angle.getRadians());
-
-                steerOut = steerPIDController.atSetpoint() ? 0 : steerOut;
-
-                io.setSteerMotorReference(steerOut);
             } else {
-                double steerOut = steerPIDController.calculate(inputs.currentState.angle.getRadians());
+                PIDController controller = (PIDController) SmartDashboard.getData(moduleName + " steer Controller");
 
-
-                steerOut = MathUtil.clamp(steerOut, -12, 12);
-
-
-                io.setSteerMotorReference(steerOut);
+                io.setSteerMotorPID(new PIDFGains(controller.getP(), controller.getI(), controller.getD()));
+                io.setSteerMotorReference(targetState.angle.getRotations());
                 io.setDriveMotorReference(0);
             }
 
@@ -135,6 +119,8 @@ public class SwerveModule {
     public void runSteerCalibration() {
         runningCalibration = true;
 
+        PIDController steerPIDController = new PIDController(0, 0, 0);
+
         SendableRegistry.setName(steerPIDController, moduleName + " steer Controller");
 
         SmartDashboard.putData(steerPIDController);
@@ -144,12 +130,12 @@ public class SwerveModule {
         runningCalibration = false;
     }
 
-    public void runDriveCalibration(){
+    public void runDriveCalibration() {
         runningDriveCalibration = true;
         runningCalibration = true;
     }
 
-    public void stopDriveCalibration(){
+    public void stopDriveCalibration() {
         runningCalibration = false;
         runningDriveCalibration = false;
     }

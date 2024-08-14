@@ -11,6 +11,7 @@ import com.revrobotics.CANSparkMax;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import frc.robot.Constants;
+import frc.util.PIDFGains;
 import org.littletonrobotics.junction.AutoLog;
 
 import static frc.robot.Constants.robotType;
@@ -27,7 +28,7 @@ public abstract class SwerveModuleIO implements Runnable{
 
         public double steerMotorAppliedVoltage = 0.0;
         public double driveMotorAppliedVoltage = 0.0;
-        public double steerMotorAplliedOutput = 0.0;
+        public double steerMotorAppliedOutput = 0.0;
         public double driveMotorAppliedOutput = 0.0;
 
         public double absEncoderPosition = 0.0;
@@ -88,6 +89,10 @@ public abstract class SwerveModuleIO implements Runnable{
      * resets the drive encoder
      */
     abstract void resetDriveEncoder();
+
+    abstract void setDriveMotorPID(PIDFGains pidGains);
+
+    abstract void setSteerMotorPID(PIDFGains pidGains);
 
     /**
      * configures the absolute encoder (duty cycle encoder)
