@@ -1,8 +1,6 @@
 package frc.robot.subsystems.DriveTrain.SwerveModules;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -41,10 +39,6 @@ public class SwerveModule {
     private final SwerveModuleIO io;
     private final SwerveModuleIOInputsAutoLogged inputs = new SwerveModuleIOInputsAutoLogged();
 
-    private final ProfiledPIDController drivePIDController;
-    public SimpleMotorFeedforward driveFeedforward;
-    private final PIDController steerPIDController;
-
     private boolean runningCalibration = false;
     private boolean runningDriveCalibration = false;
 
@@ -79,17 +73,8 @@ public class SwerveModule {
             targetState = SwerveModuleState.optimize(targetState, inputs.currentState.angle);
             targetState.speedMetersPerSecond *= Math.cos(targetState.angle.getRadians() - inputs.currentState.angle.getRadians());
 
-            double driveMotorVoltageOutput =
-                    drivePIDController.calculate(inputs.currentState.speedMetersPerSecond, targetState.speedMetersPerSecond);
-
-            driveMotorVoltageOutput += driveFeedforward.calculate(targetState.speedMetersPerSecond);
-
-            double steerMotorVoltageOutput =
-                    steerPIDController.calculate(inputs.currentState.angle.getRadians(), targetState.angle.getRadians());
-            steerMotorVoltageOutput = steerPIDController.atSetpoint() ? 0 : steerMotorVoltageOutput;
-
-            io.setDriveMotorVoltage(driveMotorVoltageOutput);
-            io.setSteerMotorVoltage(steerMotorVoltageOutput);
+            io.setDriveMotorReference(targetState.speedMetersPerSecond);
+            io.setSteerMotorReference(targetState.angle.getRotations());
 
             io.run();
         } else {
@@ -107,13 +92,13 @@ public class SwerveModule {
                 driveOut += driveFeedforward.calculate(drivePIDController.getGoal().position);
                 driveOut = MathUtil.clamp(driveOut, -12, 12);
 
-                io.setDriveMotorVoltage(driveOut);
+                io.setDriveMotorReference(driveOut);
 
                 double steerOut = steerPIDController.calculate(inputs.currentState.angle.getRadians(), targetState.angle.getRadians());
 
                 steerOut = steerPIDController.atSetpoint() ? 0 : steerOut;
 
-                io.setSteerMotorVoltage(steerOut);
+                io.setSteerMotorReference(steerOut);
             } else {
                 double steerOut = steerPIDController.calculate(inputs.currentState.angle.getRadians());
 
@@ -121,8 +106,8 @@ public class SwerveModule {
                 steerOut = MathUtil.clamp(steerOut, -12, 12);
 
 
-                io.setSteerMotorVoltage(steerOut);
-                io.setDriveMotorVoltage(0);
+                io.setSteerMotorReference(steerOut);
+                io.setDriveMotorReference(0);
             }
 
             io.run();

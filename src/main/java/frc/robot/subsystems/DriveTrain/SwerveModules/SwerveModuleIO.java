@@ -27,6 +27,8 @@ public abstract class SwerveModuleIO implements Runnable{
 
         public double steerMotorAppliedVoltage = 0.0;
         public double driveMotorAppliedVoltage = 0.0;
+        public double steerMotorAplliedOutput = 0.0;
+        public double driveMotorAppliedOutput = 0.0;
 
         public double absEncoderPosition = 0.0;
 
@@ -39,8 +41,8 @@ public abstract class SwerveModuleIO implements Runnable{
     protected final SwerveModuleConstants constants =
             robotType == Constants.RobotType.DEVELOPMENT ? SwerveModuleConstants.DEVBOT : SwerveModuleConstants.COMPBOT;
 
-    private double driveMotorVoltageInput = 0;
-    private double steerMotorVoltageInput = 0;
+    private double driveMotorReference = 0;
+    private double steerMotorReference = 0;
 
     /**
      * Updates the inputs of the module
@@ -48,32 +50,32 @@ public abstract class SwerveModuleIO implements Runnable{
     abstract void updateInputs(SwerveModuleIOInputsAutoLogged inputs);
 
     /**
-     * sets the voltage input for the drive motor
+     * sets the reference for the drive motor
      *
-     * @param voltage the voltage to set the drive motor to
+     * @param reference the target for the built-in PID controller
      */
-    public void setDriveMotorVoltage(double voltage){
-        this.driveMotorVoltageInput = voltage;
+    public void setDriveMotorReference(double reference){
+        this.driveMotorReference = reference;
     }
 
     /**
-     * sets the voltage input for the steer motor
+     * sets the reference for the steer motor
      *
-     * @param voltage the voltage to set the steer motor to
+     * @param reference the target for the built-in PID controller
      */
-    public void setSteerMotorVoltage(double voltage){
-        this.steerMotorVoltageInput = voltage;
+    public void setSteerMotorReference(double reference){
+        this.steerMotorReference = reference;
     }
 
     /**
-     * sends the inputs set by {@link #setDriveMotorVoltage driveMotor} and {@link #setSteerMotorVoltage steerMotor} to the motors
+     * sends the inputs set by {@link #setDriveMotorReference driveMotor} and {@link #setSteerMotorReference steerMotor} to the motors
      */
     @Override
     public void run() {
-        sendInputsToMotors(driveMotorVoltageInput, steerMotorVoltageInput);
+        sendInputsToMotors(driveMotorReference, steerMotorReference);
     }
 
-    abstract protected void sendInputsToMotors(double driveMotorVoltage, double steerMotorVoltage);
+    abstract protected void sendInputsToMotors(double driveMotorReference, double steerMotorReference);
 
     /**
      * sets the idle mode of the module

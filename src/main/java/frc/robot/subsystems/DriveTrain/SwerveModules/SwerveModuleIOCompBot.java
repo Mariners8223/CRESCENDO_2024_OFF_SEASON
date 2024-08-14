@@ -1,5 +1,7 @@
 package frc.robot.subsystems.DriveTrain.SwerveModules;
 
+import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.*;
 import com.revrobotics.CANSparkBase;
@@ -14,6 +16,9 @@ public class SwerveModuleIOCompBot extends SwerveModuleIO {
     private final CANSparkMax steerMotor;
     private final DutyCycleEncoder absEncoder;
     private final int absEncoderMultiplier = constants.isAbsEncoderInverted ? -1 : 1;
+
+    private final VelocityDutyCycle driveMotorVelocityDutyCycle =
+            new VelocityDutyCycle(0).withEnableFOC(false);
 
 
     public SwerveModuleIOCompBot(SwerveModule.ModuleName name) {
@@ -47,16 +52,22 @@ public class SwerveModuleIOCompBot extends SwerveModuleIO {
         inputs.drivePositionMeters =
                 (driveMotor.getPosition().getValueAsDouble() / constants.driveGearRatio) * constants.wheelCircumferenceMeters;
 
+        inputs.driveMotorAppliedOutput = driveMotor.getDutyCycle().getValueAsDouble();
+        inputs.steerMotorAplliedOutput = steerMotor.getAppliedOutput();
+
         inputs.driveMotorAppliedVoltage = driveMotor.getMotorVoltage().getValueAsDouble();
-        inputs.steerMotorAppliedVoltage = steerMotor.getAppliedOutput() * steerMotor.getBusVoltage();
+        inputs.steerMotorAppliedVoltage = inputs.steerMotorAplliedOutput * steerMotor.getBusVoltage();
 
         inputs.driveMotorTemperature = driveMotor.getDeviceTemp().getValueAsDouble();
     }
 
     @Override
-    protected void sendInputsToMotors(double driveMotorVoltageInput, double steerMotorVoltageInput) {
-        driveMotor.setVoltage(driveMotorVoltageInput);
-        steerMotor.setVoltage(steerMotorVoltageInput);
+    protected void sendInputsToMotors(double driveMotorReference, double steerMotorReference) {
+        double driveMotorOut = (driveMotorReference / constants.wheelCircumferenceMeters) * constants.driveGearRatio;
+        double steerMotorOut = steerMotorReference / constants.steerGearRatio;
+
+        driveMotor.setControl(driveMotorVelocityDutyCycle.withVelocity(driveMotorOut));
+        steerMotor.getPIDController().setReference(steerMotorOut, CANSparkBase.ControlType.kPosition);
     }
 
     @Override
