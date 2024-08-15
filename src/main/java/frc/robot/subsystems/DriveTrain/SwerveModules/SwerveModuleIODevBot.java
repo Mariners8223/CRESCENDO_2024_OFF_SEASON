@@ -20,7 +20,7 @@ public class SwerveModuleIODevBot extends SwerveModuleIO {
         int steerMotorID = MotorMap.DriveBase.MODULES[name.ordinal()][1];
         int absEncoderID = MotorMap.DriveBase.MODULES[name.ordinal()][2];
 
-        double zeroOffset = constants.abs_zeroOffsets[name.ordinal()];
+        double zeroOffset = constants.ABSOLUTE_ZERO_OFFSETS[name.ordinal()];
 
         absEncoder = configCANCoder(absEncoderID, zeroOffset);
 
@@ -31,10 +31,10 @@ public class SwerveModuleIODevBot extends SwerveModuleIO {
     @Override
     public void updateInputs(SwerveModuleIOInputsAutoLogged inputs) {
         // inputs.currentState.angle = Rotation2d.fromRotations(absEncoder.getPosition().getValueAsDouble());
-        inputs.currentState.angle = Rotation2d.fromRotations(steerMotor.getEncoder().getPosition() / constants.steerGearRatio);
+        inputs.currentState.angle = Rotation2d.fromRotations(steerMotor.getEncoder().getPosition() / constants.STEER_GEAR_RATIO);
 
         inputs.currentState.speedMetersPerSecond =
-                (driveMotor.getVelocity().getValueAsDouble() / constants.driveGearRatio) * constants.wheelCircumferenceMeters;
+                (driveMotor.getVelocity().getValueAsDouble() / constants.DRIVE_GEAR_RATIO) * constants.WHEEL_CIRCUMFERENCE_METERS;
 
         inputs.absEncoderPosition = (absEncoder.getAbsolutePosition().getValueAsDouble());
 
@@ -42,10 +42,10 @@ public class SwerveModuleIODevBot extends SwerveModuleIO {
         inputs.driveMotorTemperature = driveMotor.getDeviceTemp().getValueAsDouble();
 
         inputs.steerVelocityRadPerSec =
-                Units.rotationsPerMinuteToRadiansPerSecond(steerMotor.getEncoder().getVelocity() / constants.steerGearRatio);
+                Units.rotationsPerMinuteToRadiansPerSecond(steerMotor.getEncoder().getVelocity() / constants.STEER_GEAR_RATIO);
 
         inputs.drivePositionMeters =
-                (driveMotor.getPosition().getValueAsDouble() / constants.driveGearRatio) * constants.wheelCircumferenceMeters;
+                (driveMotor.getPosition().getValueAsDouble() / constants.DRIVE_GEAR_RATIO) * constants.WHEEL_CIRCUMFERENCE_METERS;
 
         inputs.driveMotorAppliedVoltage = driveMotor.getMotorVoltage().getValueAsDouble();
         inputs.steerMotorAppliedVoltage = steerMotor.getAppliedOutput() * steerMotor.getBusVoltage();

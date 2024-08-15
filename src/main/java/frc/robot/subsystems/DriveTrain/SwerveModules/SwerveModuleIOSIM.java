@@ -12,17 +12,13 @@ public class SwerveModuleIOSIM extends SwerveModuleIO {
     private final DCMotorSim driveMotor;
     private final DCMotorSim steerMotor;
 
-    private final double driveMotorGearRatio = constants.driveGearRatio;
-    private final double driveWheelRadiusMeters = constants.wheelRadiusMeters;
-    private final double steerMotorGearRatio = constants.steerGearRatio;
-
     private double driveMotorVoltage = 0;
     private double steerMotorVoltage = 0;
 
     public SwerveModuleIOSIM() {
-        driveMotor = new DCMotorSim(DCMotor.getFalcon500(1), 1, 0.25 / steerMotorGearRatio);
+        driveMotor = new DCMotorSim(DCMotor.getFalcon500(1), 1, 0.25 / constants.DRIVE_GEAR_RATIO);
         if (Constants.robotType == Constants.RobotType.DEVELOPMENT) {
-            steerMotor = new DCMotorSim(DCMotor.getNEO(1), 1, 0.25 / steerMotorGearRatio);
+            steerMotor = new DCMotorSim(DCMotor.getNEO(1), 1, 0.25 / constants.STEER_GEAR_RATIO);
         } else {
             steerMotor = new DCMotorSim(DCMotor.getNeo550(1), 1, 0.25);
         }
@@ -30,14 +26,14 @@ public class SwerveModuleIOSIM extends SwerveModuleIO {
 
     @Override
     public void updateInputs(SwerveModuleIOInputsAutoLogged inputs) {
-        driveMotor.update(1 / SwerveModule.moduleThreadHz);
-        steerMotor.update(1 / SwerveModule.moduleThreadHz);
+        driveMotor.update(1 / SwerveModule.MODULE_THREAD_HZ);
+        steerMotor.update(1 / SwerveModule.MODULE_THREAD_HZ);
 
-        inputs.currentState.speedMetersPerSecond = (driveMotor.getAngularVelocityRadPerSec() / driveMotorGearRatio) * driveWheelRadiusMeters;
-        inputs.currentState.angle = Rotation2d.fromRadians(steerMotor.getAngularPositionRad() / steerMotorGearRatio);
+        inputs.currentState.speedMetersPerSecond = (driveMotor.getAngularVelocityRadPerSec() / constants.DRIVE_GEAR_RATIO) * constants.WHEEL_RADIUS_METERS;
+        inputs.currentState.angle = Rotation2d.fromRadians(steerMotor.getAngularPositionRad() / constants.STEER_GEAR_RATIO);
 
-        inputs.steerVelocityRadPerSec = steerMotor.getAngularVelocityRadPerSec() / steerMotorGearRatio;
-        inputs.drivePositionMeters = driveMotor.getAngularPositionRad() * driveWheelRadiusMeters;
+        inputs.steerVelocityRadPerSec = steerMotor.getAngularVelocityRadPerSec() / constants.STEER_GEAR_RATIO;
+        inputs.drivePositionMeters = (driveMotor.getAngularPositionRad() / constants.DRIVE_GEAR_RATIO) * constants.WHEEL_RADIUS_METERS;
 
         inputs.driveMotorAppliedVoltage = driveMotorVoltage;
         inputs.steerMotorAppliedVoltage = steerMotorVoltage;

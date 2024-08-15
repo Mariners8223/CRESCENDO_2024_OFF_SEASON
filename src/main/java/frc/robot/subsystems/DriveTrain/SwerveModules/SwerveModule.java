@@ -29,13 +29,13 @@ public class SwerveModule {
         Back_Right
     }
 
-    public static final double moduleThreadHz = 50;
-    public static final double distanceBetweenWheels = 0.576; // the distance between each wheel in meters
-    public static final Translation2d[] moduleTranslations = new Translation2d[]{
-            new Translation2d(distanceBetweenWheels / 2, distanceBetweenWheels / 2),
-            new Translation2d(distanceBetweenWheels / 2, -distanceBetweenWheels / 2),
-            new Translation2d(-distanceBetweenWheels / 2, distanceBetweenWheels / 2),
-            new Translation2d(-distanceBetweenWheels / 2, -distanceBetweenWheels / 2)};
+    public static final double MODULE_THREAD_HZ = 50;
+    public static final double DISTANCE_BETWEEN_WHEELS = 0.576; // the distance between each wheel in meters
+    public static final Translation2d[] MODULE_TRANSLATIONS = new Translation2d[]{
+            new Translation2d(DISTANCE_BETWEEN_WHEELS / 2, DISTANCE_BETWEEN_WHEELS / 2),
+            new Translation2d(DISTANCE_BETWEEN_WHEELS / 2, -DISTANCE_BETWEEN_WHEELS / 2),
+            new Translation2d(-DISTANCE_BETWEEN_WHEELS / 2, DISTANCE_BETWEEN_WHEELS / 2),
+            new Translation2d(-DISTANCE_BETWEEN_WHEELS / 2, -DISTANCE_BETWEEN_WHEELS / 2)};
 
     private final String moduleName;
     private final SwerveModuleIO io;
@@ -55,9 +55,9 @@ public class SwerveModule {
         SwerveModuleConstants constants =
                 robotType == Constants.RobotType.DEVELOPMENT ? SwerveModuleConstants.DEVBOT : SwerveModuleConstants.COMPBOT;
 
-        drivePIDController = constants.driveMotorPID[name.ordinal()].createProfiledPIDController();
-        driveFeedforward = new SimpleMotorFeedforward(0, constants.driveMotorPID[name.ordinal()].getF());
-        steerPIDController = constants.steerMotorPID[name.ordinal()].createPIDController();
+        drivePIDController = constants.DRIVE_MOTOR_PID[name.ordinal()].createProfiledPIDController();
+        driveFeedforward = new SimpleMotorFeedforward(0, constants.DRIVE_MOTOR_PID[name.ordinal()].getF());
+        steerPIDController = constants.STEER_MOTOR_PID[name.ordinal()].createPIDController();
 
         if (RobotBase.isReal()) {
             io = switch (robotType) {
@@ -159,12 +159,12 @@ public class SwerveModule {
         runningCalibration = false;
     }
 
-    public void runDriveCalibration(){
+    public void runDriveCalibration() {
         runningDriveCalibration = true;
         runningCalibration = true;
     }
 
-    public void stopDriveCalibration(){
+    public void stopDriveCalibration() {
         runningCalibration = false;
         runningDriveCalibration = false;
     }

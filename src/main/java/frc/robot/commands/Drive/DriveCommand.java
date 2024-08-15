@@ -25,7 +25,7 @@ public class DriveCommand extends Command {
     @Override
     public void execute() {
         //calculates a value from 1 to the max wheel speed based on the R2 axis
-        double R2Axis = (1 - (0.5 + controller.getR2Axis() / 2)) * (driveBase.maxFreeWheelSpeed - 1) + 1;
+        double R2Axis = (1 - (0.5 + controller.getR2Axis() / 2)) * (driveBase.MAX_FREE_WHEEL_SPEED - 1) + 1;
 
         //sets the value of the 3 axis we need (accounting for drift)
         double leftX = Math.abs(controller.getLeftX()) > 0.1 ? -controller.getLeftX() : 0;
