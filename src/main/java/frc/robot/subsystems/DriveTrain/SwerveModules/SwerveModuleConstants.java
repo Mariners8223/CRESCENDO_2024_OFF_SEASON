@@ -33,16 +33,16 @@ public enum SwerveModuleConstants {
             0.59625, 0.9368, 0.226, 0.750,
 
             new PIDFGains[]{
-                new PIDFGains(6.3, 0, 0.03, 0, 0.2, 0, 1 / SwerveModule.moduleThreadHz), //FL
-                new PIDFGains(8, 0, 0.07, 0, 0.2, 0, 1 / SwerveModule.moduleThreadHz), //FR
-                new PIDFGains(7.5, 0, 0.1, 0, 0.2, 0, 1 / SwerveModule.moduleThreadHz), //BL
-                new PIDFGains(6.5, 0, 0.03, 0, 0.2, 0, 1 / SwerveModule.moduleThreadHz)  //BR
+                new PIDFGains(0.525, 0, 0.0025, 0, 0.2, 0, 1 / SwerveModule.moduleThreadHz), //FL
+                new PIDFGains(0.666, 0, 0.0058, 0, 0.2, 0, 1 / SwerveModule.moduleThreadHz), //FR
+                new PIDFGains(0.625, 0, 0.0083, 0, 0.2, 0, 1 / SwerveModule.moduleThreadHz), //BL
+                new PIDFGains(0.541, 0, 0.0025, 0, 0.2, 0, 1 / SwerveModule.moduleThreadHz)  //BR
             },
             new PIDFGains[]{
-                    new PIDFGains(0, 0, 0,3.2,0,0),
-                    new PIDFGains(0, 0, 0,3.2,0,0),
-                    new PIDFGains(0, 0, 0,3.2,0,0),
-                    new PIDFGains(0, 0, 0,3.2,0,0)
+                    new PIDFGains(0.208, 0, 0,0,0,0),
+                    new PIDFGains(0.208, 0, 0,0,0,0),
+                    new PIDFGains(0.208, 0, 0,0,0,0),
+                    new PIDFGains(0.208, 0, 0,0,0,0)
             });
 
     /**
