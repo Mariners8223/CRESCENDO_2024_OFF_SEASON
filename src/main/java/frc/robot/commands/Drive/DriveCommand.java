@@ -28,8 +28,8 @@ public class DriveCommand extends Command {
         double R2Axis = (1 - (0.5 + controller.getR2Axis() / 2)) * (driveBase.maxFreeWheelSpeed - 1) + 1;
 
         //sets the value of the 3 axis we need (accounting for drift)
-        double leftX = Math.abs(controller.getLeftX()) > 0.1 ? -controller.getLeftX() : 0;
-        double leftY = Math.abs(controller.getLeftY()) > 0.1 ? -controller.getLeftY() : 0;
+        double leftY = Math.abs(controller.getLeftX()) > 0.1 ? -controller.getLeftX() : 0;
+        double leftX = Math.abs(controller.getLeftY()) > 0.1 ? -controller.getLeftY() : 0;
         double rightX = Math.abs(controller.getRightX()) > 0.1 ? -controller.getRightX() : 0;
 
         //drives the robot with the values

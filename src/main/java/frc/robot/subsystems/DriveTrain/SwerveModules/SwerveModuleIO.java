@@ -183,7 +183,7 @@ public abstract class SwerveModuleIO implements Runnable{
         config.Slot0.kP = constants.driveMotorPID[name.ordinal()].getP(); //sets the P
         config.Slot0.kI = constants.driveMotorPID[name.ordinal()].getI(); //sets the I
         config.Slot0.kD = constants.driveMotorPID[name.ordinal()].getD(); //sets the D
-        config.Slot0.kS = constants.driveMotorPID[name.ordinal()].getF(); //sets the feedForward
+        config.Slot0.kV = constants.driveMotorPID[name.ordinal()].getF(); //sets the feedForward
 
         config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor; //just in case sets the built-in sensor
         config.Feedback.SensorToMechanismRatio = 1; //changes the units to m/s
