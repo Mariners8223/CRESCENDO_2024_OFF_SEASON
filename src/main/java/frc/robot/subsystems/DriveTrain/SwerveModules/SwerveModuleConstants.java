@@ -39,10 +39,10 @@ public enum SwerveModuleConstants {
                 new PIDFGains(0.541, 0, 0.0025, 0, 0.2, 0, 1 / SwerveModule.moduleThreadHz)  //BR
             },
             new PIDFGains[]{
-                    new PIDFGains(0.208, 0, 0,0,0,0),
-                    new PIDFGains(0.208, 0, 0,0,0,0),
-                    new PIDFGains(0.208, 0, 0,0,0,0),
-                    new PIDFGains(0.208, 0, 0,0,0,0)
+                    new PIDFGains(0, 0, 0,0,0,0),
+                    new PIDFGains(0, 0, 0,0,0,0),
+                    new PIDFGains(0, 0, 0,0,0,0),
+                    new PIDFGains(0, 0, 0,0,0,0)
             });
 
     /**

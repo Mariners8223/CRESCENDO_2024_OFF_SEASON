@@ -66,7 +66,7 @@ public class SwerveModuleIOCompBot extends SwerveModuleIO {
     @Override
     protected void sendInputsToMotors(double driveMotorReference, double steerMotorReference) {
         double driveMotorOut = (driveMotorReference / constants.wheelCircumferenceMeters) * constants.driveGearRatio;
-        double steerMotorOut = steerMotorReference / constants.steerGearRatio;
+        double steerMotorOut = steerMotorReference * constants.steerGearRatio;
 
         driveMotor.setControl(driveMotorVelocityDutyCycle.withVelocity(driveMotorOut));
         steerMotor.getPIDController().setReference(steerMotorOut, CANSparkBase.ControlType.kPosition);

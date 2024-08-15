@@ -212,6 +212,11 @@ public abstract class SwerveModuleIO implements Runnable{
         sparkMax.getPIDController().setD(constants.steerMotorPID[name.ordinal()].getD()); //sets the D for the PID Controller
         sparkMax.getPIDController().setIZone(constants.steerMotorPID[name.ordinal()].getIZone()); //sets the IZone for the PID Controller
 
+        sparkMax.getPIDController().setPositionPIDWrappingEnabled(true);
+        sparkMax.getPIDController().setPositionPIDWrappingMaxInput(0.25 * constants.steerGearRatio);
+        sparkMax.getPIDController().setPositionPIDWrappingMinInput(-0.25 * constants.steerGearRatio);
+
+
         sparkMax.setPeriodicFramePeriod(CANSparkMax.PeriodicFrame.kStatus2, (int) (1000 / SwerveModule.moduleThreadHz)); //sets the status 0 frame to 10ms
         sparkMax.setPeriodicFramePeriod(CANSparkMax.PeriodicFrame.kStatus1, (int) (1000 / SwerveModule.moduleThreadHz)); //sets the status 0 frame to 10ms
         sparkMax.setPeriodicFramePeriod(CANSparkMax.PeriodicFrame.kStatus0, (int) (1000 / SwerveModule.moduleThreadHz));
