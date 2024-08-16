@@ -1,12 +1,15 @@
 package frc.robot.subsystems.DriveTrain.SwerveModules;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.*;
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkPIDController;
+import com.revrobotics.CANSparkBase.ControlType;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.MotorMap;
@@ -17,6 +20,8 @@ public class SwerveModuleIODevBot extends SwerveModuleIO {
     private final TalonFX driveMotor;
     private final CANSparkMax steerMotor;
     private final CANcoder absEncoder;
+
+    private final VelocityDutyCycle velocityInput = new VelocityDutyCycle(0).withEnableFOC(false);
 
     public SwerveModuleIODevBot(SwerveModule.ModuleName name) {
         int driveMotorID = MotorMap.DriveBase.MODULES[name.ordinal()][0];
@@ -55,9 +60,12 @@ public class SwerveModuleIODevBot extends SwerveModuleIO {
     }
 
     @Override
-    protected void sendInputsToMotors(double driveMotorVoltageInput, double steerMotorVoltageInput) {
-        driveMotor.setVoltage(driveMotorVoltageInput);
-        steerMotor.setVoltage(steerMotorVoltageInput);
+    protected void sendInputsToMotors(double driveMotorRefrence, double steerMotorRefrence) {
+        double driveMotorOut = (driveMotorRefrence / constants.wheelCircumferenceMeters) * constants.driveGearRatio;
+        double steerMotorOut = steerMotorRefrence * constants.steerGearRatio;
+
+        driveMotor.setControl(velocityInput.withVelocity(driveMotorOut));
+        steerMotor.getPIDController().setReference(steerMotorOut, ControlType.kPosition);
     }
 
     @Override

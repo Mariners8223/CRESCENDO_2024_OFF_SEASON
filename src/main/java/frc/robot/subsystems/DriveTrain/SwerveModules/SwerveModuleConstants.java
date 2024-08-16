@@ -9,19 +9,19 @@ public enum SwerveModuleConstants {
     DEVBOT(6.75, 12.5, 0.0508, 4.75,
             false, true, true,
 
-            0.302, -0.44, -0.164, 0.303,
+            0.298, -0.41, -0.152, 0.322,
 
             new PIDFGains[]{
-                    new PIDFGains(8, 0, 0.07, 1 / SwerveModule.moduleThreadHz), //FL
-                    new PIDFGains(10, 0, 0.07, 1 / SwerveModule.moduleThreadHz), //FR
-                    new PIDFGains(7.5, 0, 0.1, 1 / SwerveModule.moduleThreadHz), //BL
-                    new PIDFGains(10, 0, 0.09, 1 / SwerveModule.moduleThreadHz) //BR
+                    new PIDFGains(0.3, 0, 0, 1 / SwerveModule.moduleThreadHz), //FL
+                    new PIDFGains(0.3, 0, 0, 1 / SwerveModule.moduleThreadHz), //FR
+                    new PIDFGains(0.3, 0, 0, 1 / SwerveModule.moduleThreadHz), //BL
+                    new PIDFGains(0.3, 0, 0, 1 / SwerveModule.moduleThreadHz) //BR
             },
             new PIDFGains[]{
-                    new PIDFGains(0, 0, 0),
-                    new PIDFGains(0, 0, 0),
-                    new PIDFGains(0, 0, 0),
-                    new PIDFGains(0, 0, 0)
+                    new PIDFGains(0.01, 0, 0),
+                    new PIDFGains(0.01, 0, 0),
+                    new PIDFGains(0.01, 0, 0),
+                    new PIDFGains(0.01, 0, 0)
             }),
 
     /**

@@ -21,7 +21,7 @@ public class Constants {
         REPLAY
     }
 
-    public static final RobotType robotType = RobotType.COMPETITION; //the type of robot the code is running on
+    public static final RobotType robotType = RobotType.DEVELOPMENT; //the type of robot the code is running on
 
 
     public static final class DriveTrain{
