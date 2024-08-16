@@ -353,18 +353,6 @@ public class DriveBase extends SubsystemBase {
         }
     }
 
-    public void runModuleSteerCalibration(){
-        for(int i = 0; i < 4; i++){
-            modules[i].runSteerCalibration();
-        }
-    }
-
-    public void stopModuleSteerCalibration(){
-        for(int i = 0; i < 4; i++){
-            modules[i].stopSteerCalibration();
-        }
-    }
-
     /**
      * path finds a path from the current pose to the target pose
      *

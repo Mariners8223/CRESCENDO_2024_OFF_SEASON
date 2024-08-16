@@ -1,11 +1,9 @@
 package frc.robot.subsystems.DriveTrain.SwerveModules;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 
-import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
@@ -39,7 +37,6 @@ public class SwerveModule {
     private final SwerveModuleIO io;
     private final SwerveModuleIOInputsAutoLogged inputs = new SwerveModuleIOInputsAutoLogged();
 
-    private boolean runningCalibration = false;
     private boolean runningDriveCalibration = false;
 
     private SwerveModuleState targetState = new SwerveModuleState();
@@ -63,7 +60,7 @@ public class SwerveModule {
     public SwerveModulePosition modulePeriodic() {
         io.updateInputs(inputs);
 
-        if (!runningCalibration) {
+        if (!runningDriveCalibration) {
             targetState = SwerveModuleState.optimize(targetState, inputs.currentState.angle);
             targetState.speedMetersPerSecond *= Math.cos(targetState.angle.getRadians() - inputs.currentState.angle.getRadians());
 
@@ -72,37 +69,25 @@ public class SwerveModule {
 
             io.run();
         } else {
-            if (runningDriveCalibration) {
-                double driveKp = SmartDashboard.getNumber("drive kP", 0);
-                double driveKi = SmartDashboard.getNumber("drive kI", 0);
-                double driveKd = SmartDashboard.getNumber("drive kD", 0);
-                double driveKf = SmartDashboard.getNumber("drive kF", 0);
 
-                io.setDriveMotorPID(new PIDFGains(driveKp, driveKi, driveKd, driveKf, 0, 0));
+            double driveKp = SmartDashboard.getNumber("drive kP", 0);
+            double driveKi = SmartDashboard.getNumber("drive kI", 0);
+            double driveKd = SmartDashboard.getNumber("drive kD", 0);
+            double driveKf = SmartDashboard.getNumber("drive kF", 0);
 
-                double driveReference = SmartDashboard.getNumber("drive setPoint", 0);
+            io.setDriveMotorPID(new PIDFGains(driveKp, driveKi, driveKd, driveKf, 0, 0));
 
-                io.setDriveMotorReference(driveReference);
+            double driveReference = SmartDashboard.getNumber("drive setPoint", 0);
 
-                io.setSteerMotorReference(targetState.angle.getRotations());
+            io.setDriveMotorReference(driveReference);
 
-            } else {
-                PIDController controller = (PIDController) SmartDashboard.getData(moduleName + " steer Controller");
-
-                io.setSteerMotorPID(new PIDFGains(controller.getP(), controller.getI(), controller.getD()));
-                io.setSteerMotorReference(targetState.angle.getRotations());
-                io.setDriveMotorReference(0);
-            }
+            io.setSteerMotorReference(targetState.angle.getRotations());
 
             io.run();
         }
         Logger.processInputs("SwerveModule/" + moduleName, inputs);
 
         return new SwerveModulePosition(inputs.drivePositionMeters, inputs.currentState.angle);
-    }
-
-    public SwerveModuleState getCurrentState() {
-        return inputs.currentState;
     }
 
     public SwerveModuleState run(SwerveModuleState targetState) {
@@ -113,28 +98,16 @@ public class SwerveModule {
 
         return targetState;
     }
-
-    public void runSteerCalibration() {
-        runningCalibration = true;
-
-        PIDController steerPIDController = new PIDController(0, 0, 0);
-
-        SendableRegistry.setName(steerPIDController, moduleName + " steer Controller");
-
-        SmartDashboard.putData(steerPIDController);
-    }
-
-    public void stopSteerCalibration() {
-        runningCalibration = false;
+    
+    public SwerveModuleState getCurrentState() {
+        return inputs.currentState;
     }
 
     public void runDriveCalibration() {
         runningDriveCalibration = true;
-        runningCalibration = true;
     }
 
     public void stopDriveCalibration() {
-        runningCalibration = false;
         runningDriveCalibration = false;
     }
 
