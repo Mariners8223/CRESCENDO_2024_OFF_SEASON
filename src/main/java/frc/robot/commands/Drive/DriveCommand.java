@@ -41,22 +41,58 @@ public class DriveCommand extends Command {
         return Math.abs(value) > 0.1 ? value : 0;
     }
 
-    
+
+    @Override
+    public void execute() {
+        //calculates a value from 1 to the max-wheel speed based on the R2 axis
+        double R2Axis = (1 - (0.5 + controller.getR2Axis() / 2)) * (driveBase.maxFreeWheelSpeed - 1) + 1;
+
+        double povAngle = controller.getHID().getPOV();
+
+        Translation2d centerOfRotation = calculateCenterOfRotation((int) povAngle);
+
+        //sets the value of the 3 vectors we need (accounting for drift)
+        double leftX = -deadBand(controller.getLeftX());
+        double leftY = -deadBand(controller.getLeftY());
+        double rightX = deadBand(controller.getRightX());
+
+        //drives the robot with the values
+        driveBase.drive(
+                leftX * R2Axis,
+                leftY * R2Axis,
+                rightX * R2Axis,
+                centerOfRotation
+        );
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        driveBase.drive(0, 0, 0, new Translation2d());
+    }
+
+
     int currentAngleFieldRelative = -1; //the pov itself angle
     int currentAngleRobotRelative = -1; //the selected angle on the robot axis
     int previousAngleFieldRelative = -1;
     int previousAngleRobotRelative = -1;
     int timer = 0;
 
+    /**
+     * calculate the center of rotation based on the angle of the pov
+     *
+     * @param angle the angle of the pov (0-360)
+     * @return the center of rotation
+     */
     private Translation2d calculateCenterOfRotation(int angle) {
         if (angle != -1) {
             if (angle == currentAngleFieldRelative) {
                 if (angle != previousAngleFieldRelative) {
-                    timer++;
                     if (timer >= 25) {
                         timer = 0;
                         previousAngleFieldRelative = currentAngleFieldRelative;
                         previousAngleRobotRelative = currentAngleRobotRelative;
+                    } else {
+                        timer++;
                     }
                 }
             } else {
@@ -70,24 +106,35 @@ public class DriveCommand extends Command {
                 timer = 0;
             }
         } else {
-            if (timer == 0) {
-                currentAngleFieldRelative = -1;
-                currentAngleRobotRelative = -1;
-            } else if (timer >= 25) {
-                previousAngleFieldRelative = -1;
-                previousAngleRobotRelative = -1;
-                timer = 0;
+            if (previousAngleFieldRelative != -1) {
+                if (timer == 0) {
+                    currentAngleFieldRelative = -1;
+                    currentAngleRobotRelative = -1;
+                    timer++;
+                } else if (timer >= 25) {
+                    previousAngleFieldRelative = -1;
+                    previousAngleRobotRelative = -1;
+                    timer = 0;
+                } else {
+                    timer++;
+                }
             }
-            timer++;
         }
+
         return findCenterOfRotation(currentAngleRobotRelative);
     }
 
+    /**
+     * selects the center of rotation based on the angle
+     *
+     * @param angle the angle to select the center of rotation (if -1, returns the center of the robot)
+     * @return the center of rotation
+     */
     private Translation2d findCenterOfRotation(int angle) {
         if (angle == -1) {
             return new Translation2d();
         } else {
-            return possibleCenterOfRotations[(int) (angle / 45) % 8];
+            return possibleCenterOfRotations[(angle / 45) % 8];
         }
     }
 
@@ -108,34 +155,5 @@ public class DriveCommand extends Command {
         beta = Math.round(beta / 45) * 45;
 
         return (int) beta;
-    }
-
-
-    @Override
-    public void execute() {
-        //calculates a value from 1 to the max wheel speed based on the R2 axis
-        double R2Axis = (1 - (0.5 + controller.getR2Axis() / 2)) * (driveBase.maxFreeWheelSpeed - 1) + 1;
-
-        double povAngle = controller.getHID().getPOV();
-
-        Translation2d centerOfRotation = calculateCenterOfRotation((int) povAngle);
-
-        //sets the value of the 3 axis we need (accounting for drift)
-        double leftX = -deadBand(controller.getLeftX());
-        double leftY = -deadBand(controller.getLeftY());
-        double rightX = deadBand(controller.getRightX());
-
-        //drives the robot with the values
-        driveBase.drive(
-                leftX * R2Axis,
-                leftY * R2Axis,
-                rightX * R2Axis,
-                centerOfRotation
-        );
-    }
-
-    @Override
-    public void end(boolean interrupted) {
-        driveBase.drive(0, 0, 0, new Translation2d());
     }
 }
