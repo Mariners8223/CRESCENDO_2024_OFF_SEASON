@@ -41,7 +41,7 @@ public class DriveCommand extends Command {
         return Math.abs(value) > 0.1 ? value : 0;
     }
 
-    boolean povPressed = false;
+    
     int currentAngleFieldRelative = -1; //the pov itself angle
     int currentAngleRobotRelative = -1; //the selected angle on the robot axis
     int previousAngleFieldRelative = -1;
