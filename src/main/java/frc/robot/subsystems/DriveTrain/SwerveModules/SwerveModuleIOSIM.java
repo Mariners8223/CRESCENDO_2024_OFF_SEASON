@@ -57,6 +57,9 @@ public class SwerveModuleIOSIM extends SwerveModuleIO {
         double driveMotorVelocity = driveMotor.getAngularVelocityRPM() / 60;
         double steerMotorPosition = steerMotor.getAngularPositionRotations();
 
+        driveMotorReference = (driveMotorReference * driveMotorGearRatio) / driveWheelRadiusMeters;
+        steerMotorReference = steerMotorReference * steerMotorGearRatio;
+
         driveMotorVoltage = driveMotorPIDController.calculate(driveMotorVelocity, driveMotorReference);
         steerMotorVoltage = steerMotorPIDController.calculate(steerMotorPosition, steerMotorReference);
 
