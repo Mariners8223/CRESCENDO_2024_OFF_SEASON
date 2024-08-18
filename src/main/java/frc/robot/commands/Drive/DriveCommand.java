@@ -1,5 +1,6 @@
 package frc.robot.commands.Drive;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
@@ -18,8 +19,8 @@ public class DriveCommand extends Command {
             new Translation2d(distanceBetweenWheels / 2, -distanceBetweenWheels / 2),
             new Translation2d(0, -distanceBetweenWheels / 2),
             new Translation2d(-distanceBetweenWheels / 2, -distanceBetweenWheels / 2),
-            new Translation2d(-distanceBetweenWheels /2 , 0),
-            new Translation2d( -distanceBetweenWheels, distanceBetweenWheels / 2),
+            new Translation2d(-distanceBetweenWheels / 2, 0),
+            new Translation2d(-distanceBetweenWheels, distanceBetweenWheels / 2),
             new Translation2d(0, distanceBetweenWheels / 2),
             new Translation2d(distanceBetweenWheels / 2, distanceBetweenWheels / 2)
     };
@@ -40,6 +41,75 @@ public class DriveCommand extends Command {
         return Math.abs(value) > 0.1 ? value : 0;
     }
 
+    boolean povPressed = false;
+    int currentAngleFieldRelative = -1; //the pov itself angle
+    int currentAngleRobotRelative = -1; //the selected angle on the robot axis
+    int previousAngleFieldRelative = -1;
+    int previousAngleRobotRelative = -1;
+    int timer = 0;
+
+    private Translation2d calculateCenterOfRotation(int angle) {
+        if (angle != -1) {
+            if (angle == currentAngleFieldRelative) {
+                if (angle != previousAngleFieldRelative) {
+                    timer++;
+                    if (timer >= 25) {
+                        timer = 0;
+                        previousAngleFieldRelative = currentAngleFieldRelative;
+                        previousAngleRobotRelative = currentAngleRobotRelative;
+                    }
+                }
+            } else {
+                if (angle == previousAngleFieldRelative) {
+                    currentAngleRobotRelative = previousAngleRobotRelative;
+                    currentAngleFieldRelative = previousAngleFieldRelative;
+                } else {
+                    currentAngleFieldRelative = angle;
+                    currentAngleRobotRelative = convertPOVToRobotRelative(angle);
+                }
+                timer = 0;
+            }
+        } else {
+            if (timer == 0) {
+                currentAngleFieldRelative = -1;
+                currentAngleRobotRelative = -1;
+            } else if (timer >= 25) {
+                previousAngleFieldRelative = -1;
+                previousAngleRobotRelative = -1;
+                timer = 0;
+            }
+            timer++;
+        }
+        return findCenterOfRotation(currentAngleRobotRelative);
+    }
+
+    private Translation2d findCenterOfRotation(int angle) {
+        if (angle == -1) {
+            return new Translation2d();
+        } else {
+            return possibleCenterOfRotations[(int) (angle / 45) % 8];
+        }
+    }
+
+    /**
+     * Converts the POV angle to a robot relative angle
+     * <p>
+     * function is:
+     * f(angle) = (Math.round((360 - angle + inputModules(theta, 0, 360)) / 45) * 45)
+     *
+     * @param angle the pov angle
+     * @return the robot relative angle snapped to nearest 45 degrees
+     */
+    private int convertPOVToRobotRelative(double angle) {
+        double theta = MathUtil.inputModulus(driveBase.getAngle(), 0, 360);
+        double alpha = 360 - angle;
+        double beta = alpha + theta;
+
+        beta = Math.round(beta / 45) * 45;
+
+        return (int) beta;
+    }
+
 
     @Override
     public void execute() {
@@ -48,8 +118,7 @@ public class DriveCommand extends Command {
 
         double povAngle = controller.getHID().getPOV();
 
-        Translation2d centerOfRotation = povAngle == -1 ?
-                new Translation2d() : possibleCenterOfRotations[(int)(povAngle / 45) % 8];
+        Translation2d centerOfRotation = calculateCenterOfRotation((int) povAngle);
 
         //sets the value of the 3 axis we need (accounting for drift)
         double leftX = -deadBand(controller.getLeftX());
