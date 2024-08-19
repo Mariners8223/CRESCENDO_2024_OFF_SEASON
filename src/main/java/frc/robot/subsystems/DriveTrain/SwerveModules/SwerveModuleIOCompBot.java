@@ -17,7 +17,7 @@ public class SwerveModuleIOCompBot extends SwerveModuleIO {
     private final TalonFX driveMotor;
     private final CANSparkMax steerMotor;
     private final DutyCycleEncoder absEncoder;
-    private final int absEncoderMultiplier = constants.isAbsEncoderInverted ? -1 : 1;
+    private final int absEncoderMultiplier = constants.ABSOLUTE_ENCODER_INVERTED ? -1 : 1;
 
     private final VelocityDutyCycle driveMotorVelocityDutyCycle =
             new VelocityDutyCycle(0).withEnableFOC(false);
@@ -28,7 +28,7 @@ public class SwerveModuleIOCompBot extends SwerveModuleIO {
         int steerMotorID = MotorMap.DriveBase.MODULES[name.ordinal()][1];
         int absEncoderID = MotorMap.DriveBase.MODULES[name.ordinal()][2];
 
-        double zeroOffset = constants.abs_zeroOffsets[name.ordinal()];
+        double zeroOffset = constants.ABSOLUTE_ZERO_OFFSETS[name.ordinal()];
 
         absEncoder = configDutyCycleEncoder(absEncoderID, zeroOffset);
 
@@ -42,17 +42,17 @@ public class SwerveModuleIOCompBot extends SwerveModuleIO {
         // inputs.currentState.angle = Rotation2d.fromRotations(steerMotor.getEncoder().getPosition() / DevBotConstants.steerGearRatio);
 
         inputs.currentState.speedMetersPerSecond =
-                (driveMotor.getVelocity().getValueAsDouble() / constants.driveGearRatio) * constants.wheelCircumferenceMeters;
+                (driveMotor.getVelocity().getValueAsDouble() / constants.DRIVE_GEAR_RATIO) * constants.WHEEL_CIRCUMFERENCE_METERS;
 
         inputs.driveMotorRPM = driveMotor.getVelocity().getValueAsDouble() * 60;
 
         inputs.absEncoderPosition = (absEncoder.getAbsolutePosition() - absEncoder.getPositionOffset()) * absEncoderMultiplier;
 
         inputs.steerVelocityRadPerSec =
-                Units.rotationsPerMinuteToRadiansPerSecond(steerMotor.getEncoder().getVelocity() / constants.steerGearRatio);
+                Units.rotationsPerMinuteToRadiansPerSecond(steerMotor.getEncoder().getVelocity() / constants.STEER_GEAR_RATIO);
 
         inputs.drivePositionMeters =
-                (driveMotor.getPosition().getValueAsDouble() / constants.driveGearRatio) * constants.wheelCircumferenceMeters;
+                (driveMotor.getPosition().getValueAsDouble() / constants.DRIVE_GEAR_RATIO) * constants.WHEEL_CIRCUMFERENCE_METERS;
 
         inputs.driveMotorAppliedOutput = driveMotor.getDutyCycle().getValueAsDouble();
         inputs.steerMotorAppliedOutput = steerMotor.getAppliedOutput();

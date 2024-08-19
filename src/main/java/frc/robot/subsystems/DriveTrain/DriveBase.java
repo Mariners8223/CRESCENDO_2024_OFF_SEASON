@@ -48,7 +48,7 @@ public class DriveBase extends SubsystemBase {
     /**
      * the kinematics of the swerve drivetrain (how the modules are placed and calculating the kinematics)
      */
-    private final SwerveDriveKinematics driveTrainKinematics = new SwerveDriveKinematics(SwerveModule.moduleTranslations);
+    private final SwerveDriveKinematics driveTrainKinematics = new SwerveDriveKinematics(SwerveModule.MODULE_TRANSLATIONS);
 
     /**
      * a variable representing the deltas of the modules (how much they have moved since the last update)
@@ -76,9 +76,9 @@ public class DriveBase extends SubsystemBase {
     /**
      * the max speed the wheels can spin (drive motor at max speed)
      */
-    public final double maxFreeWheelSpeed = Constants.robotType == Constants.RobotType.DEVELOPMENT ?
-            SwerveModuleConstants.DEVBOT.maxDriveVelocityMetersPerSecond :
-            SwerveModuleConstants.COMPBOT.maxDriveVelocityMetersPerSecond; //the max speed the wheels can spin when the robot is not moving
+    public final double MAX_FREE_WHEEL_SPEED = Constants.robotType == Constants.RobotType.DEVELOPMENT ?
+            SwerveModuleConstants.DEVBOT.MAX_WHEEL_LINEAR_VELOCITY :
+            SwerveModuleConstants.COMPBOT.MAX_WHEEL_LINEAR_VELOCITY; //the max speed the wheels can spin when the robot is not moving
 
     /**
      * the target states of the modules (the states the modules should be in)
@@ -124,13 +124,17 @@ public class DriveBase extends SubsystemBase {
 
         SmartDashboard.putData("Gyro", gyro);
 
-        ReplanningConfig replanConfig = new ReplanningConfig(Constants.DriveTrain.PathPlanner.planPathToStartingPointIfNotAtIt, Constants.DriveTrain.PathPlanner.enableDynamicRePlanning, Constants.DriveTrain.PathPlanner.pathErrorTolerance, Constants.DriveTrain.PathPlanner.pathErrorSpikeTolerance);
+        ReplanningConfig replanConfig =
+                new ReplanningConfig(DriveBaseConstants.PathPlanner.PLAN_PATH_TO_STARTING_POINT,
+                        DriveBaseConstants.PathPlanner.DYNAMIC_RE_PLANNING,
+                        DriveBaseConstants.PathPlanner.PATH_ERROR_TOLERANCE,
+                        DriveBaseConstants.PathPlanner.PATH_ERROR_SPIKE_TOLERANCE);
         // ^how pathplanner reacts to position error
         HolonomicPathFollowerConfig pathFollowerConfig = new HolonomicPathFollowerConfig(
-                Constants.DriveTrain.PathPlanner.XYPID.createPIDConstants(),
-                Constants.DriveTrain.PathPlanner.thetaPID.createPIDConstants(),
-                maxFreeWheelSpeed,
-                Math.sqrt(Math.pow(SwerveModule.distanceBetweenWheels, 2) * 2) / 2,
+                DriveBaseConstants.PathPlanner.XY_PID.createPIDConstants(),
+                DriveBaseConstants.PathPlanner.THETA_PID.createPIDConstants(),
+                MAX_FREE_WHEEL_SPEED,
+                Math.sqrt(Math.pow(SwerveModule.DISTANCE_BETWEEN_WHEELS, 2) * 2) / 2,
                 replanConfig);
         //^creates path constraints for pathPlanner
 
@@ -157,7 +161,8 @@ public class DriveBase extends SubsystemBase {
         ).ignoringDisable(true));
 
         new Trigger(RobotState::isTeleop).and(RobotState::isEnabled).whileTrue(new StartEndCommand(() ->
-                this.setDefaultCommand(new DriveCommand(this, RobotContainer.driveController)), this::removeDefaultCommand).ignoringDisable(true));
+                this.setDefaultCommand(new DriveCommand(this, RobotContainer.driveController)),
+                this::removeDefaultCommand).ignoringDisable(true));
     }
 
 
@@ -280,9 +285,12 @@ public class DriveBase extends SubsystemBase {
      * @param Yspeed        the Y speed of the robot (left is positive) m/s
      * @param rotationSpeed the rotation of the robot (left is positive) rad/s
      */
-    public void drive(double Xspeed, double Yspeed, double rotationSpeed, Translation2d centerOfRotation) {
-        targetStates = driveTrainKinematics.toSwerveModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(Xspeed, Yspeed, rotationSpeed, getRotation2d()), centerOfRotation);
-        SwerveDriveKinematics.desaturateWheelSpeeds(targetStates, maxFreeWheelSpeed);
+    public void drive(double Xspeed, double Yspeed, double rotationSpeed) {
+        ChassisSpeeds fieldRelativeSpeeds =
+                ChassisSpeeds.fromFieldRelativeSpeeds(Xspeed, Yspeed, rotationSpeed, getRotation2d());
+
+        targetStates = driveTrainKinematics.toSwerveModuleStates(fieldRelativeSpeeds);
+        SwerveDriveKinematics.desaturateWheelSpeeds(targetStates, MAX_FREE_WHEEL_SPEED);
 
         for (int i = 0; i < 4; i++) {
             targetStates[i] = modules[i].run(targetStates[i]);
@@ -304,7 +312,7 @@ public class DriveBase extends SubsystemBase {
     public void robotRelativeDrive(double Xspeed, double Yspeed, double rotationSpeed) {
 
         targetStates = driveTrainKinematics.toSwerveModuleStates(new ChassisSpeeds(Xspeed, Yspeed, rotationSpeed));
-        SwerveDriveKinematics.desaturateWheelSpeeds(inputs.currentStates, maxFreeWheelSpeed);
+        SwerveDriveKinematics.desaturateWheelSpeeds(inputs.currentStates, MAX_FREE_WHEEL_SPEED);
 
         for (int i = 0; i < 4; i++) {
             targetStates[i] = modules[i].run(targetStates[i]);
@@ -323,7 +331,7 @@ public class DriveBase extends SubsystemBase {
      */
     public void drive(ChassisSpeeds chassisSpeeds) {
         targetStates = driveTrainKinematics.toSwerveModuleStates(chassisSpeeds);
-        SwerveDriveKinematics.desaturateWheelSpeeds(targetStates, maxFreeWheelSpeed);
+        SwerveDriveKinematics.desaturateWheelSpeeds(targetStates, MAX_FREE_WHEEL_SPEED);
 
         for (int i = 0; i < 4; i++) {
             targetStates[i] = modules[i].run(targetStates[i]);
@@ -335,8 +343,8 @@ public class DriveBase extends SubsystemBase {
         Logger.processInputs(getName(), inputs);
     }
 
-    public void runModuleDriveCalibration(){
-        for(int i = 0; i < 4; i++){
+    public void runModuleDriveCalibration() {
+        for (int i = 0; i < 4; i++) {
             modules[i].runDriveCalibration();
         }
 
@@ -348,8 +356,8 @@ public class DriveBase extends SubsystemBase {
         SmartDashboard.putNumber("drive kS", 0);
     }
 
-    public void stopModuleDriveCalibration(){
-        for(int i = 0; i < 4; i++){
+    public void stopModuleDriveCalibration() {
+        for (int i = 0; i < 4; i++) {
             modules[i].stopDriveCalibration();
         }
     }
@@ -363,7 +371,7 @@ public class DriveBase extends SubsystemBase {
      * @return a command that follows a path to the target pose
      */
     public Command findPath(Pose2d targetPose, double endVelocity, double rotationDelay) {
-        return AutoBuilder.pathfindToPose(targetPose, Constants.DriveTrain.PathPlanner.pathConstraints, endVelocity, rotationDelay);
+        return AutoBuilder.pathfindToPose(targetPose, DriveBaseConstants.PathPlanner.PATH_CONSTRAINTS, endVelocity, rotationDelay);
     }
 
     /**
@@ -374,7 +382,7 @@ public class DriveBase extends SubsystemBase {
      * @return a command that follows a path to the target pose
      */
     public Command findPath(Pose2d targetPose, double endVelocity) {
-        return AutoBuilder.pathfindToPose(targetPose, Constants.DriveTrain.PathPlanner.pathConstraints, endVelocity);
+        return AutoBuilder.pathfindToPose(targetPose, DriveBaseConstants.PathPlanner.PATH_CONSTRAINTS, endVelocity);
     }
 
     /**
@@ -384,7 +392,7 @@ public class DriveBase extends SubsystemBase {
      * @return a command that follows a path to the target pose
      */
     public Command findPath(Pose2d targetPose) {
-        return AutoBuilder.pathfindToPose(targetPose, Constants.DriveTrain.PathPlanner.pathConstraints);
+        return AutoBuilder.pathfindToPose(targetPose, DriveBaseConstants.PathPlanner.PATH_CONSTRAINTS);
     }
 
     /**
@@ -394,7 +402,7 @@ public class DriveBase extends SubsystemBase {
      * @return a command that path finds to a given path then follows that path
      */
     public Command pathFindToPathAndFollow(PathPlannerPath targetPath) {
-        return AutoBuilder.pathfindThenFollowPath(targetPath, Constants.DriveTrain.PathPlanner.pathConstraints);
+        return AutoBuilder.pathfindThenFollowPath(targetPath, DriveBaseConstants.PathPlanner.PATH_CONSTRAINTS);
     }
 
     /**
@@ -405,11 +413,16 @@ public class DriveBase extends SubsystemBase {
      * @return a command that path finds to a given path then follows that path
      */
     public Command pathFindToPathAndFollow(PathPlannerPath targetPath, double rotationDelay) {
-        return AutoBuilder.pathfindThenFollowPath(targetPath, Constants.DriveTrain.PathPlanner.pathConstraints, rotationDelay);
+        return AutoBuilder.pathfindThenFollowPath(targetPath, DriveBaseConstants.PathPlanner.PATH_CONSTRAINTS, rotationDelay);
     }
 
-    SwerveModulePosition[] previousPositions = new SwerveModulePosition[]{new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition()};
-    SwerveModulePosition[] positions = new SwerveModulePosition[]{new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition()};
+    SwerveModulePosition[] previousPositions =new SwerveModulePosition[]{
+            new SwerveModulePosition(), new SwerveModulePosition(),
+            new SwerveModulePosition(), new SwerveModulePosition()};
+
+    SwerveModulePosition[] positions = new SwerveModulePosition[]{
+            new SwerveModulePosition(), new SwerveModulePosition(),
+            new SwerveModulePosition(), new SwerveModulePosition()};
 
     @Override
     public void periodic() {

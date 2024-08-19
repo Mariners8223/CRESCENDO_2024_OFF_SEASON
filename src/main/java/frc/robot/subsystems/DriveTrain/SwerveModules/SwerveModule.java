@@ -25,13 +25,13 @@ public class SwerveModule {
         Back_Right
     }
 
-    public static final double moduleThreadHz = 50;
-    public static final double distanceBetweenWheels = 0.576; // the distance between each wheel in meters
-    public static final Translation2d[] moduleTranslations = new Translation2d[]{
-            new Translation2d(distanceBetweenWheels / 2, distanceBetweenWheels / 2),
-            new Translation2d(distanceBetweenWheels / 2, -distanceBetweenWheels / 2),
-            new Translation2d(-distanceBetweenWheels / 2, distanceBetweenWheels / 2),
-            new Translation2d(-distanceBetweenWheels / 2, -distanceBetweenWheels / 2)};
+    public static final double MODULE_THREAD_HZ = 50;
+    public static final double DISTANCE_BETWEEN_WHEELS = 0.576; // the distance between each wheel in meters
+    public static final Translation2d[] MODULE_TRANSLATIONS = new Translation2d[]{
+            new Translation2d(DISTANCE_BETWEEN_WHEELS / 2, DISTANCE_BETWEEN_WHEELS / 2),
+            new Translation2d(DISTANCE_BETWEEN_WHEELS / 2, -DISTANCE_BETWEEN_WHEELS / 2),
+            new Translation2d(-DISTANCE_BETWEEN_WHEELS / 2, DISTANCE_BETWEEN_WHEELS / 2),
+            new Translation2d(-DISTANCE_BETWEEN_WHEELS / 2, -DISTANCE_BETWEEN_WHEELS / 2)};
 
     private final String moduleName;
     private final SwerveModuleIO io;

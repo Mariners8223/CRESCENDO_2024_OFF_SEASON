@@ -48,57 +48,57 @@ public enum SwerveModuleConstants {
     /**
      * the gear ratio (not including circular movement to liner) between the drive motor and the wheel
      */
-    public final double driveGearRatio;
+    public final double DRIVE_GEAR_RATIO;
 
     /**
      * the gear ratio between the steer motor and the module itself
      */
-    public final double steerGearRatio;
+    public final double STEER_GEAR_RATIO;
 
     /**
      * the radius of the drive wheel in meters
      */
-    public final double wheelRadiusMeters;
+    public final double WHEEL_RADIUS_METERS;
 
     /**
      * the circumference of the wheel in meters
      */
-    public final double wheelCircumferenceMeters;
+    public final double WHEEL_CIRCUMFERENCE_METERS;
 
     /**
      * the max velocity of the module in meters per second
      */
-    public final double maxDriveVelocityMetersPerSecond;
+    public final double MAX_WHEEL_LINEAR_VELOCITY;
 
     /**
      * if the drive motor is inverted (meaning positive is counter-clockwise)
      */
-    public final boolean isDriveInverted;
+    public final boolean DRIVE_INVERTED;
 
     /**
      * if the steer motor is inverted (meaning positive is counter-clockwise)
      */
-    public final boolean isSteerInverted;
+    public final boolean STEER_INVERTED;
 
     /**
      * if the absolute encoder is inverted (meaning positive is counter-clockwise)
      */
-    public final boolean isAbsEncoderInverted;
+    public final boolean ABSOLUTE_ENCODER_INVERTED;
 
     /**
      * the offset between the zero of the magnet of the encoder and the zero of the module (in rotations)
      */
-    public final double[] abs_zeroOffsets = new double[4];
+    public final double[] ABSOLUTE_ZERO_OFFSETS = new double[4];
 
     /**
      * the PIDF gains for the drive motor
      */
-    public final PIDFGains[] driveMotorPID;
+    public final PIDFGains[] DRIVE_MOTOR_PID;
 
     /**
      * the PIDF gains for the steer motor
      */
-    public final PIDFGains[] steerMotorPID;
+    public final PIDFGains[] STEER_MOTOR_PID;
 
     SwerveModuleConstants(double driveGearRatio, double steerGearRatio, double wheelRadiusMeters,
                           double maxDriveVelocityMetersPerSecond, boolean isDriveInverted, boolean isSteerInverted,
@@ -106,21 +106,21 @@ public enum SwerveModuleConstants {
                           double back_left_zeroOffset, double back_right_zeroOffset, PIDFGains[] steerMotorPID,
                           PIDFGains[] driveMotorPID) {
 
-        this.driveGearRatio = driveGearRatio;
-        this.steerGearRatio = steerGearRatio;
-        this.wheelRadiusMeters = wheelRadiusMeters;
-        this.wheelCircumferenceMeters = 2 * Math.PI * wheelRadiusMeters;
-        this.maxDriveVelocityMetersPerSecond = maxDriveVelocityMetersPerSecond;
-        this.isDriveInverted = isDriveInverted;
-        this.isSteerInverted = isSteerInverted;
-        this.isAbsEncoderInverted = isAbsEncoderInverted;
+        this.DRIVE_GEAR_RATIO = driveGearRatio;
+        this.STEER_GEAR_RATIO = steerGearRatio;
+        this.WHEEL_RADIUS_METERS = wheelRadiusMeters;
+        this.WHEEL_CIRCUMFERENCE_METERS = 2 * Math.PI * wheelRadiusMeters;
+        this.MAX_WHEEL_LINEAR_VELOCITY = maxDriveVelocityMetersPerSecond;
+        this.DRIVE_INVERTED = isDriveInverted;
+        this.STEER_INVERTED = isSteerInverted;
+        this.ABSOLUTE_ENCODER_INVERTED = isAbsEncoderInverted;
 
-        this.abs_zeroOffsets[0] = front_left_zeroOffset;
-        this.abs_zeroOffsets[1] = front_right_zeroOffset;
-        this.abs_zeroOffsets[2] = back_left_zeroOffset;
-        this.abs_zeroOffsets[3] = back_right_zeroOffset;
+        this.ABSOLUTE_ZERO_OFFSETS[0] = front_left_zeroOffset;
+        this.ABSOLUTE_ZERO_OFFSETS[1] = front_right_zeroOffset;
+        this.ABSOLUTE_ZERO_OFFSETS[2] = back_left_zeroOffset;
+        this.ABSOLUTE_ZERO_OFFSETS[3] = back_right_zeroOffset;
 
-        this.driveMotorPID = driveMotorPID;
-        this.steerMotorPID = steerMotorPID;
+        this.DRIVE_MOTOR_PID = driveMotorPID;
+        this.STEER_MOTOR_PID = steerMotorPID;
     }
 }
