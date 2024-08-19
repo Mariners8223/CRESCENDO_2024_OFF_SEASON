@@ -15,7 +15,7 @@ public class DriveBaseConstants {
             public static final double PATH_ERROR_SPIKE_TOLERANCE = 1; //the max position spike before path planner replans the path in meters
 
             public static final PathConstraints PATH_CONSTRAINTS = new PathConstraints(
-                    Constants.robotType == RobotType.DEVELOPMENT ?
+                    Constants.ROBOT_TYPE == RobotType.DEVELOPMENT ?
                             SwerveModuleConstants.DEVBOT.MAX_WHEEL_LINEAR_VELOCITY :
                             SwerveModuleConstants.COMPBOT.MAX_WHEEL_LINEAR_VELOCITY,
                     10,

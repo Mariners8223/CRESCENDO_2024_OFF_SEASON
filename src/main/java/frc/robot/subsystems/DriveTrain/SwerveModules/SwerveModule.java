@@ -11,7 +11,7 @@ import frc.robot.Constants;
 import frc.util.PIDFGains;
 import org.littletonrobotics.junction.Logger;
 
-import static frc.robot.Constants.robotType;
+import static frc.robot.Constants.ROBOT_TYPE;
 
 public class SwerveModule {
 
@@ -45,13 +45,13 @@ public class SwerveModule {
         this.moduleName = name.toString();
 
         if (RobotBase.isReal()) {
-            io = switch (robotType) {
+            io = switch (ROBOT_TYPE) {
                 case DEVELOPMENT -> new SwerveModuleIODevBot(name);
                 case COMPETITION -> new SwerveModuleIOCompBot(name);
                 case REPLAY -> throw new IllegalArgumentException("Robot cannot be replay if it's real");
             };
         } else {
-            io = robotType == Constants.RobotType.REPLAY ? new SwerveModuleIOSIM.SwerveModuleIOReplay() : new SwerveModuleIOSIM();
+            io = ROBOT_TYPE == Constants.RobotType.REPLAY ? new SwerveModuleIOSIM.SwerveModuleIOReplay() : new SwerveModuleIOSIM();
 
         }
 
@@ -61,13 +61,11 @@ public class SwerveModule {
         io.updateInputs(inputs);
 
         if (!runningDriveCalibration) {
-            targetState = SwerveModuleState.optimize(targetState, inputs.currentState.angle);
+//            targetState = SwerveModuleState.optimize(targetState, inputs.currentState.angle);
             targetState.speedMetersPerSecond *= Math.cos(targetState.angle.getRadians() - inputs.currentState.angle.getRadians());
 
             io.setDriveMotorReference(targetState.speedMetersPerSecond);
             io.setSteerMotorReference(targetState.angle.getRotations());
-
-            io.run();
         } else {
 
             double driveKp = SmartDashboard.getNumber("drive kP", 0);
@@ -82,9 +80,10 @@ public class SwerveModule {
             io.setDriveMotorReference(driveReference);
 
             io.setSteerMotorReference(targetState.angle.getRotations());
-
-            io.run();
         }
+
+        io.run();
+
         Logger.processInputs("SwerveModule/" + moduleName, inputs);
 
         return new SwerveModulePosition(inputs.drivePositionMeters, inputs.currentState.angle);

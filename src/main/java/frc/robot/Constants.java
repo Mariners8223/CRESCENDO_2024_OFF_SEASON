@@ -9,24 +9,22 @@ import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModule;
 
 import java.util.Map;
 
-/** Add your docs here. */
+/**
+ * Add your docs here.
+ */
 public class Constants {
-    public enum RobotType{
+    public enum RobotType {
         COMPETITION,
         DEVELOPMENT,
         REPLAY
     }
 
-    public static final RobotType robotType = RobotType.DEVELOPMENT; //the type of robot the code is running on
+    public static final RobotType ROBOT_TYPE = RobotType.DEVELOPMENT; //the type of robot the code is running on
 
-
-    public static final class DriveTrain{
-        public static final Map<Integer, String> sparkMaxNames = Map.of(
-                MotorMap.DriveBase.MODULES[SwerveModule.ModuleName.Front_Left.ordinal()][1], "Front_Left",
-                MotorMap.DriveBase.MODULES[SwerveModule.ModuleName.Front_Right.ordinal()][1], "Front_Right",
-                MotorMap.DriveBase.MODULES[SwerveModule.ModuleName.Back_Left.ordinal()][1], "Back_Left",
-                MotorMap.DriveBase.MODULES[SwerveModule.ModuleName.Back_Right.ordinal()][1], "Back_Right"
-        );
-        
-    } 
+    public static final Map<Integer, String> SPARK_MAX_NAMES = Map.of(
+            MotorMap.DriveBase.MODULES[SwerveModule.ModuleName.Front_Left.ordinal()][1], "Front_Left",
+            MotorMap.DriveBase.MODULES[SwerveModule.ModuleName.Front_Right.ordinal()][1], "Front_Right",
+            MotorMap.DriveBase.MODULES[SwerveModule.ModuleName.Back_Left.ordinal()][1], "Back_Left",
+            MotorMap.DriveBase.MODULES[SwerveModule.ModuleName.Back_Right.ordinal()][1], "Back_Right"
+    );
 }

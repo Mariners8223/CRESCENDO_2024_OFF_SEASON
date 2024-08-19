@@ -7,7 +7,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.*;
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkBase.ControlType;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -55,14 +54,18 @@ public class SwerveModuleIODevBot extends SwerveModuleIO {
         inputs.drivePositionMeters =
                 (driveMotor.getPosition().getValueAsDouble() / constants.DRIVE_GEAR_RATIO) * constants.WHEEL_CIRCUMFERENCE_METERS;
 
+        inputs.driveMotorAppliedOutput = driveMotor.getDutyCycle().getValueAsDouble();
+        inputs.steerMotorAppliedOutput = steerMotor.getAppliedOutput();
+
         inputs.driveMotorAppliedVoltage = driveMotor.getMotorVoltage().getValueAsDouble();
-        inputs.steerMotorAppliedVoltage = steerMotor.getAppliedOutput() * steerMotor.getBusVoltage();
+        inputs.steerMotorAppliedVoltage = inputs.steerMotorAppliedOutput * steerMotor.getBusVoltage();
+
     }
 
     @Override
-    protected void sendInputsToMotors(double driveMotorRefrence, double steerMotorRefrence) {
-        double driveMotorOut = (driveMotorRefrence / constants.wheelCircumferenceMeters) * constants.driveGearRatio;
-        double steerMotorOut = steerMotorRefrence * constants.steerGearRatio;
+    protected void sendInputsToMotors(double driveMotorReference, double steerMotorReference) {
+        double driveMotorOut = (driveMotorReference / constants.WHEEL_CIRCUMFERENCE_METERS) * constants.DRIVE_GEAR_RATIO;
+        double steerMotorOut = steerMotorReference * constants.STEER_GEAR_RATIO;
 
         driveMotor.setControl(velocityInput.withVelocity(driveMotorOut));
         steerMotor.getPIDController().setReference(steerMotorOut, ControlType.kPosition);
@@ -89,15 +92,4 @@ public class SwerveModuleIODevBot extends SwerveModuleIO {
 
         driveMotor.getConfigurator().apply(config);
     }
-
-    @Override
-    void setSteerMotorPID(PIDFGains pidGains) {
-        SparkPIDController pidController = steerMotor.getPIDController();
-
-        pidController.setP(pidGains.getP());
-        pidController.setI(pidGains.getI());
-        pidController.setD(pidGains.getD());
-        pidController.setFF(pidGains.getF());
-    }
-
 }

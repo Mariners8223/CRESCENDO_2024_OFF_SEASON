@@ -6,24 +6,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.robot.subsystems.DriveTrain.DriveBase;
 
-import static frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModule.distanceBetweenWheels;
-
+import static frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModule.DISTANCE_BETWEEN_WHEELS;
 
 public class DriveCommand extends Command {
 
     private final DriveBase driveBase;
     private final CommandPS5Controller controller;
-
-    private static final Translation2d[] possibleCenterOfRotations = {
-            new Translation2d(distanceBetweenWheels / 2, 0),
-            new Translation2d(distanceBetweenWheels / 2, -distanceBetweenWheels / 2),
-            new Translation2d(0, -distanceBetweenWheels / 2),
-            new Translation2d(-distanceBetweenWheels / 2, -distanceBetweenWheels / 2),
-            new Translation2d(-distanceBetweenWheels / 2, 0),
-            new Translation2d(-distanceBetweenWheels, distanceBetweenWheels / 2),
-            new Translation2d(0, distanceBetweenWheels / 2),
-            new Translation2d(distanceBetweenWheels / 2, distanceBetweenWheels / 2)
-    };
 
     public DriveCommand(DriveBase driveBase, CommandPS5Controller controller) {
         this.driveBase = driveBase;
@@ -124,6 +112,17 @@ public class DriveCommand extends Command {
         return findCenterOfRotation(currentAngleRobotRelative);
     }
 
+    private static final Translation2d[] POSSIBLE_CENTER_OF_ROTATIONS = {
+            new Translation2d(DISTANCE_BETWEEN_WHEELS / 2, 0),
+            new Translation2d(DISTANCE_BETWEEN_WHEELS / 2, -DISTANCE_BETWEEN_WHEELS / 2),
+            new Translation2d(0, -DISTANCE_BETWEEN_WHEELS / 2),
+            new Translation2d(-DISTANCE_BETWEEN_WHEELS / 2, -DISTANCE_BETWEEN_WHEELS / 2),
+            new Translation2d(-DISTANCE_BETWEEN_WHEELS / 2, 0),
+            new Translation2d(-DISTANCE_BETWEEN_WHEELS, DISTANCE_BETWEEN_WHEELS / 2),
+            new Translation2d(0, DISTANCE_BETWEEN_WHEELS / 2),
+            new Translation2d(DISTANCE_BETWEEN_WHEELS / 2, DISTANCE_BETWEEN_WHEELS / 2)
+    };
+
     /**
      * selects the center of rotation based on the angle
      *
@@ -134,7 +133,7 @@ public class DriveCommand extends Command {
         if (angle == -1) {
             return new Translation2d();
         } else {
-            return possibleCenterOfRotations[(angle / 45) % 8];
+            return POSSIBLE_CENTER_OF_ROTATIONS[(angle / 45) % 8];
         }
     }
 

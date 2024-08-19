@@ -6,7 +6,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.*;
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
@@ -65,8 +64,8 @@ public class SwerveModuleIOCompBot extends SwerveModuleIO {
 
     @Override
     protected void sendInputsToMotors(double driveMotorReference, double steerMotorReference) {
-        double driveMotorOut = (driveMotorReference / constants.wheelCircumferenceMeters) * constants.driveGearRatio;
-        double steerMotorOut = steerMotorReference * constants.steerGearRatio;
+        double driveMotorOut = (driveMotorReference / constants.WHEEL_CIRCUMFERENCE_METERS) * constants.DRIVE_GEAR_RATIO;
+        double steerMotorOut = steerMotorReference * constants.STEER_GEAR_RATIO;
 
         driveMotor.setControl(driveMotorVelocityDutyCycle.withVelocity(driveMotorOut));
         steerMotor.getPIDController().setReference(steerMotorOut, CANSparkBase.ControlType.kPosition);
@@ -93,16 +92,6 @@ public class SwerveModuleIOCompBot extends SwerveModuleIO {
         config.kV = pidGains.getF();
 
         driveMotor.getConfigurator().apply(config);
-    }
-
-    @Override
-    void setSteerMotorPID(PIDFGains pidGains) {
-        SparkPIDController pidController = steerMotor.getPIDController();
-
-        pidController.setP(pidGains.getP());
-        pidController.setI(pidGains.getI());
-        pidController.setD(pidGains.getD());
-        pidController.setFF(pidGains.getF());
     }
 
 }

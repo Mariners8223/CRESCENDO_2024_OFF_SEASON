@@ -32,7 +32,7 @@ public class Robot extends LoggedRobot
     public void robotInit() {
         new RobotContainer();
 
-        Logger.recordMetadata("Robot Type", Constants.robotType.name());
+        Logger.recordMetadata("Robot Type", Constants.ROBOT_TYPE.name());
 
         Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
         Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
@@ -43,6 +43,7 @@ public class Robot extends LoggedRobot
             case 0:
                 Logger.recordMetadata("GitDirty", "All changes committed");
                 break;
+            //noinspection DataFlowIssue
             case 1:
                 Logger.recordMetadata("GitDirty", "Uncommitted changes");
                 break;
@@ -50,7 +51,7 @@ public class Robot extends LoggedRobot
                 Logger.recordMetadata("GitDirty", "Unknown");
                 break;
         }
-        Logger.registerURCL(URCL.startExternal(Constants.DriveTrain.sparkMaxNames));
+        Logger.registerURCL(URCL.startExternal(Constants.SPARK_MAX_NAMES));
 
         if(isReal()){
             Logger.addDataReceiver(new WPILOGWriter("/U/logs/AdvantageKit"));
@@ -62,7 +63,7 @@ public class Robot extends LoggedRobot
             SignalLogger.start();
         }
         else{
-            if(Constants.robotType == Constants.RobotType.REPLAY){
+            if(Constants.ROBOT_TYPE == Constants.RobotType.REPLAY){
                 String logPath = LogFileUtil.findReplayLog();
 
                 Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));

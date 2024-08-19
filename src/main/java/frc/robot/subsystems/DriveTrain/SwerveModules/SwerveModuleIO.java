@@ -14,7 +14,7 @@ import frc.robot.Constants;
 import frc.util.PIDFGains;
 import org.littletonrobotics.junction.AutoLog;
 
-import static frc.robot.Constants.robotType;
+import static frc.robot.Constants.ROBOT_TYPE;
 
 public abstract class SwerveModuleIO implements Runnable {
     @AutoLog
@@ -40,7 +40,7 @@ public abstract class SwerveModuleIO implements Runnable {
      * the constants of the module (depends on if it's a devbot or a compbot)
      */
     protected final SwerveModuleConstants constants =
-            robotType == Constants.RobotType.DEVELOPMENT ? SwerveModuleConstants.DEVBOT : SwerveModuleConstants.COMPBOT;
+            ROBOT_TYPE == Constants.RobotType.DEVELOPMENT ? SwerveModuleConstants.DEVBOT : SwerveModuleConstants.COMPBOT;
 
     private double driveMotorReference = 0;
     private double steerMotorReference = 0;
@@ -91,8 +91,6 @@ public abstract class SwerveModuleIO implements Runnable {
     abstract void resetDriveEncoder();
 
     abstract void setDriveMotorPID(PIDFGains pidGains);
-
-    abstract void setSteerMotorPID(PIDFGains pidGains);
 
     /**
      * configures the absolute encoder (duty cycle encoder)
@@ -186,10 +184,10 @@ public abstract class SwerveModuleIO implements Runnable {
 
         config.MotorOutput.NeutralMode = NeutralModeValue.Coast; //sets it to coast (changed when the robot is enabled)
 
-        config.Slot0.kP = constants.driveMotorPID[name.ordinal()].getP(); //sets the P
-        config.Slot0.kI = constants.driveMotorPID[name.ordinal()].getI(); //sets the I
-        config.Slot0.kD = constants.driveMotorPID[name.ordinal()].getD(); //sets the D
-        config.Slot0.kV = constants.driveMotorPID[name.ordinal()].getF(); //sets the feedForward
+        config.Slot0.kP = constants.DRIVE_MOTOR_PID[name.ordinal()].getP(); //sets the P
+        config.Slot0.kI = constants.DRIVE_MOTOR_PID[name.ordinal()].getI(); //sets the I
+        config.Slot0.kD = constants.DRIVE_MOTOR_PID[name.ordinal()].getD(); //sets the D
+        config.Slot0.kV = constants.DRIVE_MOTOR_PID[name.ordinal()].getF(); //sets the feedForward
 
         config.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = 0.25;
 
@@ -222,13 +220,13 @@ public abstract class SwerveModuleIO implements Runnable {
         sparkMax.getPIDController().setIZone(constants.STEER_MOTOR_PID[name.ordinal()].getIZone()); //sets the IZone for the PID Controller
 
         sparkMax.getPIDController().setPositionPIDWrappingEnabled(true);
-        sparkMax.getPIDController().setPositionPIDWrappingMaxInput(0.25 * constants.steerGearRatio);
-        sparkMax.getPIDController().setPositionPIDWrappingMinInput(-0.25 * constants.steerGearRatio);
+        sparkMax.getPIDController().setPositionPIDWrappingMaxInput(0.25 * constants.STEER_GEAR_RATIO);
+        sparkMax.getPIDController().setPositionPIDWrappingMinInput(-0.25 * constants.STEER_GEAR_RATIO);
 
 
-        sparkMax.setPeriodicFramePeriod(CANSparkMax.PeriodicFrame.kStatus2, (int) (1000 / SwerveModule.moduleThreadHz)); //sets the status 0 frame to 10ms
-        sparkMax.setPeriodicFramePeriod(CANSparkMax.PeriodicFrame.kStatus1, (int) (1000 / SwerveModule.moduleThreadHz)); //sets the status 0 frame to 10ms
-        sparkMax.setPeriodicFramePeriod(CANSparkMax.PeriodicFrame.kStatus0, (int) (1000 / SwerveModule.moduleThreadHz));
+        sparkMax.setPeriodicFramePeriod(CANSparkMax.PeriodicFrame.kStatus2, (int) (1000 / SwerveModule.MODULE_THREAD_HZ)); //sets the status 0 frame to 10ms
+        sparkMax.setPeriodicFramePeriod(CANSparkMax.PeriodicFrame.kStatus1, (int) (1000 / SwerveModule.MODULE_THREAD_HZ)); //sets the status 0 frame to 10ms
+        sparkMax.setPeriodicFramePeriod(CANSparkMax.PeriodicFrame.kStatus0, (int) (1000 / SwerveModule.MODULE_THREAD_HZ));
 
         sparkMax.getEncoder().setPositionConversionFactor(1); //sets the gear ratio for the module
         sparkMax.getEncoder().setVelocityConversionFactor(1); //sets the velocity to rad per sec of the module

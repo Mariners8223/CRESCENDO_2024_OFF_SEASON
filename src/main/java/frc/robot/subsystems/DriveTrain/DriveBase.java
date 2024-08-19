@@ -76,7 +76,7 @@ public class DriveBase extends SubsystemBase {
     /**
      * the max speed the wheels can spin (drive motor at max speed)
      */
-    public final double MAX_FREE_WHEEL_SPEED = Constants.robotType == Constants.RobotType.DEVELOPMENT ?
+    public final double MAX_FREE_WHEEL_SPEED = Constants.ROBOT_TYPE == Constants.RobotType.DEVELOPMENT ?
             SwerveModuleConstants.DEVBOT.MAX_WHEEL_LINEAR_VELOCITY :
             SwerveModuleConstants.COMPBOT.MAX_WHEEL_LINEAR_VELOCITY; //the max speed the wheels can spin when the robot is not moving
 
@@ -116,7 +116,7 @@ public class DriveBase extends SubsystemBase {
         modules[3] = new SwerveModule(SwerveModule.ModuleName.Back_Right);
 
         if (RobotBase.isReal()) {
-            gyro = new NavxIO(Constants.robotType == RobotType.DEVELOPMENT);
+            gyro = new NavxIO(Constants.ROBOT_TYPE == RobotType.DEVELOPMENT);
             gyro.reset(new Pose2d());
         } else gyro = new SimGyroIO(() -> driveTrainKinematics.toTwist2d(moduleDeltas), this::getChassisSpeeds);
 
@@ -285,11 +285,11 @@ public class DriveBase extends SubsystemBase {
      * @param Yspeed        the Y speed of the robot (left is positive) m/s
      * @param rotationSpeed the rotation of the robot (left is positive) rad/s
      */
-    public void drive(double Xspeed, double Yspeed, double rotationSpeed) {
+    public void drive(double Xspeed, double Yspeed, double rotationSpeed, Translation2d centerOfRotation) {
         ChassisSpeeds fieldRelativeSpeeds =
                 ChassisSpeeds.fromFieldRelativeSpeeds(Xspeed, Yspeed, rotationSpeed, getRotation2d());
 
-        targetStates = driveTrainKinematics.toSwerveModuleStates(fieldRelativeSpeeds);
+        targetStates = driveTrainKinematics.toSwerveModuleStates(fieldRelativeSpeeds, centerOfRotation);
         SwerveDriveKinematics.desaturateWheelSpeeds(targetStates, MAX_FREE_WHEEL_SPEED);
 
         for (int i = 0; i < 4; i++) {
