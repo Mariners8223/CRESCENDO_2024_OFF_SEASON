@@ -7,6 +7,7 @@ package frc.robot.subsystems.DriveTrain;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.commands.Drive.DriveCommand;
 import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModule;
 import frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModuleConstants;
@@ -169,18 +170,20 @@ public class DriveBase extends SubsystemBase {
     /**
      * resets the robot to 0, 0 and a rotation of 0 (towards red alliance)
      */
-    public void resetOnlyDirection() {
-        if (DriverStation.getAlliance().isPresent()) if (DriverStation.getAlliance().get() == Alliance.Blue)
-            currentPose = new Pose2d(currentPose.getX(), currentPose.getY(), new Rotation2d());
-        else currentPose = new Pose2d(currentPose.getX(), currentPose.getY(), new Rotation2d(-Math.PI));
-        else currentPose = new Pose2d(currentPose.getX(), currentPose.getY(), new Rotation2d());
+    public Command resetOnlyDirection() {
+        return new InstantCommand(() -> {
+            if (DriverStation.getAlliance().isPresent()) if (DriverStation.getAlliance().get() == Alliance.Blue)
+                currentPose = new Pose2d(currentPose.getX(), currentPose.getY(), new Rotation2d());
+            else currentPose = new Pose2d(currentPose.getX(), currentPose.getY(), new Rotation2d(-Math.PI));
+            else currentPose = new Pose2d(currentPose.getX(), currentPose.getY(), new Rotation2d());
 
-        SwerveModulePosition[] positions = new SwerveModulePosition[4];
-        for (int i = 0; i < 4; i++) positions[i] = modules[i].modulePeriodic();
+            SwerveModulePosition[] positions = new SwerveModulePosition[4];
+            for (int i = 0; i < 4; i++) positions[i] = modules[i].modulePeriodic();
 
-        poseEstimator.resetPosition(new Rotation2d(), positions, currentPose);
+            poseEstimator.resetPosition(new Rotation2d(), positions, currentPose);
 
-        gyro.reset(currentPose);
+            gyro.reset(currentPose);
+        }).withName("Reset Only Direction").ignoringDisable(true);
     }
 
     public void setModulesBrakeMode(boolean isBrake) {
@@ -343,23 +346,27 @@ public class DriveBase extends SubsystemBase {
         Logger.processInputs(getName(), inputs);
     }
 
-    public void runModuleDriveCalibration() {
-        for (int i = 0; i < 4; i++) {
-            modules[i].runDriveCalibration();
-        }
+    public Command runModuleDriveCalibration() {
+        return new InstantCommand(() -> {
+            for (int i = 0; i < 4; i++) {
+                modules[i].runDriveCalibration();
+            }
 
-        SmartDashboard.putNumber("drive P", 0);
-        SmartDashboard.putNumber("drive I", 0);
-        SmartDashboard.putNumber("drive D", 0);
-        SmartDashboard.putNumber("drive setPoint", 0);
+            SmartDashboard.putNumber("drive P", 0);
+            SmartDashboard.putNumber("drive I", 0);
+            SmartDashboard.putNumber("drive D", 0);
+            SmartDashboard.putNumber("drive setPoint", 0);
 
-        SmartDashboard.putNumber("drive kS", 0);
+            SmartDashboard.putNumber("drive kS", 0);
+        }).withName("Run Module Drive Calibration").ignoringDisable(true);
     }
 
-    public void stopModuleDriveCalibration() {
-        for (int i = 0; i < 4; i++) {
-            modules[i].stopDriveCalibration();
-        }
+    public Command stopModuleDriveCalibration() {
+        return new InstantCommand(() -> {
+            for (int i = 0; i < 4; i++) {
+                modules[i].stopDriveCalibration();
+            }
+        }).withName("Stop Module Drive Calibration").ignoringDisable(true);
     }
 
     /**
@@ -416,7 +423,7 @@ public class DriveBase extends SubsystemBase {
         return AutoBuilder.pathfindThenFollowPath(targetPath, DriveBaseConstants.PathPlanner.PATH_CONSTRAINTS, rotationDelay);
     }
 
-    SwerveModulePosition[] previousPositions =new SwerveModulePosition[]{
+    SwerveModulePosition[] previousPositions = new SwerveModulePosition[]{
             new SwerveModulePosition(), new SwerveModulePosition(),
             new SwerveModulePosition(), new SwerveModulePosition()};
 
