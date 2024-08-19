@@ -11,9 +11,10 @@ import com.revrobotics.CANSparkMax;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import frc.robot.Constants;
+import frc.util.PIDFGains;
 import org.littletonrobotics.junction.AutoLog;
 
-import static frc.robot.Constants.robotType;
+import static frc.robot.Constants.ROBOT_TYPE;
 
 public abstract class SwerveModuleIO implements Runnable {
     @AutoLog
@@ -27,6 +28,8 @@ public abstract class SwerveModuleIO implements Runnable {
 
         public double steerMotorAppliedVoltage = 0.0;
         public double driveMotorAppliedVoltage = 0.0;
+        public double steerMotorAppliedOutput = 0.0;
+        public double driveMotorAppliedOutput = 0.0;
 
         public double absEncoderPosition = 0.0;
 
@@ -37,10 +40,10 @@ public abstract class SwerveModuleIO implements Runnable {
      * the constants of the module (depends on if it's a devbot or a compbot)
      */
     protected final SwerveModuleConstants constants =
-            robotType == Constants.RobotType.DEVELOPMENT ? SwerveModuleConstants.DEVBOT : SwerveModuleConstants.COMPBOT;
+            ROBOT_TYPE == Constants.RobotType.DEVELOPMENT ? SwerveModuleConstants.DEVBOT : SwerveModuleConstants.COMPBOT;
 
-    private double driveMotorVoltageInput = 0;
-    private double steerMotorVoltageInput = 0;
+    private double driveMotorReference = 0;
+    private double steerMotorReference = 0;
 
     /**
      * Updates the inputs of the module
@@ -48,32 +51,32 @@ public abstract class SwerveModuleIO implements Runnable {
     abstract void updateInputs(SwerveModuleIOInputsAutoLogged inputs);
 
     /**
-     * sets the voltage input for the drive motor
+     * sets the reference for the drive motor
      *
-     * @param voltage the voltage to set the drive motor to
+     * @param reference the target for the built-in PID controller
      */
-    public void setDriveMotorVoltage(double voltage) {
-        this.driveMotorVoltageInput = voltage;
+    public void setDriveMotorReference(double reference){
+        this.driveMotorReference = reference;
     }
 
     /**
-     * sets the voltage input for the steer motor
+     * sets the reference for the steer motor
      *
-     * @param voltage the voltage to set the steer motor to
+     * @param reference the target for the built-in PID controller
      */
-    public void setSteerMotorVoltage(double voltage) {
-        this.steerMotorVoltageInput = voltage;
+    public void setSteerMotorReference(double reference){
+        this.steerMotorReference = reference;
     }
 
     /**
-     * sends the inputs set by {@link #setDriveMotorVoltage driveMotor} and {@link #setSteerMotorVoltage steerMotor} to the motors
+     * sends the inputs set by {@link #setDriveMotorReference driveMotor} and {@link #setSteerMotorReference steerMotor} to the motors
      */
     @Override
     public void run() {
-        sendInputsToMotors(driveMotorVoltageInput, steerMotorVoltageInput);
+        sendInputsToMotors(driveMotorReference, steerMotorReference);
     }
 
-    abstract protected void sendInputsToMotors(double driveMotorVoltage, double steerMotorVoltage);
+    abstract protected void sendInputsToMotors(double driveMotorReference, double steerMotorReference);
 
     /**
      * sets the idle mode of the module
@@ -86,6 +89,8 @@ public abstract class SwerveModuleIO implements Runnable {
      * resets the drive encoder
      */
     abstract void resetDriveEncoder();
+
+    abstract void setDriveMotorPID(PIDFGains pidGains);
 
     /**
      * configures the absolute encoder (duty cycle encoder)
@@ -182,7 +187,9 @@ public abstract class SwerveModuleIO implements Runnable {
         config.Slot0.kP = constants.DRIVE_MOTOR_PID[name.ordinal()].getP(); //sets the P
         config.Slot0.kI = constants.DRIVE_MOTOR_PID[name.ordinal()].getI(); //sets the I
         config.Slot0.kD = constants.DRIVE_MOTOR_PID[name.ordinal()].getD(); //sets the D
-        config.Slot0.kS = constants.DRIVE_MOTOR_PID[name.ordinal()].getF(); //sets the feedForward
+        config.Slot0.kV = constants.DRIVE_MOTOR_PID[name.ordinal()].getF(); //sets the feedForward
+
+        config.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = 0.25;
 
         config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor; //just in case sets the built-in sensor
         config.Feedback.SensorToMechanismRatio = 1; //changes the units to m/s
@@ -211,6 +218,11 @@ public abstract class SwerveModuleIO implements Runnable {
         sparkMax.getPIDController().setI(constants.STEER_MOTOR_PID[name.ordinal()].getI()); //sets the I for the PID Controller
         sparkMax.getPIDController().setD(constants.STEER_MOTOR_PID[name.ordinal()].getD()); //sets the D for the PID Controller
         sparkMax.getPIDController().setIZone(constants.STEER_MOTOR_PID[name.ordinal()].getIZone()); //sets the IZone for the PID Controller
+
+        sparkMax.getPIDController().setPositionPIDWrappingEnabled(true);
+        sparkMax.getPIDController().setPositionPIDWrappingMaxInput(0.25 * constants.STEER_GEAR_RATIO);
+        sparkMax.getPIDController().setPositionPIDWrappingMinInput(-0.25 * constants.STEER_GEAR_RATIO);
+
 
         sparkMax.setPeriodicFramePeriod(CANSparkMax.PeriodicFrame.kStatus2, (int) (1000 / SwerveModule.MODULE_THREAD_HZ)); //sets the status 0 frame to 10ms
         sparkMax.setPeriodicFramePeriod(CANSparkMax.PeriodicFrame.kStatus1, (int) (1000 / SwerveModule.MODULE_THREAD_HZ)); //sets the status 0 frame to 10ms

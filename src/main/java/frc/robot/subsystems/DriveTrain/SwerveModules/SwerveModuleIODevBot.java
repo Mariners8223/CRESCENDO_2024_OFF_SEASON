@@ -1,19 +1,26 @@
 package frc.robot.subsystems.DriveTrain.SwerveModules;
 
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.*;
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkBase.ControlType;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.MotorMap;
+import frc.util.PIDFGains;
 
 public class SwerveModuleIODevBot extends SwerveModuleIO {
 
     private final TalonFX driveMotor;
     private final CANSparkMax steerMotor;
     private final CANcoder absEncoder;
+
+    private final VelocityDutyCycle velocityInput = new VelocityDutyCycle(0).withEnableFOC(false);
 
     public SwerveModuleIODevBot(SwerveModule.ModuleName name) {
         int driveMotorID = MotorMap.DriveBase.MODULES[name.ordinal()][0];
@@ -47,14 +54,21 @@ public class SwerveModuleIODevBot extends SwerveModuleIO {
         inputs.drivePositionMeters =
                 (driveMotor.getPosition().getValueAsDouble() / constants.DRIVE_GEAR_RATIO) * constants.WHEEL_CIRCUMFERENCE_METERS;
 
+        inputs.driveMotorAppliedOutput = driveMotor.getDutyCycle().getValueAsDouble();
+        inputs.steerMotorAppliedOutput = steerMotor.getAppliedOutput();
+
         inputs.driveMotorAppliedVoltage = driveMotor.getMotorVoltage().getValueAsDouble();
-        inputs.steerMotorAppliedVoltage = steerMotor.getAppliedOutput() * steerMotor.getBusVoltage();
+        inputs.steerMotorAppliedVoltage = inputs.steerMotorAppliedOutput * steerMotor.getBusVoltage();
+
     }
 
     @Override
-    protected void sendInputsToMotors(double driveMotorVoltageInput, double steerMotorVoltageInput) {
-        driveMotor.setVoltage(driveMotorVoltageInput);
-        steerMotor.setVoltage(steerMotorVoltageInput);
+    protected void sendInputsToMotors(double driveMotorReference, double steerMotorReference) {
+        double driveMotorOut = (driveMotorReference / constants.WHEEL_CIRCUMFERENCE_METERS) * constants.DRIVE_GEAR_RATIO;
+        double steerMotorOut = steerMotorReference * constants.STEER_GEAR_RATIO;
+
+        driveMotor.setControl(velocityInput.withVelocity(driveMotorOut));
+        steerMotor.getPIDController().setReference(steerMotorOut, ControlType.kPosition);
     }
 
     @Override
@@ -68,5 +82,14 @@ public class SwerveModuleIODevBot extends SwerveModuleIO {
         driveMotor.setPosition(0);
     }
 
+    void setDriveMotorPID(PIDFGains pidGains) {
+        Slot0Configs config = new Slot0Configs();
 
+        config.kP = pidGains.getP();
+        config.kI = pidGains.getI();
+        config.kD = pidGains.getD();
+        config.kV = pidGains.getF();
+
+        driveMotor.getConfigurator().apply(config);
+    }
 }
