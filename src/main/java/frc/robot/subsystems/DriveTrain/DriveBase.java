@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.DriveTrain;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.wpilibj.*;
 import frc.robot.commands.Drive.DriveCommand;
@@ -279,8 +280,8 @@ public class DriveBase extends SubsystemBase {
      * @param Yspeed        the Y speed of the robot (left is positive) m/s
      * @param rotationSpeed the rotation of the robot (left is positive) rad/s
      */
-    public void drive(double Xspeed, double Yspeed, double rotationSpeed) {
-        targetStates = driveTrainKinematics.toSwerveModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(Xspeed, Yspeed, rotationSpeed, getRotation2d()));
+    public void drive(double Xspeed, double Yspeed, double rotationSpeed, Translation2d centerOfRotation) {
+        targetStates = driveTrainKinematics.toSwerveModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(Xspeed, Yspeed, rotationSpeed, getRotation2d()), centerOfRotation);
         SwerveDriveKinematics.desaturateWheelSpeeds(targetStates, maxFreeWheelSpeed);
 
         for (int i = 0; i < 4; i++) {
