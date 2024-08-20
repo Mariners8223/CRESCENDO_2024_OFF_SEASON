@@ -40,9 +40,9 @@ public class DriveCommand extends Command {
         Translation2d centerOfRotation = calculateCenterOfRotation((int) povAngle);
 
         //sets the value of the 3 vectors we need (accounting for drift)
-        double leftX = -deadBand(controller.getLeftX());
-        double leftY = -deadBand(controller.getLeftY());
-        double rightX = deadBand(controller.getRightX());
+        double leftX = -deadBand(controller.getLeftY());
+        double leftY = -deadBand(controller.getLeftX());
+        double rightX = -deadBand(controller.getRightX());
 
         //drives the robot with the values
         driveBase.drive(
@@ -148,7 +148,7 @@ public class DriveCommand extends Command {
      */
     private int convertPOVToRobotRelative(double angle) {
         double theta = MathUtil.inputModulus(driveBase.getAngle(), 0, 360);
-        double alpha = 360 - angle;
+        double alpha = angle;
         double beta = alpha + theta;
 
         beta = Math.round(beta / 45) * 45;
