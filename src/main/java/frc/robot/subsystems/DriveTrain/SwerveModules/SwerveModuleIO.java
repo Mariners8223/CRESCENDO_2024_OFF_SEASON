@@ -183,6 +183,7 @@ public abstract class SwerveModuleIO implements Runnable {
         config.CurrentLimits.SupplyTimeThreshold = 0.1;
 
         config.MotorOutput.NeutralMode = NeutralModeValue.Coast; //sets it to coast (changed when the robot is enabled)
+        config.MotorOutput.DutyCycleNeutralDeadband = 0.05;
 
         config.Slot0.kP = constants.DRIVE_MOTOR_PID[name.ordinal()].getP(); //sets the P
         config.Slot0.kI = constants.DRIVE_MOTOR_PID[name.ordinal()].getI(); //sets the I
