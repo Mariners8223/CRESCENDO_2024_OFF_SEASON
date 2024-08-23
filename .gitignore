@@ -335,3 +335,5 @@ bin/
 src/main/java/frc/robot/BuildConstants.java
 
 ctre_sim/
+
+obsidian_vault/.obsidian/workspace.json
