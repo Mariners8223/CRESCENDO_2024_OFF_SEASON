@@ -11,17 +11,19 @@ public interface ShooterIntakeIO {
 
     @AutoLog
     public class ShooterIntakeInputs{
-        double shit;
-        double moreShit;
+        double RPMShooterMotorOnPivot;
+        double RPMShooterMotorOffPivot;
+        double PickupMotorRPM;
+        boolean BeamBreaker;
+        boolean Fix;
     }
-//SPL = spineless SP = spinefull
 //RPM = rotations per min
-    public void setMotorSpeedShooterSPRPM(double speedRPM);
-    public void setMotorSpeedShooterSPLRPM(double speedRPM);
-    public void setMotorSpeedPickupRPM(double speedRPM);
-   
+    public void setShooterMotorOnPivotRPM(double speedRPM);
+    public void setShooterMotorOffPivotRPM(double speedRPM);
+    public void setPickupMotorRPM(double speedRPM);
 
 
     public void update(ShooterIntakeInputsAutoLogged inputs);
-    
+
+   
 }
