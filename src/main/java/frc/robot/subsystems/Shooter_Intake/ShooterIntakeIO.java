@@ -14,8 +14,7 @@ public interface ShooterIntakeIO {
         double RPMShooterMotorOnPivot;
         double RPMShooterMotorOffPivot;
         double PickupMotorRPM;
-        boolean BeamBreaker;
-        boolean Fix;
+        boolean BeamBreakValue;
     }
 //RPM = rotations per min
     public void setShooterMotorOnPivotRPM(double speedRPM);
