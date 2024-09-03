@@ -13,16 +13,20 @@ public interface ShooterIntakeIO {
     public class ShooterIntakeInputs{
         double RPMShooterMotorOnPivot;
         double RPMShooterMotorOffPivot;
-        double PickupMotorRPM;
+        double IntakeMotorRPM;
+        double intakePosition;
         boolean BeamBreakValue;
     }
 //RPM = rotations per min
-    public void setShooterMotorOnPivotRPM(double speedRPM);
-    public void setShooterMotorOffPivotRPM(double speedRPM);
-    public void setPickupMotorRPM(double speedRPM);
-
+    public void setTargetShooterMotorOnPivotRPM(double speedRPM);
+    public void setTargetShooterMotorOffPivotRPM(double speedRPM);
+    public void setTargetIntakeMotorRPM(double speedRPM);
+    public void StopMotorOnPivot();
+    public void StopMotorOffPivot();
+    public void stopIntakeMotor();
+    public void setIntakeTargetPosition(double rotation);
 
     public void update(ShooterIntakeInputsAutoLogged inputs);
 
-   
+
 }
