@@ -25,6 +25,7 @@ public interface ShooterIntakeIO {
     public void StopMotorOffPivot();
     public void stopIntakeMotor();
     public void setIntakeTargetPosition(double rotation);
+    
 
     public void update(ShooterIntakeInputsAutoLogged inputs);
 

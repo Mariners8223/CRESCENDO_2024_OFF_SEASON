@@ -32,7 +32,7 @@ public class ShooterIntake extends SubsystemBase {
     io.setIntakeTargetPosition(rotation);
   }
 
-  public double getIntakeMotorPosition(){
+  public double getIntakeMotorPositions(){
     return inputs.intakePosition;
   }
 
@@ -57,5 +57,8 @@ public class ShooterIntake extends SubsystemBase {
   }
   public void stopIntakeMotor(){
     io.stopIntakeMotor();
+  }
+  public double getIntakeMotorRPM(){
+    return inputs.IntakeMotorRPM;
   }
 }

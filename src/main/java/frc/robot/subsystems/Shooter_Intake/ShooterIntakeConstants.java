@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems.Shooter_Intake;
 
+import edu.wpi.first.units.Time;
+
 /** Add your docs here. */
 public class ShooterIntakeConstants {
     public enum PresetSpeeds{
@@ -18,5 +20,17 @@ public class ShooterIntakeConstants {
           this.RPM = RPM;
         }
       }
+    public enum PresetsTimeSec
+    {
+        TimeShooter(Sec: 2);
+
+        public final double Sec;
+
+        private PresetsTimeSec (double Sec)
+        {
+            this.Sec=Sec;
+        }
+
       
+    }
 }
