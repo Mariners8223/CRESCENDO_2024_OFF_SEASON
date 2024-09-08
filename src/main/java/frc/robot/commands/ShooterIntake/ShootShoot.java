@@ -4,6 +4,7 @@
 
 package frc.robot.commands.ShooterIntake;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Shooter_Intake.ShooterIntake;
@@ -14,11 +15,15 @@ import frc.robot.subsystems.Shooter_Intake.ShooterIntakeConstants;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class ShootShoot extends SequentialCommandGroup {
     private static final double INTAKE_SPEED = ShooterIntakeConstants.PresetSpeeds.SPEED4.RPM;
+    
+    ShooterIntake shooterIntake;
   /** Creates a new ShootShoot. */
+  Timer timer = new Timer(); 
   public ShootShoot() {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands();
+    timer.start();
   }
    private class Step1 extends Command{
     private Step1(){
@@ -68,7 +73,7 @@ public class ShootShoot extends SequentialCommandGroup {
     }
   @Override
   public boolean isFinished() {
-  return;
+    return timer.get() >=2;
   }
 
   }

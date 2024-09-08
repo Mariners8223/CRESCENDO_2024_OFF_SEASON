@@ -15,7 +15,9 @@ import frc.robot.subsystems.Shooter_Intake.ShooterIntakeConstants;
 public class IntakeFromShooter extends SequentialCommandGroup {
   private static final double INTAKE_SPEED = ShooterIntakeConstants.PresetSpeeds.SPEED2.RPM;
   private static final double SLOW_INTAKE_SPEED = ShooterIntakeConstants.PresetSpeeds.SPEED6.RPM;
-  private static final double SLOW_INTAKE_SPEED2 = ShooterIntakeConstants.PresetSpeeds.SPEED6.RPM;
+  private static final double SLOW_INTAKE_SPEED2 = ShooterIntakeConstants.PresetSpeeds.SPEED5.RPM;
+
+  ShooterIntake shooterIntake;
   /** Creates a new IntakeFromShooter. */
   public IntakeFromShooter() {
     // Add your commands in the addCommands() call, e.g.
@@ -57,7 +59,9 @@ public class IntakeFromShooter extends SequentialCommandGroup {
 
     @Override
     public void end(boolean interrupted) {
-     
+     shooterIntake.setTargetIntakeMotorRPM(0);
+     shooterIntake.setTargetRPMShooterMotorOffPivot(0);
+     shooterIntake.setTargetRPMShooterMotorOnPivot(0);
     }
   @Override
   public boolean isFinished() {
