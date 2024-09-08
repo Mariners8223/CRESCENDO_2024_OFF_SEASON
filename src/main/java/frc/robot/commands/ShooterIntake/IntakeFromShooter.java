@@ -65,7 +65,7 @@ public class IntakeFromShooter extends SequentialCommandGroup {
     }
   @Override
   public boolean isFinished() {
-    shooterIntake.BeamBreakValue() & shooterIntake.getIntakeMotorFriction();
+    shooterIntake.BeamBreakValue() && shooterIntake.getIntakeMotorFriction();
   
 
   }
