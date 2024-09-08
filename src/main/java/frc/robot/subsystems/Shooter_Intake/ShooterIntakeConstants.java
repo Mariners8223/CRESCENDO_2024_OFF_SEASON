@@ -38,5 +38,6 @@ public class ShooterIntakeConstants {
 
     public static final double INTAKE_MOTOR_UNDER_LOAD_CURRENT = 15;
     public static final double SHOOTER_MOTOR_UNDER_LOAD_CURRENT = 15;
+    public static final double SHOOTERSPEED = 10;
 
  }

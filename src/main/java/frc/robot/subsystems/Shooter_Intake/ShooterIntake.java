@@ -78,12 +78,13 @@ public class ShooterIntake extends SubsystemBase {
     return inputs.onPivotShooterMotorCurrent >= ShooterIntakeConstants.SHOOTER_MOTOR_UNDER_LOAD_CURRENT 
     || inputs.offPivotShooterMotorCurrent >= ShooterIntakeConstants.SHOOTER_MOTOR_UNDER_LOAD_CURRENT;
   }
-  //TODO this is incorect
-  public double claculate(){
-    return Math.abs(inputs.onPivotShooterMotorRPM - inputs.onPivotShooterMotorRPM);
-  }
+
   public boolean isShooterMotorsAtSetSpeed(){
-    return claculate()>=10 & claculate()<=20;
+
+    return Math.abs(inputs.onPivotShooterMotorRPM - onPivotShooterSetSpeed)<= (ShooterIntakeConstants.SHOOTERSPEED) &&
+     Math.abs(inputs.offPivotShooterMotorRPM - offPivotShooterSetSpeed)<= (ShooterIntakeConstants.SHOOTERSPEED);
+
   }
+
 }
 
