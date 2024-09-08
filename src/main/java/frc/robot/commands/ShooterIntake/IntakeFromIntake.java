@@ -9,12 +9,14 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Shooter_Intake.ShooterIntake;
+import frc.robot.subsystems.Shooter_Intake.ShooterIntakeConstants;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class IntakeFromIntake extends SequentialCommandGroup {
-
+private static final double INTAKE_SPEED = ShooterIntakeConstants.PresetSpeeds.SPEED2.RPM;
+private static final double SLOW_INTAKE_SPEED = ShooterIntakeConstants.PresetSpeeds.SPEED5.RPM;
   ShooterIntake shooterIntake;
   /** Creates a new IntakeFromIntake. */
   public IntakeFromIntake(ShooterIntake shooterIntake) {
@@ -36,32 +38,33 @@ public class IntakeFromIntake extends SequentialCommandGroup {
 
     @Override
     public void initialize() {
-
+      shooterIntake.setTargetIntakeMotorRPM(INTAKE_SPEED);
     }
 
     @Override
     public void end(boolean interrupted) {
-      setGpLoaded();
+
     }
   @Override
   public boolean isFinished() {
-    return shooterIntake.getBeamBreakValue();
+    return shooterIntake.getIntakeMotorFriction();
   }
 
   }
 
   private class Step2 extends Command{
     private Step2(){
-
+     
     }
 
     @Override
     public void initialize() {
-
+       shooterIntake.setTargetIntakeMotorRPM(SLOW_INTAKE_SPEED);
     }
 
     @Override
     public void end(boolean interrupted) {
+      shooterIntake.setTargetIntakeMotorRPM(0);
       setGpLoaded();
     }
   @Override

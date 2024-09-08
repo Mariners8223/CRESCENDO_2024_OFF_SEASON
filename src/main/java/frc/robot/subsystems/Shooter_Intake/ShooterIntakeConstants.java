@@ -10,9 +10,12 @@ import edu.wpi.first.units.Time;
 public class ShooterIntakeConstants {
     public enum PresetSpeeds{
         SPEED1(4000),
-        SPEED2(3000),
+        SPEED2(-3000),
         SPEED3(2000),
-        SPEED4(1000);
+        SPEED4(1000),
+        SPEED5(500),
+        SPEED6(-500);
+
     
         public final double RPM;
     

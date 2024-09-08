@@ -52,7 +52,7 @@ public class ShooterIntake extends SubsystemBase {
   public void StopMotorOnPivot(){
     io.StopMotorOnPivot();
   }
-   public void StopMotorOffPivot(){
+   public void stopMotorOffPivot(){
     io.StopMotorOffPivot();
   }
   public void stopIntakeMotor(){
@@ -60,5 +60,11 @@ public class ShooterIntake extends SubsystemBase {
   }
   public double getIntakeMotorRPM(){
     return inputs.IntakeMotorRPM;
+  }
+  public boolean getIntakeMotorFriction(){
+    return input.ExtraIntakeMotorFriction;
+  }
+  public boolean getShooterMotorsFriction(){
+    return input.ShooterMotorsFriction;
   }
 }
