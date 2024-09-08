@@ -15,40 +15,31 @@ import frc.robot.subsystems.Shooter_Intake.ShooterIntakeConstants;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class ShootShoot extends SequentialCommandGroup {
     private static final double INTAKE_SPEED = ShooterIntakeConstants.PresetSpeeds.SPEED4.RPM;
-    
+
     ShooterIntake shooterIntake;
+    private final double rpm;
   /** Creates a new ShootShoot. */
   Timer timer = new Timer(); 
-  public ShootShoot() {
+  public ShootShoot(double rpm) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
+
+    this.rpm = rpm;
     addCommands();
     timer.start();
   }
+  
    private class Step1 extends Command{
-    private Step1(){
-
-    }
 
     @Override
-    public void initialize() {
-      shooterIntake.setTargetRPMShooterMotorOffPivot(INPUTED_SPEED);
-      shooterIntake.setTargetRPMShooterMotorOnPivot(INPUTED_SPEED);
-    }
-    public void execute(){
-
-    }
-
-    @Override
-    public void end(boolean interrupted) {
+    public void initialize(){
+      shooterIntake.setTargetRPMShooterMotorOffPivot(rpm);
+      shooterIntake.setTargetRPMShooterMotorOnPivot(rpm);
     }
 
   @Override
   public boolean isFinished() {
-    if (shooterIntake.getTargetRPMShooterMotorOffPivot() && shooterIntake.getTargetRPMShooterMotorOnPivot() == (INPUTED_SPEED)){
-        return true;
-    }
-       return false;
+    return (shooterIntake.isShooterMotorsUnderLoad());
     
     //return shooterIntake.getTargetRPMShooterMotorOffPivot();
     //return shooterIntake.getTargetRPMShooterMotorOnPivot();

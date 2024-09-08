@@ -13,6 +13,7 @@ import frc.robot.subsystems.Shooter_Intake.ShooterIntakeConstants;
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class IntakeFromShooter extends SequentialCommandGroup {
+
   private static final double INTAKE_SPEED = ShooterIntakeConstants.PresetSpeeds.SPEED2.RPM;
   private static final double SLOW_INTAKE_SPEED = ShooterIntakeConstants.PresetSpeeds.SPEED6.RPM;
   private static final double SLOW_INTAKE_SPEED2 = ShooterIntakeConstants.PresetSpeeds.SPEED5.RPM;
@@ -42,7 +43,7 @@ public class IntakeFromShooter extends SequentialCommandGroup {
     }
   @Override
   public boolean isFinished() {
-    shooterIntake.getShooterMotorsFriction();
+    return shooterIntake.isIntakeMotorUnderLoad();
   }
 
   }
@@ -65,8 +66,8 @@ public class IntakeFromShooter extends SequentialCommandGroup {
     }
   @Override
   public boolean isFinished() {
-    shooterIntake.BeamBreakValue() && shooterIntake.getIntakeMotorFriction();
-  
+    return shooterIntake.getBeamBreakValue() && shooterIntake.isIntakeMotorUnderLoad();
 
   }
+}
 }

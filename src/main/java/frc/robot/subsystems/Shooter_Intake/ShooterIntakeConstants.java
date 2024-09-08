@@ -25,7 +25,7 @@ public class ShooterIntakeConstants {
       }
     public enum PresetsTimeSec
     {
-        TimeShooter(Sec: 2);
+        TimeShooter(2);
 
         public final double Sec;
 
@@ -33,7 +33,10 @@ public class ShooterIntakeConstants {
         {
             this.Sec=Sec;
         }
-
       
     }
-}
+
+    public static final double INTAKE_MOTOR_UNDER_LOAD_CURRENT = 15;
+    public static final double SHOOTER_MOTOR_UNDER_LOAD_CURRENT = 15;
+
+ }

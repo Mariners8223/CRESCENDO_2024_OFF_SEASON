@@ -8,8 +8,12 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class ShooterIntake extends SubsystemBase {
-  ShooterIntakeIO io;
-  ShooterIntakeInputsAutoLogged inputs = new ShooterIntakeInputsAutoLogged();
+  private ShooterIntakeIO io;
+  private ShooterIntakeInputsAutoLogged inputs = new ShooterIntakeInputsAutoLogged();
+
+  private double intakeSetSpeed;
+  private double onPivotShooterSetSpeed;
+  private double offPivotShooterSetSpeed;
 
   boolean isGpLoaded = false;
   /** Creates a new ShooterIntake. */
@@ -33,16 +37,20 @@ public class ShooterIntake extends SubsystemBase {
   }
 
   public double getIntakeMotorPositions(){
-    return inputs.intakePosition;
+    return inputs.intakeMotorPosition;
   }
 
   public void setTargetRPMShooterMotorOnPivot(double speed){
+    this.onPivotShooterSetSpeed = speed;
+    Logger.recordOutput("Shooter Intake/On Pivot Motor Set speed", speed);
     io.setTargetShooterMotorOnPivotRPM(speed);
   }
   public void setTargetRPMShooterMotorOffPivot(double speed){
+    this.offPivotShooterSetSpeed = speed;
     io.setTargetShooterMotorOffPivotRPM(speed);
   }
   public void setTargetIntakeMotorRPM(double speed){
+    this.intakeSetSpeed = speed;  
     io.setTargetIntakeMotorRPM(speed);
   }
   
@@ -59,12 +67,23 @@ public class ShooterIntake extends SubsystemBase {
     io.stopIntakeMotor();
   }
   public double getIntakeMotorRPM(){
-    return inputs.IntakeMotorRPM;
+    return inputs.intakeMotorRPM;
   }
-  public boolean getIntakeMotorFriction(){
-    return input.ExtraIntakeMotorFriction;
+  
+  public boolean isIntakeMotorUnderLoad(){
+    return inputs.intakeMotorCurrent >= ShooterIntakeConstants.INTAKE_MOTOR_UNDER_LOAD_CURRENT;
   }
-  public boolean getShooterMotorsFriction(){
-    return input.ShooterMotorsFriction;
+
+  public boolean isShooterMotorsUnderLoad(){
+    return inputs.onPivotShooterMotorCurrent >= ShooterIntakeConstants.SHOOTER_MOTOR_UNDER_LOAD_CURRENT 
+    || inputs.offPivotShooterMotorCurrent >= ShooterIntakeConstants.SHOOTER_MOTOR_UNDER_LOAD_CURRENT;
+  }
+  //TODO this is incorect
+  public double claculate(){
+    return Math.abs(inputs.onPivotShooterMotorRPM - inputs.onPivotShooterMotorRPM);
+  }
+  public boolean isShooterMotorsAtSetSpeed(){
+    return claculate()>=10 & claculate()<=20;
   }
 }
+

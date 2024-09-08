@@ -11,13 +11,14 @@ public interface ShooterIntakeIO {
 
     @AutoLog
     public class ShooterIntakeInputs{
-        double RPMShooterMotorOnPivot;
-        double RPMShooterMotorOffPivot;
-        double IntakeMotorRPM;
-        double intakePosition;
         boolean BeamBreakValue;
-        boolean IntakeMotorFriction;
-        boolean ShooterMotorsFriction;
+        double intakeMotorCurrent;
+        double onPivotShooterMotorCurrent;
+        double offPivotShooterMotorCurrent;
+        double onPivotShooterMotorRPM;
+        double offPivotShooterMotorRPM;
+        double intakeMotorRPM;
+        double intakeMotorPosition;
     }
 //RPM = rotations per min
     public void setTargetShooterMotorOnPivotRPM(double speedRPM);

@@ -47,7 +47,7 @@ private static final double SLOW_INTAKE_SPEED = ShooterIntakeConstants.PresetSpe
     }
   @Override
   public boolean isFinished() {
-    return shooterIntake.getIntakeMotorFriction();
+    return shooterIntake.isIntakeMotorUnderLoad();
   }
 
   }
@@ -65,7 +65,7 @@ private static final double SLOW_INTAKE_SPEED = ShooterIntakeConstants.PresetSpe
     @Override
     public void end(boolean interrupted) {
       shooterIntake.setTargetIntakeMotorRPM(0);
-      setGpLoaded();
+      shooterIntake.setGpLoaded(true);
     }
   @Override
   public boolean isFinished() {
