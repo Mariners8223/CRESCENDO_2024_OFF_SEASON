@@ -5,6 +5,8 @@
 package frc.robot.commands.ShooterIntake;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Shooter_Intake.ShooterIntake;
 import frc.robot.subsystems.Shooter_Intake.ShooterIntakeConstants;
@@ -20,10 +22,18 @@ public class IntakeFromShooter extends SequentialCommandGroup {
 
   ShooterIntake shooterIntake;
   /** Creates a new IntakeFromShooter. */
-  public IntakeFromShooter() {
+  public IntakeFromShooter(ShooterIntake shooterIntake) {
+
+    this.shooterIntake = shooterIntake;
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
-    addCommands();
+
+    addRequirements(shooterIntake);
+
+    addCommands(
+      new Step1(),
+      new Step2()
+    );
   }
   private class Step1 extends Command{
     private Step1(){
@@ -43,7 +53,7 @@ public class IntakeFromShooter extends SequentialCommandGroup {
     }
   @Override
   public boolean isFinished() {
-    return shooterIntake.isIntakeMotorUnderLoad();
+    return shooterIntake.isIntakeMotorsUnderLoad();
   }
 
   }
@@ -60,13 +70,13 @@ public class IntakeFromShooter extends SequentialCommandGroup {
 
     @Override
     public void end(boolean interrupted) {
-     shooterIntake.setTargetIntakeMotorRPM(0);
-     shooterIntake.setTargetRPMShooterMotorOffPivot(0);
-     shooterIntake.setTargetRPMShooterMotorOnPivot(0);
+     shooterIntake.stopMotorOffPivot();
+     shooterIntake.stopIntakeMotor();
+     shooterIntake.StopMotorOnPivot();
     }
   @Override
   public boolean isFinished() {
-    return shooterIntake.getBeamBreakValue() && shooterIntake.isIntakeMotorUnderLoad();
+    return shooterIntake.getBeamBreakValue() && shooterIntake.isIntakeMotorsUnderLoad();
 
   }
 }

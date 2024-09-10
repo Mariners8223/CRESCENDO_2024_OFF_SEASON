@@ -5,8 +5,6 @@
 package frc.robot.commands.ShooterIntake;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Shooter_Intake.ShooterIntake;
 import frc.robot.subsystems.Shooter_Intake.ShooterIntakeConstants;
@@ -25,15 +23,16 @@ private static final double SLOW_INTAKE_SPEED = ShooterIntakeConstants.PresetSpe
 
     this.shooterIntake = shooterIntake;
 
+    addRequirements(shooterIntake);
+
     addCommands(
-      new InstantCommand(),
-      new ParallelRaceGroup(null)
-    );
+      new Step1(),
+      new Step2()
+      );
   }
 
   private class Step1 extends Command{
     private Step1(){
-
     }
 
     @Override
@@ -47,14 +46,13 @@ private static final double SLOW_INTAKE_SPEED = ShooterIntakeConstants.PresetSpe
     }
   @Override
   public boolean isFinished() {
-    return shooterIntake.isIntakeMotorUnderLoad();
+    return shooterIntake.isIntakeMotorsUnderLoad();
   }
 
   }
 
   private class Step2 extends Command{
     private Step2(){
-     
     }
 
     @Override

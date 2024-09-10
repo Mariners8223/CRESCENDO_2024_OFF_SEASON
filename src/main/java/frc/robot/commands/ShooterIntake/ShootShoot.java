@@ -6,6 +6,8 @@ package frc.robot.commands.ShooterIntake;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Shooter_Intake.ShooterIntake;
 import frc.robot.subsystems.Shooter_Intake.ShooterIntakeConstants;
@@ -18,18 +20,18 @@ public class ShootShoot extends SequentialCommandGroup {
 
     ShooterIntake shooterIntake;
     private final double rpm;
-  /** Creates a new ShootShoot. */
-  Timer timer = new Timer(); 
+  /** Creates a new ShootShoot. */ 
   public ShootShoot(double rpm) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
 
     this.rpm = rpm;
-    addCommands();
-    timer.start();
+    addCommands(new Step1(),
+      new Step2(),
+      new InstantCommand());
   }
   
-   private class Step1 extends Command{
+  private class Step1 extends Command{
 
     @Override
     public void initialize(){
@@ -39,11 +41,7 @@ public class ShootShoot extends SequentialCommandGroup {
 
   @Override
   public boolean isFinished() {
-    return (shooterIntake.isShooterMotorsUnderLoad());
-    
-    //return shooterIntake.getTargetRPMShooterMotorOffPivot();
-    //return shooterIntake.getTargetRPMShooterMotorOnPivot();
-
+    return (shooterIntake.isShooterMotorsAtSetSpeed());
   }
 
   }
