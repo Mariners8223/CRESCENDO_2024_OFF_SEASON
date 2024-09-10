@@ -4,6 +4,7 @@
 
 package frc.robot.commands.ShooterIntake;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
@@ -57,7 +58,6 @@ public class IntakeFromShooter extends SequentialCommandGroup {
   }
 
   }
-
   private class Step2 extends Command{
     private Step2(){
 
@@ -70,13 +70,35 @@ public class IntakeFromShooter extends SequentialCommandGroup {
 
     @Override
     public void end(boolean interrupted) {
-     shooterIntake.stopMotorOffPivot();
-     shooterIntake.stopIntakeMotor();
-     shooterIntake.StopMotorOnPivot();
+
     }
   @Override
   public boolean isFinished() {
-    return shooterIntake.getBeamBreakValue() && shooterIntake.isIntakeMotorsUnderLoad();
+    return shooterIntake.getBeamBreakValue();
+
+  }
+}
+ private class Step3 extends Command{
+  Timer timer = new Timer();
+    private Step3(){
+
+    }
+
+    @Override
+    public void initialize() {
+      
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+     shooterIntake.stopMotorOffPivot();
+     shooterIntake.stopIntakeMotor();
+     shooterIntake.StopMotorOnPivot();
+     shooterIntake.setGpLoaded(true);
+    }
+  @Override
+  public boolean isFinished() {
+    return  timer.get()>=0.5 || shooterIntake.getBeamBreakValue();
 
   }
 }

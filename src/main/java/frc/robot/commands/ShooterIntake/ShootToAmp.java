@@ -19,12 +19,14 @@ public class ShootToAmp extends SequentialCommandGroup {
       private static final double INTAKE_SPEED = ShooterIntakeConstants.PresetSpeeds.SPEED6.RPM;
 
       ShooterIntake shooterIntake;
-      Timer timer = new Timer(); 
+      private Timer timer = new Timer(); 
 
   /** Creates a new ShootToAmp. */
+  
   public ShootToAmp() {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
+    addRequirements(shooterIntake);
     addCommands(
       new Step1(),
       new InstantCommand(),
@@ -43,7 +45,8 @@ public class ShootToAmp extends SequentialCommandGroup {
 
     @Override
     public void end(boolean interrupted) {
-      shooterIntake.setTargetIntakeMotorRPM(0);
+      shooterIntake. stopIntakeMotor();
+      shooterIntake.setGpLoaded(false);
     }
   @Override
   public boolean isFinished() {

@@ -62,7 +62,7 @@ private static final double SLOW_INTAKE_SPEED = ShooterIntakeConstants.PresetSpe
 
     @Override
     public void end(boolean interrupted) {
-      shooterIntake.setTargetIntakeMotorRPM(0);
+      shooterIntake.stopIntakeMotor();
       shooterIntake.setGpLoaded(true);
     }
   @Override
