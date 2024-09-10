@@ -13,8 +13,8 @@ import frc.robot.subsystems.Shooter_Intake.ShooterIntakeConstants;
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class IntakeFromIntake extends SequentialCommandGroup {
-private static final double INTAKE_SPEED = ShooterIntakeConstants.PresetSpeeds.SPEED2.RPM;
-private static final double SLOW_INTAKE_SPEED = ShooterIntakeConstants.PresetSpeeds.SPEED5.RPM;
+private static final double INTAKE_SPEED = ShooterIntakeConstants.IntakePresetSpeeds.IntakeSpeedHigh.RPM;
+private static final double SLOW_INTAKE_SPEED = ShooterIntakeConstants.IntakePresetSpeeds.IntakeSpeedLow.RPM;
   ShooterIntake shooterIntake;
   /** Creates a new IntakeFromIntake. */
   public IntakeFromIntake(ShooterIntake shooterIntake) {

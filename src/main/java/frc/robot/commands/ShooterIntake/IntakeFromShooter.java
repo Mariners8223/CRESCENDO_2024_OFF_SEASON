@@ -15,10 +15,9 @@ import frc.robot.subsystems.Shooter_Intake.ShooterIntakeConstants;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class IntakeFromShooter extends SequentialCommandGroup {
 
-  private static final double INTAKE_SPEED = ShooterIntakeConstants.PresetSpeeds.SPEED2.RPM;
-  private static final double SLOW_INTAKE_SPEED = ShooterIntakeConstants.PresetSpeeds.SPEED6.RPM;
-  private static final double SLOW_INTAKE_SPEED2 = ShooterIntakeConstants.PresetSpeeds.SPEED5.RPM;
-  private static final int TIMER = ShooterIntakeConstants.PresetSpeeds.INTAKESHOOTERTIME.sec;
+  private static final double INTAKE_SPEED = ShooterIntakeConstants.ShooterPresetSpeeds.IntakeShooterSpeedHigh.RPM;
+  private static final double SLOW_INTAKE_SPEED = ShooterIntakeConstants.ShooterPresetSpeeds.IntakeShooterSpeedLow.RPM;
+  private static final double SLOW_INTAKE_SPEED2 = ShooterIntakeConstants.ShooterPresetSpeeds.IntakeShooterSpeedLow.RPM;
 
   ShooterIntake shooterIntake;
   /** Creates a new IntakeFromShooter. */
@@ -38,7 +37,7 @@ public class IntakeFromShooter extends SequentialCommandGroup {
   private class Step1 extends Command{
     @Override
     public void initialize() {
-      shooterIntake.setTargetRPMShooterMotorOffPivot(INTAKE_SPEED);
+      shooterIntake.setTargetRPMShooterMotorOffPivot(ShooterIntakeConstants.ShooterPresetSpeeds.ShooterSpeedHigh.RPM);
       shooterIntake.setTargetRPMShooterMotorOnPivot(INTAKE_SPEED);
     }
 
@@ -71,7 +70,7 @@ public class IntakeFromShooter extends SequentialCommandGroup {
     }
   @Override
   public boolean isFinished() {
-    return  timer.get() >= TIMER && shooterIntake.getBeamBreakValue();
+    return  timer.get() >= ShooterIntakeConstants.AccelarationTime.INTAKESHOOTERTIME.sec && shooterIntake.getBeamBreakValue();
 
   }
 }

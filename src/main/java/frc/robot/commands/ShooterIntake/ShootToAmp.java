@@ -6,53 +6,45 @@ package frc.robot.commands.ShooterIntake;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Shooter_Intake.ShooterIntake;
 import frc.robot.subsystems.Shooter_Intake.ShooterIntakeConstants;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class ShootToAmp extends SequentialCommandGroup {
-      private static final double INTAKE_SPEED = ShooterIntakeConstants.PresetSpeeds.SPEED6.RPM;
-      private static final int TIMER = ShooterIntakeConstants.PresetSpeeds.SHOOTAMPTIME.sec;
-      ShooterIntake shooterIntake;
+public class ShootToAmp extends Command {
+  ShooterIntake shooterIntake;
       
 
   /** Creates a new ShootToAmp. */
   
-  public ShootToAmp() {
+  public ShootToAmp(ShooterIntake shooterIntake) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
+    this.shooterIntake = shooterIntake;
+
     addRequirements(shooterIntake);
-    addCommands(
-      new Step1()
-      );
   }
-    private class Step1 extends Command{
-    private Timer timer = new Timer(); 
+  
+  private Timer timer = new Timer(); 
+  
+  @Override
+  public void initialize() {
+    timer.reset();
+    shooterIntake.setTargetIntakeMotorRPM(ShooterIntakeConstants.IntakePresetSpeeds.ShootAmpSpeed.RPM);
+  }
 
+  @Override
+  public void end(boolean interrupted) {
+    shooterIntake. stopIntakeMotor();
+    shooterIntake.setGpLoaded(false);
+  }
 
-    @Override
-    public void initialize() {
-      timer.reset();
-      shooterIntake.setTargetIntakeMotorRPM(INTAKE_SPEED);
-    }
-
-    @Override
-    public void end(boolean interrupted) {
-      shooterIntake. stopIntakeMotor();
-      shooterIntake.setGpLoaded(false);
-    }
   @Override
   public boolean isFinished() {
-    return timer.get() <= TIMER;
+    return timer.get() <= ShooterIntakeConstants.AccelarationTime.SHOOTAMPTIME.sec;
 
   }
 
-  }
+}
 
-
-  }

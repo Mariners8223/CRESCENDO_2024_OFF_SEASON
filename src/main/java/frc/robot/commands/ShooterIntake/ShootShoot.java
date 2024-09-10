@@ -6,7 +6,6 @@ package frc.robot.commands.ShooterIntake;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Shooter_Intake.ShooterIntake;
 import frc.robot.subsystems.Shooter_Intake.ShooterIntakeConstants;
@@ -15,10 +14,8 @@ import frc.robot.subsystems.Shooter_Intake.ShooterIntakeConstants;
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class ShootShoot extends SequentialCommandGroup {
-    private static final double INTAKE_SPEED = ShooterIntakeConstants.PresetSpeeds.SPEED4.RPM;
-    private static final int TIMER = ShooterIntakeConstants.PresetSpeeds.SHOOTSHOOTTIME.sec;
-    ShooterIntake shooterIntake;
-    private final double rpm;
+  ShooterIntake shooterIntake;
+  private double rpm;
   /** Creates a new ShootShoot. */ 
   public ShootShoot(double rpm) {
     // Add your commands in the addCommands() call, e.g.
@@ -41,7 +38,8 @@ public class ShootShoot extends SequentialCommandGroup {
   //TODO corret time
     @Override
     public boolean isFinished() {
-      return shooterIntake.isShooterMotorsAtSetSpeed() || timer.get() >= TIMER;
+      return shooterIntake.isShooterMotorsAtSetSpeed()
+      || timer.get() >= ShooterIntakeConstants.AccelarationTime.SHOOTSHOOTTIME.sec;
     }
 
   }
@@ -52,8 +50,7 @@ public class ShootShoot extends SequentialCommandGroup {
     @Override
     public void initialize() {
       timer.restart();
-      shooterIntake.setTargetIntakeMotorRPM(INTAKE_SPEED);
-
+      shooterIntake.setTargetIntakeMotorRPM(ShooterIntakeConstants.ShooterPresetSpeeds.IntakeShooterSpeedLow.RPM);
     }
 
     @Override
@@ -65,7 +62,7 @@ public class ShootShoot extends SequentialCommandGroup {
     }
   @Override
   public boolean isFinished() {
-    return timer.get() >= TIMER;
+    return timer.get() >= ShooterIntakeConstants.AccelarationTime.SHOOTSHOOTTIME.sec;
     
   }
 
