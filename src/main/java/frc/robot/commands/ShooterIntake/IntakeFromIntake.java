@@ -13,8 +13,6 @@ import frc.robot.subsystems.Shooter_Intake.ShooterIntakeConstants;
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class IntakeFromIntake extends SequentialCommandGroup {
-private static final double INTAKE_SPEED = ShooterIntakeConstants.IntakePresetSpeeds.IntakeSpeedHigh.RPM;
-private static final double SLOW_INTAKE_SPEED = ShooterIntakeConstants.IntakePresetSpeeds.IntakeSpeedLow.RPM;
   ShooterIntake shooterIntake;
   /** Creates a new IntakeFromIntake. */
   public IntakeFromIntake(ShooterIntake shooterIntake) {
@@ -32,38 +30,30 @@ private static final double SLOW_INTAKE_SPEED = ShooterIntakeConstants.IntakePre
   }
 
   private class Step1 extends Command{
-    private Step1(){
-    }
 
     @Override
     public void initialize() {
-      shooterIntake.setTargetIntakeMotorRPM(INTAKE_SPEED);
+      shooterIntake.setTargetIntakeMotorRPM(ShooterIntakeConstants.IntakePresetSpeeds.IntakeSpeedHigh.RPM);
     }
 
-    @Override
-    public void end(boolean interrupted) {
-
+   @Override
+    public boolean isFinished() {
+      return shooterIntake.isIntakeMotorsUnderLoad();
     }
-  @Override
-  public boolean isFinished() {
-    return shooterIntake.isIntakeMotorsUnderLoad();
-  }
 
   }
 
   private class Step2 extends Command{
-    private Step2(){
-    }
 
     @Override
     public void initialize() {
-       shooterIntake.setTargetIntakeMotorRPM(SLOW_INTAKE_SPEED);
+      shooterIntake.setTargetIntakeMotorRPM(ShooterIntakeConstants.IntakePresetSpeeds.IntakeSpeedLow.RPM);
     }
 
     @Override
     public void end(boolean interrupted) {
       shooterIntake.stopIntakeMotor();
-      shooterIntake.setGpLoaded(true);
+      shooterIntake.setGpLoaded(!interrupted);
     }
   @Override
   public boolean isFinished() {

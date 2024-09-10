@@ -14,11 +14,6 @@ import frc.robot.subsystems.Shooter_Intake.ShooterIntakeConstants;
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class IntakeFromShooter extends SequentialCommandGroup {
-
-  private static final double INTAKE_SPEED = ShooterIntakeConstants.ShooterPresetSpeeds.IntakeShooterSpeedHigh.RPM;
-  private static final double SLOW_INTAKE_SPEED = ShooterIntakeConstants.ShooterPresetSpeeds.IntakeShooterSpeedLow.RPM;
-  private static final double SLOW_INTAKE_SPEED2 = ShooterIntakeConstants.ShooterPresetSpeeds.IntakeShooterSpeedLow.RPM;
-
   ShooterIntake shooterIntake;
   /** Creates a new IntakeFromShooter. */
   public IntakeFromShooter(ShooterIntake shooterIntake) {
@@ -37,14 +32,14 @@ public class IntakeFromShooter extends SequentialCommandGroup {
   private class Step1 extends Command{
     @Override
     public void initialize() {
-      shooterIntake.setTargetRPMShooterMotorOffPivot(ShooterIntakeConstants.ShooterPresetSpeeds.ShooterSpeedHigh.RPM);
-      shooterIntake.setTargetRPMShooterMotorOnPivot(INTAKE_SPEED);
+      shooterIntake.setTargetRPMShooterMotorOffPivot(ShooterIntakeConstants.ShooterPresetSpeeds.IntakeShooterSpeedHigh.RPM);
+      shooterIntake.setTargetRPMShooterMotorOnPivot(ShooterIntakeConstants.ShooterPresetSpeeds.ShooterSpeedHigh.RPM);
     }
 
     @Override
     public void end(boolean interrupted) {
-      shooterIntake.setTargetRPMShooterMotorOffPivot(SLOW_INTAKE_SPEED);
-      shooterIntake.setTargetRPMShooterMotorOnPivot(SLOW_INTAKE_SPEED);
+      shooterIntake.setTargetRPMShooterMotorOffPivot(ShooterIntakeConstants.ShooterPresetSpeeds.IntakeShooterSpeedLow.RPM);
+      shooterIntake.setTargetRPMShooterMotorOnPivot(ShooterIntakeConstants.ShooterPresetSpeeds.ShooterSpeedLow.RPM);
     }
   @Override
   public boolean isFinished() {
@@ -58,7 +53,7 @@ public class IntakeFromShooter extends SequentialCommandGroup {
     @Override
     public void initialize() {
       timer.start();
-      shooterIntake.setTargetIntakeMotorRPM(SLOW_INTAKE_SPEED2);
+      shooterIntake.setTargetIntakeMotorRPM(ShooterIntakeConstants.IntakePresetSpeeds.IntakeSpeedLow.RPM);
     }
 
     @Override
