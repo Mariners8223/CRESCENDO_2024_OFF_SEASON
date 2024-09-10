@@ -17,9 +17,9 @@ import frc.robot.subsystems.Shooter_Intake.ShooterIntakeConstants;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class ShootToAmp extends SequentialCommandGroup {
       private static final double INTAKE_SPEED = ShooterIntakeConstants.PresetSpeeds.SPEED6.RPM;
-
+      private static final int TIMER = ShooterIntakeConstants.PresetSpeeds.SHOOTAMPTIME.sec;
       ShooterIntake shooterIntake;
-      private Timer timer = new Timer(); 
+      
 
   /** Creates a new ShootToAmp. */
   
@@ -28,18 +28,16 @@ public class ShootToAmp extends SequentialCommandGroup {
     // addCommands(new FooCommand(), new BarCommand());
     addRequirements(shooterIntake);
     addCommands(
-      new Step1(),
-      new InstantCommand(),
-      new ParallelRaceGroup(null));
-    timer.start();
+      new Step1()
+      );
   }
     private class Step1 extends Command{
-    private Step1(){
+    private Timer timer = new Timer(); 
 
-    }
 
     @Override
     public void initialize() {
+      timer.reset();
       shooterIntake.setTargetIntakeMotorRPM(INTAKE_SPEED);
     }
 
@@ -50,7 +48,7 @@ public class ShootToAmp extends SequentialCommandGroup {
     }
   @Override
   public boolean isFinished() {
-    return timer.get() <=5;
+    return timer.get() <= TIMER;
 
   }
 

@@ -6,8 +6,6 @@ package frc.robot.commands.ShooterIntake;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Shooter_Intake.ShooterIntake;
 import frc.robot.subsystems.Shooter_Intake.ShooterIntakeConstants;
@@ -20,6 +18,7 @@ public class IntakeFromShooter extends SequentialCommandGroup {
   private static final double INTAKE_SPEED = ShooterIntakeConstants.PresetSpeeds.SPEED2.RPM;
   private static final double SLOW_INTAKE_SPEED = ShooterIntakeConstants.PresetSpeeds.SPEED6.RPM;
   private static final double SLOW_INTAKE_SPEED2 = ShooterIntakeConstants.PresetSpeeds.SPEED5.RPM;
+  private static final int TIMER = ShooterIntakeConstants.PresetSpeeds.INTAKESHOOTERTIME.sec;
 
   ShooterIntake shooterIntake;
   /** Creates a new IntakeFromShooter. */
@@ -37,10 +36,6 @@ public class IntakeFromShooter extends SequentialCommandGroup {
     );
   }
   private class Step1 extends Command{
-    private Step1(){
-
-    }
-
     @Override
     public void initialize() {
       shooterIntake.setTargetRPMShooterMotorOffPivot(INTAKE_SPEED);
@@ -54,51 +49,29 @@ public class IntakeFromShooter extends SequentialCommandGroup {
     }
   @Override
   public boolean isFinished() {
-    return shooterIntake.isIntakeMotorsUnderLoad();
+    return shooterIntake.getBeamBreakValue();
   }
 
   }
+
   private class Step2 extends Command{
-    private Step2(){
-
-    }
-
+    Timer timer = new Timer();
     @Override
     public void initialize() {
+      timer.start();
       shooterIntake.setTargetIntakeMotorRPM(SLOW_INTAKE_SPEED2);
     }
 
     @Override
     public void end(boolean interrupted) {
-
-    }
-  @Override
-  public boolean isFinished() {
-    return shooterIntake.getBeamBreakValue();
-
-  }
-}
- private class Step3 extends Command{
-  Timer timer = new Timer();
-    private Step3(){
-
-    }
-
-    @Override
-    public void initialize() {
-      
-    }
-
-    @Override
-    public void end(boolean interrupted) {
-     shooterIntake.stopMotorOffPivot();
+      shooterIntake.stopMotorOffPivot();
      shooterIntake.stopIntakeMotor();
      shooterIntake.StopMotorOnPivot();
      shooterIntake.setGpLoaded(true);
     }
   @Override
   public boolean isFinished() {
-    return  timer.get()>=0.5 || shooterIntake.getBeamBreakValue();
+    return  timer.get() >= TIMER && shooterIntake.getBeamBreakValue();
 
   }
 }

@@ -7,7 +7,6 @@ package frc.robot.commands.ShooterIntake;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Shooter_Intake.ShooterIntake;
 import frc.robot.subsystems.Shooter_Intake.ShooterIntakeConstants;
@@ -17,6 +16,7 @@ import frc.robot.subsystems.Shooter_Intake.ShooterIntakeConstants;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class ShootShoot extends SequentialCommandGroup {
     private static final double INTAKE_SPEED = ShooterIntakeConstants.PresetSpeeds.SPEED4.RPM;
+    private static final int TIMER = ShooterIntakeConstants.PresetSpeeds.SHOOTSHOOTTIME.sec;
     ShooterIntake shooterIntake;
     private final double rpm;
   /** Creates a new ShootShoot. */ 
@@ -25,34 +25,33 @@ public class ShootShoot extends SequentialCommandGroup {
     // addCommands(new FooCommand(), new BarCommand());
     addRequirements(shooterIntake);
     this.rpm = rpm;
-    addCommands(new Step1(),
-      new Step2(),
-      new InstantCommand());
+    addCommands(
+      new Step1(),
+      new Step2());
   }
   
   private class Step1 extends Command{
     Timer timer = new Timer();
     @Override
     public void initialize(){
+      timer.restart();
       shooterIntake.setTargetRPMShooterMotorOffPivot(rpm);
       shooterIntake.setTargetRPMShooterMotorOnPivot(rpm);
     }
-//TODO corret time
-  @Override
-  public boolean isFinished() {
-    return (shooterIntake.isShooterMotorsAtSetSpeed()) || timer.get() >=2;
-  }
+  //TODO corret time
+    @Override
+    public boolean isFinished() {
+      return shooterIntake.isShooterMotorsAtSetSpeed() || timer.get() >= TIMER;
+    }
 
   }
 
   private class Step2 extends Command{
     Timer timer = new Timer();
-    private Step2(){
-      
-    }
 
     @Override
     public void initialize() {
+      timer.restart();
       shooterIntake.setTargetIntakeMotorRPM(INTAKE_SPEED);
 
     }
@@ -66,7 +65,7 @@ public class ShootShoot extends SequentialCommandGroup {
     }
   @Override
   public boolean isFinished() {
-    return timer.get() >=2;
+    return timer.get() >= TIMER;
     
   }
 
