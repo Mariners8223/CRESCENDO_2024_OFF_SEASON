@@ -51,16 +51,16 @@ public class IntakeFromShooter extends SequentialCommandGroup {
     Timer timer = new Timer();
     @Override
     public void initialize() {
-      timer.start();
+      timer.restart();
       shooterIntake.setTargetIntakeMotorRPM(ShooterIntakeConstants.IntakePresetSpeeds.IntakeSpeedLow.RPM);
     }
 
     @Override
     public void end(boolean interrupted) {
       shooterIntake.stopMotorOffPivot();
-     shooterIntake.stopIntakeMotor();
-     shooterIntake.StopMotorOnPivot();
-     shooterIntake.setGpLoaded(true);
+      shooterIntake.stopIntakeMotor();
+      shooterIntake.StopMotorOnPivot();
+      shooterIntake.setGpLoaded(!interrupted);
     }
    @Override
     public boolean isFinished() {

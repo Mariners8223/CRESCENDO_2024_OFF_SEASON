@@ -15,7 +15,7 @@ public class ShooterIntake extends SubsystemBase {
   private double onPivotShooterSetSpeed;
   private double offPivotShooterSetSpeed;
 
-  boolean isGpLoaded = false;
+  boolean isGpLoaded = true;
   /** Creates a new ShooterIntake. */
   public ShooterIntake() {}
   
@@ -82,8 +82,7 @@ public class ShooterIntake extends SubsystemBase {
 
   public boolean isShooterMotorsAtSetSpeed(){
     return Math.abs(inputs.onPivotShooterMotorRPM - onPivotShooterSetSpeed)<= (ShooterIntakeConstants.SHOOTERSPEED) &&
-     Math.abs(inputs.offPivotShooterMotorRPM - offPivotShooterSetSpeed)<= (ShooterIntakeConstants.SHOOTERSPEED);
-
+    Math.abs(inputs.offPivotShooterMotorRPM - offPivotShooterSetSpeed)<= (ShooterIntakeConstants.SHOOTERSPEED);
   }
 
 }

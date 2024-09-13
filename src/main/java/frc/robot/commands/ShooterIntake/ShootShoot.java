@@ -17,9 +17,10 @@ public class ShootShoot extends SequentialCommandGroup {
   ShooterIntake shooterIntake;
   private double rpm;
   /** Creates a new ShootShoot. */ 
-  public ShootShoot(double rpm) {
+  public ShootShoot(double rpm, ShooterIntake shooterIntake) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
+    this.shooterIntake = shooterIntake;
     addRequirements(shooterIntake);
     this.rpm = rpm;
     addCommands(
