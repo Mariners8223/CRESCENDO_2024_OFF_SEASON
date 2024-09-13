@@ -42,8 +42,7 @@ public class ShootToAmp extends Command {
 
   @Override
   public boolean isFinished() {
-    return timer.get() <= ShooterIntakeConstants.AccelarationTime.SHOOTAMPTIME.sec;
-
+    return timer.get() <= ShooterIntakeConstants.AccelarationTime.SHOOTAMPTIME.sec; 
   }
 
 }

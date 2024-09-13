@@ -81,7 +81,6 @@ public class ShooterIntake extends SubsystemBase {
   }
 
   public boolean isShooterMotorsAtSetSpeed(){
-
     return Math.abs(inputs.onPivotShooterMotorRPM - onPivotShooterSetSpeed)<= (ShooterIntakeConstants.SHOOTERSPEED) &&
      Math.abs(inputs.offPivotShooterMotorRPM - offPivotShooterSetSpeed)<= (ShooterIntakeConstants.SHOOTERSPEED);
 

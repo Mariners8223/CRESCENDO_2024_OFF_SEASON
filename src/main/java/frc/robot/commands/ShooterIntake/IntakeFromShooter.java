@@ -41,11 +41,10 @@ public class IntakeFromShooter extends SequentialCommandGroup {
       shooterIntake.setTargetRPMShooterMotorOffPivot(ShooterIntakeConstants.ShooterPresetSpeeds.IntakeShooterSpeedLow.RPM);
       shooterIntake.setTargetRPMShooterMotorOnPivot(ShooterIntakeConstants.ShooterPresetSpeeds.ShooterSpeedLow.RPM);
     }
-  @Override
-  public boolean isFinished() {
+   @Override
+   public boolean isFinished() {
     return shooterIntake.getBeamBreakValue();
-  }
-
+    }
   }
 
   private class Step2 extends Command{
@@ -63,10 +62,9 @@ public class IntakeFromShooter extends SequentialCommandGroup {
      shooterIntake.StopMotorOnPivot();
      shooterIntake.setGpLoaded(true);
     }
-  @Override
-  public boolean isFinished() {
-    return  timer.get() >= ShooterIntakeConstants.AccelarationTime.INTAKESHOOTERTIME.sec && shooterIntake.getBeamBreakValue();
-
+   @Override
+    public boolean isFinished() {
+     return  timer.get() >= ShooterIntakeConstants.AccelarationTime.INTAKESHOOTERTIME.sec && shooterIntake.getBeamBreakValue();
+    }
   }
-}
 }

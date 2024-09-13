@@ -24,7 +24,8 @@ public class ShootShoot extends SequentialCommandGroup {
     this.rpm = rpm;
     addCommands(
       new Step1(),
-      new Step2());
+      new Step2()
+    );
   }
   
   private class Step1 extends Command{
@@ -60,9 +61,9 @@ public class ShootShoot extends SequentialCommandGroup {
       shooterIntake.stopMotorOffPivot();
       shooterIntake.StopMotorOnPivot();
     }
-  @Override
-  public boolean isFinished() {
-    return timer.get() >= ShooterIntakeConstants.AccelarationTime.SHOOTSHOOTTIME.sec;
+    @Override
+    public boolean isFinished() {
+      return timer.get() >= ShooterIntakeConstants.AccelarationTime.SHOOTSHOOTTIME.sec;
     
   }
 

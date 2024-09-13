@@ -22,21 +22,16 @@ public class ShooterIntakeConstants {
 
     private AccelarationTime(int sec){
       this.sec = sec;
-      }
+    }
   }
 
   public enum ShooterPresetSpeeds{
     
     ShooterSpeedHigh(2000),
     ShooterSpeedLow(1000),
-  
     IntakeShooterSpeedHigh(-2000),
     IntakeShooterSpeedLow(-1000);
-  
-    
-    
-    
-  
+
     public final double RPM;
     
     private ShooterPresetSpeeds(double RPM){
@@ -51,7 +46,7 @@ public class ShooterIntakeConstants {
     IntakeGetOutSpeed( -100),
     IntakeShooterIntake( 500);
 
-     public final double RPM;
+    public final double RPM;
     
     private IntakePresetSpeeds(double RPM){
       this.RPM = RPM;

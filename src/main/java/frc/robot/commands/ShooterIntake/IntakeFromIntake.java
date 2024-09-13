@@ -26,7 +26,7 @@ public class IntakeFromIntake extends SequentialCommandGroup {
     addCommands(
       new Step1(),
       new Step2()
-      );
+    );
   }
 
   private class Step1 extends Command{
