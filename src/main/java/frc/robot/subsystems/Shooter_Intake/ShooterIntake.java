@@ -42,15 +42,17 @@ public class ShooterIntake extends SubsystemBase {
 
   public void setTargetRPMShooterMotorOnPivot(double speed){
     this.onPivotShooterSetSpeed = speed;
-    Logger.recordOutput("Shooter Intake/On Pivot Motor Set speed", speed);
+    Logger.recordOutput("Shooter/ On Pivot Motor /Set speed", speed);
     io.setTargetShooterMotorOnPivotRPM(speed);
   }
   public void setTargetRPMShooterMotorOffPivot(double speed){
     this.offPivotShooterSetSpeed = speed;
+    Logger.recordOutput("Shooter/ Off Pivot Motor /Set speed", speed);
     io.setTargetShooterMotorOffPivotRPM(speed);
   }
   public void setTargetIntakeMotorRPM(double speed){
     this.intakeSetSpeed = speed;  
+    Logger.recordOutput("Shooter/ Intake Motor /Set speed", speed);
     io.setTargetIntakeMotorRPM(speed);
   }
   
@@ -58,12 +60,15 @@ public class ShooterIntake extends SubsystemBase {
     return inputs.BeamBreakValue;
   }
   public void StopMotorOnPivot(){
+    Logger.recordOutput("Shooter/ On Pivot Motor /Set speed",0);
     io.StopMotorOnPivot();
   }
    public void stopMotorOffPivot(){
+    Logger.recordOutput("Shooter/ Off Pivot Motor /Set speed",0);
     io.StopMotorOffPivot();
   }
   public void stopIntakeMotor(){
+    Logger.recordOutput("Shooter/ Intake Motor /Set speed", 0);
     io.stopIntakeMotor();
   }
   public double getIntakeMotorRPM(){
