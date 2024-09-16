@@ -3,6 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems.Shooter_Intake;
+
+import frc.util.PIDFGains;
+
 /** Add your docs here. */
 public class ShooterIntakeConstants {
 
@@ -52,6 +55,29 @@ public class ShooterIntakeConstants {
       this.RPM = RPM;
     }
 
+    public static class IO_CONSTNATS{ 
+    public static final int INTAKE_MOTOR_ID = 0;
+    public static final int ON_PIVOT_SHOOTER_MOTOR_ID = 1;
+    public static final int OFF_PIVOT_SHOOTER_MOTOR_ID = 3;
+    public static final int BEAM_BREAK_PORT = 0;
 
+      public static final double INTAKE_MOTOR_GEAR_RATIO = 1;
+      public static final double SHOOTER_MAX_RPM = 5700;
+    
+    
+    
+      public static final boolean BEAM_BREAK_INVERTED = false;
+      public static final boolean INTAKE_MOTOR_INVERTED = false;
+      public static final boolean ON_PIVOT_SHOOTER_MOTOR_INVERTED = false;
+      public static final boolean off_PIVOT_SHOOTER_MOTOR_INVERTED = false;
+
+
+      public static final PIDFGains ON_PIVOT_SHOOTER_PID = new  PIDFGains(0, 0, 0,0);
+      public static final PIDFGains OFF_PIVOT_SHOOTER_PID = new  PIDFGains(0, 0, 0,0);
+      public static final PIDFGains INTAKE_MOTOR_PID = new  PIDFGains(0, 0, 0,0);
+    
+    
+    }
   }
+
 }
