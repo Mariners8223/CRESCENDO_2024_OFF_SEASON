@@ -54,12 +54,13 @@ public class ShooterIntakeConstants {
     private IntakePresetSpeeds(double RPM){
       this.RPM = RPM;
     }
+  }
 
-    public static class IO_CONSTNATS{ 
-    public static final int INTAKE_MOTOR_ID = 0;
-    public static final int ON_PIVOT_SHOOTER_MOTOR_ID = 1;
-    public static final int OFF_PIVOT_SHOOTER_MOTOR_ID = 3;
-    public static final int BEAM_BREAK_PORT = 0;
+  public class IO_CONSTNATS{ 
+      public static final int INTAKE_MOTOR_ID = 0;
+      public static final int ON_PIVOT_SHOOTER_MOTOR_ID = 1;
+      public static final int OFF_PIVOT_SHOOTER_MOTOR_ID = 3;
+      public static final int BEAM_BREAK_PORT = 0;
 
       public static final double INTAKE_MOTOR_GEAR_RATIO = 1;
       public static final double SHOOTER_MAX_RPM = 5700;
