@@ -70,7 +70,7 @@ public class ShooterIntakeConstants {
       public static final boolean BEAM_BREAK_INVERTED = false;
       public static final boolean INTAKE_MOTOR_INVERTED = false;
       public static final boolean ON_PIVOT_SHOOTER_MOTOR_INVERTED = false;
-      public static final boolean off_PIVOT_SHOOTER_MOTOR_INVERTED = false;
+      public static final boolean OFF_PIVOT_SHOOTER_MOTOR_INVERTED = false;
 
 
       public static final PIDFGains ON_PIVOT_SHOOTER_PID = new  PIDFGains(0, 0, 0,0);
@@ -80,5 +80,3 @@ public class ShooterIntakeConstants {
     
     }
   }
-
-}

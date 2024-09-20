@@ -30,7 +30,7 @@ public class ShooterIntakeIOReal implements ShooterIntakeIO {
         motor.getPIDController().setFF(ShooterIntakeConstants.IO_CONSTNATS.INTAKE_MOTOR_PID.getF());
     }
 
-    public CANSparkFlex configureonPivotShooterMotor(){
+    public CANSparkFlex configureOnPivotShooterMotor(){
         CANSparkFlex motor = new CANSparkFlex(ShooterIntakeConstants.IO_CONSTNATS.ON_PIVOT_SHOOTER_MOTOR_ID, MotorType.kBrushless);
 
         motor.setInverted(ShooterIntakeConstants.IO_CONSTNATS.ON_PIVOT_SHOOTER_MOTOR_INVERTED);
@@ -39,6 +39,17 @@ public class ShooterIntakeIOReal implements ShooterIntakeIO {
         motor.getPIDController().setI(ShooterIntakeConstants.IO_CONSTNATS.ON_PIVOT_SHOOTER_PID.getI());
         motor.getPIDController().setD(ShooterIntakeConstants.IO_CONSTNATS.ON_PIVOT_SHOOTER_PID.getD());
         motor.getPIDController().setFF(ShooterIntakeConstants.IO_CONSTNATS.ON_PIVOT_SHOOTER_PID.getF());
+    }
+
+      public CANSparkFlex configureOffPivotShooterMotor(){
+        CANSparkFlex motor = new CANSparkFlex(ShooterIntakeConstants.IO_CONSTNATS.OFF_PIVOT_SHOOTER_MOTOR_ID, MotorType.kBrushless);
+
+        motor.setInverted(ShooterIntakeConstants.IO_CONSTNATS.OFF_PIVOT_SHOOTER_MOTOR_INVERTED);
+
+        motor.getPIDController().setP(ShooterIntakeConstants.IO_CONSTNATS.OFF_PIVOT_SHOOTER_PID.getP());
+        motor.getPIDController().setI(ShooterIntakeConstants.IO_CONSTNATS.OFF_PIVOT_SHOOTER_PID.getI());
+        motor.getPIDController().setD(ShooterIntakeConstants.IO_CONSTNATS.OFF_PIVOT_SHOOTER_PID.getD());
+        motor.getPIDController().setFF(ShooterIntakeConstants.IO_CONSTNATS.OFF_PIVOT_SHOOTER_PID.getF());
     }
 
     public void setTargetIntakeMotorRPM(double speedRPM){
