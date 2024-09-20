@@ -1,87 +1,96 @@
 package frc.robot.subsystems.Shooter_Intake;
 
-import java.net.CacheRequest;
-
 import com.revrobotics.CANSparkFlex;
-import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkBase.ControlType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import frc.util.PIDFGains;
 
 public class ShooterIntakeIOReal implements ShooterIntakeIO {
-    CANSparkFlex intakemotor;
+    CANSparkFlex intakeMotor;
     CANSparkFlex onPivotShooterMotor;
     CANSparkFlex offPivotShooterMotor;
     DigitalInput beamBreak;
 
     public ShooterIntakeIOReal(){
-        intakemotor = configureIntakeMotor();
+        intakeMotor = configureIntakeMotor();
     }
 
     public CANSparkFlex configureIntakeMotor(){
-        CANSparkFlex motor = new CANSparkFlex(ShooterIntakeConstants.IO_CONSTNATS.INTAKE_MOTOR_ID, MotorType.kBrushless);
-
-        motor.setInverted(ShooterIntakeConstants.IO_CONSTNATS.INTAKE_MOTOR_INVERTED);
-
-        motor.getPIDController().setP(ShooterIntakeConstants.IO_CONSTNATS.INTAKE_MOTOR_PID.getP());
-        motor.getPIDController().setI(ShooterIntakeConstants.IO_CONSTNATS.INTAKE_MOTOR_PID.getI());
-        motor.getPIDController().setD(ShooterIntakeConstants.IO_CONSTNATS.INTAKE_MOTOR_PID.getD());
-        motor.getPIDController().setFF(ShooterIntakeConstants.IO_CONSTNATS.INTAKE_MOTOR_PID.getF());
+       return configureMotor(ShooterIntakeConstants.IO_CONSTNATS.INTAKE_MOTOR_ID,
+       ShooterIntakeConstants.IO_CONSTNATS.INTAKE_MOTOR_INVERTED,
+       ShooterIntakeConstants.IO_CONSTNATS.INTAKE_MOTOR_PID);
     }
 
     public CANSparkFlex configureOnPivotShooterMotor(){
-        CANSparkFlex motor = new CANSparkFlex(ShooterIntakeConstants.IO_CONSTNATS.ON_PIVOT_SHOOTER_MOTOR_ID, MotorType.kBrushless);
-
-        motor.setInverted(ShooterIntakeConstants.IO_CONSTNATS.ON_PIVOT_SHOOTER_MOTOR_INVERTED);
-
-        motor.getPIDController().setP(ShooterIntakeConstants.IO_CONSTNATS.ON_PIVOT_SHOOTER_PID.getP());
-        motor.getPIDController().setI(ShooterIntakeConstants.IO_CONSTNATS.ON_PIVOT_SHOOTER_PID.getI());
-        motor.getPIDController().setD(ShooterIntakeConstants.IO_CONSTNATS.ON_PIVOT_SHOOTER_PID.getD());
-        motor.getPIDController().setFF(ShooterIntakeConstants.IO_CONSTNATS.ON_PIVOT_SHOOTER_PID.getF());
+     return configureMotor(ShooterIntakeConstants.IO_CONSTNATS.ON_PIVOT_SHOOTER_MOTOR_ID,
+       ShooterIntakeConstants.IO_CONSTNATS.ON_PIVOT_SHOOTER_MOTOR_INVERTED,
+       ShooterIntakeConstants.IO_CONSTNATS.ON_PIVOT_SHOOTER_PID);
     }
 
-      public CANSparkFlex configureOffPivotShooterMotor(){
-        CANSparkFlex motor = new CANSparkFlex(ShooterIntakeConstants.IO_CONSTNATS.OFF_PIVOT_SHOOTER_MOTOR_ID, MotorType.kBrushless);
-
-        motor.setInverted(ShooterIntakeConstants.IO_CONSTNATS.OFF_PIVOT_SHOOTER_MOTOR_INVERTED);
-
-        motor.getPIDController().setP(ShooterIntakeConstants.IO_CONSTNATS.OFF_PIVOT_SHOOTER_PID.getP());
-        motor.getPIDController().setI(ShooterIntakeConstants.IO_CONSTNATS.OFF_PIVOT_SHOOTER_PID.getI());
-        motor.getPIDController().setD(ShooterIntakeConstants.IO_CONSTNATS.OFF_PIVOT_SHOOTER_PID.getD());
-        motor.getPIDController().setFF(ShooterIntakeConstants.IO_CONSTNATS.OFF_PIVOT_SHOOTER_PID.getF());
+    public CANSparkFlex configureOffPivotShooterMotor(){
+ return configureMotor(ShooterIntakeConstants.IO_CONSTNATS.OFF_PIVOT_SHOOTER_MOTOR_ID,
+       ShooterIntakeConstants.IO_CONSTNATS.OFF_PIVOT_SHOOTER_MOTOR_INVERTED,
+       ShooterIntakeConstants.IO_CONSTNATS.OFF_PIVOT_SHOOTER_PID);
     }
 
     public void setTargetIntakeMotorRPM(double speedRPM){
+        this.intakeMotor.getPIDController().setReference(speedRPM, ControlType.kVelocity);
 
     }
     public void setTargetShooterMotorOffPivotRPM(double speedRPM){
+        this.offPivotShooterMotor.getPIDController().setReference(speedRPM, ControlType.kVelocity);
 
     }
     public void setTargetShooterMotorOnPivotRPM(double speedRPM){
+        this.onPivotShooterMotor.getPIDController().setReference(speedRPM, ControlType.kVelocity);
 
     }
-    public void StopMotorOffPivot(double speedRPM){
+    public void StopMotorOffPivot(){
+        this.offPivotShooterMotor.stopMotor();
 
     }
-    public void StopMotorOnPivot(double speedRPM){
+    public void StopMotorOnPivot(){
+        this.onPivotShooterMotor.stopMotor();
 
     }
-    public void setIntakeTargetPosition(double speedRPM){
+    public void stopIntakeMotor() {
+        this.intakeMotor.stopMotor();
+
+    }
+    public void setIntakeTargetPosition(double rotation){
+        this.intakeMotor.getPIDController().setReference(rotation, ControlType.kPosition);
 
     }
     public void update(ShooterIntakeInputsAutoLogged inputs){
+        
+        // update shooterIntake variables
+        //intake motor
+        inputs.intakeMotorCurrent = this.intakeMotor.getOutputCurrent();
+        inputs.intakeMotorPosition = this.intakeMotor.getAbsoluteEncoder().getPosition();
+        inputs.intakeMotorRPM = this.intakeMotor.getEncoder().getVelocity();
 
+        //on pivot shooter motor
+        inputs.onPivotShooterMotorCurrent = this.onPivotShooterMotor.getOutputCurrent();
+        inputs.onPivotShooterMotorRPM = this.onPivotShooterMotor.getEncoder().getVelocity();
+
+        //off pivot shooter motor
+        inputs.offPivotShooterMotorCurrent = this.offPivotShooterMotor.getOutputCurrent();
+        inputs.offPivotShooterMotorRPM = this.offPivotShooterMotor.getEncoder().getVelocity();
+
+        //beamBreak
+        inputs.BeamBreakValue = this.beamBreak.get();
     }
-    private CANSparkFlex configureMotor(int motorID, boolean isInverted, PIDFGains){
+    
+    private CANSparkFlex configureMotor(int motorID, boolean isInverted, PIDFGains gains){
         CANSparkFlex motor = new CANSparkFlex(motorID, CANSparkFlex.MotorType.kBrushless);
 
-        Motor.setInverted(isInverted);
+        motor.setInverted(isInverted);
 
         motor.getPIDController().setP(gains.getP());
         motor.getPIDController().setI(gains.getI());
         motor.getPIDController().setD(gains.getD());
         motor.getPIDController().setFF(gains.getF());
-        
+        return motor;
     }
 }

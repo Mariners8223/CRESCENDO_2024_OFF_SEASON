@@ -11,7 +11,6 @@ public class ShooterIntake extends SubsystemBase {
   private ShooterIntakeIO io;
   private ShooterIntakeInputsAutoLogged inputs = new ShooterIntakeInputsAutoLogged();
 
-  private double intakeSetSpeed;
   private double onPivotShooterSetSpeed;
   private double offPivotShooterSetSpeed;
 
@@ -32,6 +31,10 @@ public class ShooterIntake extends SubsystemBase {
     this.isGpLoaded = gpLoaded;
   }
 
+  /*
+   * set amount of rotations the motor needs to do relitive to zero set postion
+   * @ param rotation num of rotations or part of rotation to turn, sign denotes direction of turn 
+   */ 
   public void setIntakeMotorTargetPosition(double rotation){
     io.setIntakeTargetPosition(rotation);
   }
@@ -51,7 +54,6 @@ public class ShooterIntake extends SubsystemBase {
     io.setTargetShooterMotorOffPivotRPM(speed);
   }
   public void setTargetIntakeMotorRPM(double speed){
-    this.intakeSetSpeed = speed;  
     Logger.recordOutput("Shooter/ Intake Motor /Set speed", speed);
     io.setTargetIntakeMotorRPM(speed);
   }
