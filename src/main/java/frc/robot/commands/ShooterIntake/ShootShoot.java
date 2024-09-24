@@ -4,6 +4,8 @@
 
 package frc.robot.commands.ShooterIntake;
 
+import java.util.function.Supplier;
+
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
@@ -16,22 +18,22 @@ import frc.robot.subsystems.Shooter_Intake.ShooterIntakeConstants;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class ShootShoot extends SequentialCommandGroup {
   ShooterIntake shooterIntake;
-  private double rpm;
+    private Supplier<Double> rpmSupplier;
   /** Creates a new ShootShoot. */ 
-  public ShootShoot(double rpm, ShooterIntake shooterIntake) {
+  private ShootShoot(Supplier<Double> rpmSupplier, ShooterIntake shooterIntake) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     this.shooterIntake = shooterIntake;
     addRequirements(shooterIntake);
-    this.rpm = rpm;
+    this.rpmSupplier = rpmSupplier;
     addCommands(
       new Step1(),
       new Step2()
     );
   }
 
-  public ConditionalCommand getCommand(ShooterIntake shooterIntake){
-    return new ShootShoot(rpm, shooterIntake).onlyIf(() -> shooterIntake.isGpLoaded());
+  public ConditionalCommand getCommand(ShooterIntake shooterIntake,Supplier<Double> rpmSupplier){
+    return new ShootShoot(rpmSupplier, shooterIntake).onlyIf(() -> shooterIntake.isGpLoaded());
   }
   
   private class Step1 extends Command{
@@ -39,6 +41,7 @@ public class ShootShoot extends SequentialCommandGroup {
     @Override
     public void initialize(){
       timer.restart();
+      double rpm = rpmSupplier.get();
       shooterIntake.setTargetRPMShooterMotorOffPivot(rpm);
       shooterIntake.setTargetRPMShooterMotorOnPivot(rpm);
     }

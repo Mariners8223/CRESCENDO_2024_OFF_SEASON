@@ -5,7 +5,6 @@ import com.revrobotics.CANSparkBase.ControlType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.util.PIDFGains;
-
 public class ShooterIntakeIOReal implements ShooterIntakeIO {
     CANSparkFlex intakeMotor;
     CANSparkFlex onPivotShooterMotor;
@@ -14,9 +13,12 @@ public class ShooterIntakeIOReal implements ShooterIntakeIO {
 
     public ShooterIntakeIOReal(){
         intakeMotor = configureIntakeMotor();
+        onPivotShooterMotor = configureOnPivotShooterMotor();
+        offPivotShooterMotor = configureOffPivotShooterMotor();
+        beamBreak = new DigitalInput(ShooterIntakeConstants.IO_CONSTNATS.BEAM_BREAK_PORT);
     }
 
-    public CANSparkFlex configureIntakeMotor(){
+    private CANSparkFlex configureIntakeMotor(){
        return configureMotor(ShooterIntakeConstants.IO_CONSTNATS.INTAKE_MOTOR_ID,
        ShooterIntakeConstants.IO_CONSTNATS.INTAKE_MOTOR_INVERTED,
        ShooterIntakeConstants.IO_CONSTNATS.INTAKE_MOTOR_PID);
@@ -79,7 +81,8 @@ public class ShooterIntakeIOReal implements ShooterIntakeIO {
         inputs.offPivotShooterMotorRPM = this.offPivotShooterMotor.getEncoder().getVelocity();
 
         //beamBreak
-        inputs.BeamBreakValue = this.beamBreak.get();
+        inputs.BeamBreakValue =
+            ShooterIntakeConstants.IO_CONSTNATS.BEAM_BREAK_INVERTED ? !beamBreak.get() : beamBreak.get();
     }
     
     private CANSparkFlex configureMotor(int motorID, boolean isInverted, PIDFGains gains){

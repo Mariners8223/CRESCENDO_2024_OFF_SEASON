@@ -23,7 +23,7 @@ public interface ShooterIntakeIO {
 //RPM = rotations per min
     public void setTargetShooterMotorOnPivotRPM(double speedRPM);
     public void setTargetShooterMotorOffPivotRPM(double speedRPM);
-    public void setTargetIntakeMotorRPM(double speedRPM);
+    public void setTargetIntakeMotorRPM(double DutyCycle);
     public void StopMotorOnPivot();
     public void StopMotorOffPivot();
     public void stopIntakeMotor();
