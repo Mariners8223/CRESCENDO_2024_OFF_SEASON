@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.Shooter_Intake;
 
+import edu.wpi.first.wpilibj.DutyCycle;
 import frc.util.PIDFGains;
 
 /** Add your docs here. */
@@ -28,6 +29,22 @@ public class ShooterIntakeConstants {
     }
   }
 
+  public enum DezzNuts{
+
+    PivotShooterSpeed(),
+    IntakeIntakeSpeed(),
+    IntakeShooterSpeed(),
+    OutIntakeSpeed();
+
+    public final double Arpm;
+    private DezzNuts (double Arpm)
+    {
+      this.Arpm =Arpm;
+    }  
+    
+  }
+
+
   public enum ShooterPresetSpeeds{
     
     ShooterSpeedHigh(2000),
@@ -40,6 +57,7 @@ public class ShooterIntakeConstants {
     private ShooterPresetSpeeds(double RPM){
       this.RPM = RPM;
     }
+
 //IntakeShooterIntake speed should be 0.175 
   }
   public enum IntakePresetSpeeds{
@@ -72,7 +90,7 @@ public class ShooterIntakeConstants {
       public static final boolean ON_PIVOT_SHOOTER_MOTOR_INVERTED = false;
       public static final boolean OFF_PIVOT_SHOOTER_MOTOR_INVERTED = false;
 
-
+//משהו משהו שאיל רוצה שנעשה
       public static final PIDFGains ON_PIVOT_SHOOTER_PID = new  PIDFGains(0, 0, 0,0);
       public static final PIDFGains OFF_PIVOT_SHOOTER_PID = new  PIDFGains(0, 0, 0,0);
       public static final PIDFGains INTAKE_MOTOR_PID = new  PIDFGains(0, 0, 0,0);
