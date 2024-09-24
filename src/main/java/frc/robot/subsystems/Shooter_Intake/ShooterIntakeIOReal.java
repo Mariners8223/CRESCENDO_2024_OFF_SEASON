@@ -3,6 +3,7 @@ package frc.robot.subsystems.Shooter_Intake;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkBase.ControlType;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.util.PIDFGains;
 public class ShooterIntakeIOReal implements ShooterIntakeIO {
@@ -84,6 +85,30 @@ public class ShooterIntakeIOReal implements ShooterIntakeIO {
         inputs.BeamBreakValue =
             ShooterIntakeConstants.IO_CONSTNATS.BEAM_BREAK_INVERTED ? !beamBreak.get() : beamBreak.get();
     }
+
+
+    public void setTargetIntakeMotorDutyCycle(double dutyCycle) {
+        // Ensure the duty cycle is within the valid range (0.0 to 1.0 for forward power, -1.0 to 0.0 for reverse power)
+        dutyCycle = MathUtil.clamp(dutyCycle, -1, 1);
+
+        // Set the motor power directly based on the duty cycle (percent output)
+        intakeMotor.set(dutyCycle);  // Assuming intakeMotor is a motor controller (e.g., PWMVictorSPX or TalonSRX)
+    }
+     public void setTargetShooterMotorOnPivotDutyCycle(double dutyCycle) {
+        // Ensure the duty cycle is within the valid range (0.0 to 1.0 for forward power, -1.0 to 0.0 for reverse power)
+        dutyCycle = MathUtil.clamp(dutyCycle, -1, 1);
+
+        // Set the motor power directly based on the duty cycle (percent output)
+        intakeMotor.set(dutyCycle);  // Assuming intakeMotor is a motor controller (e.g., PWMVictorSPX or TalonSRX)
+    }
+     public void setTargetShooterMotorOffPivotDutyCycle(double dutyCycle) {
+        // Ensure the duty cycle is within the valid range (0.0 to 1.0 for forward power, -1.0 to 0.0 for reverse power)
+        dutyCycle = MathUtil.clamp(dutyCycle, -1, 1);
+
+        // Set the motor power directly based on the duty cycle (percent output)
+        intakeMotor.set(dutyCycle);  // Assuming intakeMotor is a motor controller (e.g., PWMVictorSPX or TalonSRX)
+    }
+
     
     private CANSparkFlex configureMotor(int motorID, boolean isInverted, PIDFGains gains){
         CANSparkFlex motor = new CANSparkFlex(motorID, CANSparkFlex.MotorType.kBrushless);

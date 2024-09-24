@@ -19,11 +19,18 @@ public interface ShooterIntakeIO {
         double offPivotShooterMotorRPM;
         double intakeMotorRPM;
         double intakeMotorPosition;
+        double IntakeMotorDutyCycle;
     }
 //RPM = rotations per min
     public void setTargetShooterMotorOnPivotRPM(double speedRPM);
     public void setTargetShooterMotorOffPivotRPM(double speedRPM);
-    public void setTargetIntakeMotorRPM(double DutyCycle);
+
+
+    public void setTargetShooterMotorOnPivotDutyCycle(double dutyCycle);
+    public void setTargetShooterMotorOffPivotDutyCycle(double dutyCycle);
+    public void setTargetIntakeMotorDutyCycle(double dutyCycle);
+
+    
     public void StopMotorOnPivot();
     public void StopMotorOffPivot();
     public void stopIntakeMotor();

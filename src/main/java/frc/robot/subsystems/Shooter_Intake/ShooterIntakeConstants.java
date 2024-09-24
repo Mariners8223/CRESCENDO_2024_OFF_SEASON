@@ -40,7 +40,7 @@ public class ShooterIntakeConstants {
     private ShooterPresetSpeeds(double RPM){
       this.RPM = RPM;
     }
-
+//IntakeShooterIntake speed should be 0.175 
   }
   public enum IntakePresetSpeeds{
     ShootAmpSpeed( -500),
