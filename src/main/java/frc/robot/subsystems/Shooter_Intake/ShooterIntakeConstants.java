@@ -28,21 +28,26 @@ public class ShooterIntakeConstants {
       this.sec = sec;
     }
   }
+  double speed = DezzNuts.PivotShooterSpeed.getArpm();
 
-  public enum DezzNuts{
+  public enum DezzNuts {
 
-    PivotShooterSpeed(),
-    IntakeIntakeSpeed(),
-    IntakeShooterSpeed(),
-    OutIntakeSpeed();
+    PivotShooterSpeed(1000.0),  // Example RPM values
+    IntakeIntakeSpeed(800.0),
+    IntakeShooterSpeed(1200.0),
+    OutIntakeSpeed(900.0);
 
     public final double Arpm;
-    private DezzNuts (double Arpm)
-    {
-      this.Arpm =Arpm;
-    }  
-    
-  }
+
+    private DezzNuts(double Arpm) {
+        this.Arpm = Arpm;
+    }
+
+    public double getArpm() {
+        return Arpm;
+    }
+}
+
 
 
   public enum ShooterPresetSpeeds{
