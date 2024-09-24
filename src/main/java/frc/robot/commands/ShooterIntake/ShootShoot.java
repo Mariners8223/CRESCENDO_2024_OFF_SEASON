@@ -32,7 +32,7 @@ public class ShootShoot extends SequentialCommandGroup {
     );
   }
 
-  public ConditionalCommand getCommand(ShooterIntake shooterIntake,Supplier<Double> rpmSupplier){
+  public static ConditionalCommand getCommand(ShooterIntake shooterIntake,Supplier<Double> rpmSupplier){
     return new ShootShoot(rpmSupplier, shooterIntake).onlyIf(() -> shooterIntake.isGpLoaded());
   }
   

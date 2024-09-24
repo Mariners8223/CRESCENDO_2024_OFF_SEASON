@@ -25,10 +25,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.ShooterIntake.IntakeFromIntake;
+import frc.robot.commands.ShooterIntake.ShootShoot;
 import frc.robot.commands.ShooterIntake.ShootToAmp;
 import frc.robot.commands.ShooterIntake.UpdateSpeedWhenMoved;
 import frc.robot.subsystems.DriveTrain.DriveBase;
 import frc.robot.subsystems.Shooter_Intake.ShooterIntake;
+import frc.robot.subsystems.Shooter_Intake.ShooterIntakeConstants;
 
 public class RobotContainer{
     public static DriveBase driveBase;
@@ -124,6 +126,7 @@ public class RobotContainer{
         armController.cross().whileTrue(new UpdateSpeedWhenMoved(shooterIntake, () -> SmartDashboard.getNumber("speed", 0)));
         armController.circle().onTrue(IntakeFromIntake.getCommand(shooterIntake));
         armController.square().onTrue(ShootToAmp.getCommand(shooterIntake));
+        armController.triangle().onTrue(ShootShoot.getCommand(shooterIntake, () -> ShooterIntakeConstants.Shooter_Speeds.SHOOT_SPEED.value));
     }
     
     
