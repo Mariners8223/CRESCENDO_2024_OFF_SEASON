@@ -13,9 +13,10 @@ public class UpdateSpeedWhenMoved extends Command {
   ShooterIntake shooterIntake;
   private Supplier<Double> rpmSupplier;
   /** Creates a new UpdateSpeedWhenMoved. */
-  public UpdateSpeedWhenMoved(ShooterIntake shooterIntake) {
+  public UpdateSpeedWhenMoved(ShooterIntake shooterIntake, Supplier<Double> rpmSupplier) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.shooterIntake = shooterIntake;
+    this.rpmSupplier = rpmSupplier;
     addRequirements(shooterIntake);
   }
 
@@ -27,7 +28,8 @@ public class UpdateSpeedWhenMoved extends Command {
     shooterIntake.setTargetRPMShooterMotorOnPivot(rpm);
   }
   
-  public void end () {
+  @Override
+  public void end(boolean interrupted) {
     shooterIntake.StopMotorOnPivot();
     shooterIntake.stopMotorOffPivot();
   }

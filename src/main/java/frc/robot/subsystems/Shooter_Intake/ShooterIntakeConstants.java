@@ -17,7 +17,7 @@ public class ShooterIntakeConstants {
   //TODO change times
   public enum AccelarationTime{
     SHOOTSHOOTTIME(5),
-    SHOOTAMPTIME(5),
+    SHOOTAMPTIME(1),
     INTAKESHOOTERTIME(5),
     INTAKEINTAKETIME(5);
 
@@ -42,7 +42,7 @@ public class ShooterIntakeConstants {
   public enum Intake_Speeds{
     EJECT_SPEED(-0.3),
     SHOOT_POWER(0.5),
-    INTAKE_SPEED(0.35);
+    INTAKE_SPEED(0.4);
 
     public final double value;
 
@@ -52,25 +52,25 @@ public class ShooterIntakeConstants {
   }
 
   public class IO_CONSTNATS{ 
-      public static final int INTAKE_MOTOR_ID = 0;
-      public static final int ON_PIVOT_SHOOTER_MOTOR_ID = 1;
-      public static final int OFF_PIVOT_SHOOTER_MOTOR_ID = 3;
-      public static final int BEAM_BREAK_PORT = 0;
+      public static final int INTAKE_MOTOR_ID = 16;
+      public static final int ON_PIVOT_SHOOTER_MOTOR_ID = 14;
+      public static final int OFF_PIVOT_SHOOTER_MOTOR_ID = 15;
+      public static final int BEAM_BREAK_PORT = 4;
 
-      public static final double INTAKE_MOTOR_GEAR_RATIO = 1;
-      public static final double SHOOTER_MAX_RPM = 5700;
+      public static final double INTAKE_MOTOR_GEAR_RATIO = 3;
+      public static final double SHOOTER_MAX_RPM = 5800;
     
     
     
       public static final boolean BEAM_BREAK_INVERTED = false;
-      public static final boolean INTAKE_MOTOR_INVERTED = false;
+      public static final boolean INTAKE_MOTOR_INVERTED = true;
       public static final boolean ON_PIVOT_SHOOTER_MOTOR_INVERTED = false;
-      public static final boolean OFF_PIVOT_SHOOTER_MOTOR_INVERTED = false;
+      public static final boolean OFF_PIVOT_SHOOTER_MOTOR_INVERTED = true;
 
 //משהו משהו שאיל רוצה שנעשה
-      public static final PIDFGains ON_PIVOT_SHOOTER_PID = new  PIDFGains(0, 0, 0,0);
-      public static final PIDFGains OFF_PIVOT_SHOOTER_PID = new  PIDFGains(0, 0, 0,0);
-      public static final PIDFGains INTAKE_MOTOR_PID = new  PIDFGains(0, 0, 0,0);
+      public static final PIDFGains ON_PIVOT_SHOOTER_PID = new  PIDFGains(0.0001, 0, 0, 0.00017, 0, 0, 0);
+      public static final PIDFGains OFF_PIVOT_SHOOTER_PID = new  PIDFGains(0.00007, 0, 0,0.000165, 0, 0);
+      public static final PIDFGains INTAKE_MOTOR_PID = new  PIDFGains(0.0002, 0, 0,0, 0, 0);
     
     
     }

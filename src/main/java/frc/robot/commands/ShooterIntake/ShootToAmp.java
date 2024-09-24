@@ -27,7 +27,7 @@ public class ShootToAmp extends Command {
     addRequirements(shooterIntake);
   }
 
-  public ConditionalCommand getCommand(ShooterIntake shooterIntake){
+  public static ConditionalCommand getCommand(ShooterIntake shooterIntake){
     return new ShootToAmp(shooterIntake).onlyIf(() -> shooterIntake.isGpLoaded());
   }
   

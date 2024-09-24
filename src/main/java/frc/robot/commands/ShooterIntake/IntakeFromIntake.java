@@ -24,7 +24,7 @@ public class IntakeFromIntake extends Command {
     addRequirements(shooterIntake);
   }
 
-  public ConditionalCommand getCommand(ShooterIntake shooterIntake){
+  public static ConditionalCommand getCommand(ShooterIntake shooterIntake){
     return new IntakeFromIntake(shooterIntake).onlyIf(() -> !shooterIntake.isGpLoaded());
   }
 
@@ -35,7 +35,7 @@ public class IntakeFromIntake extends Command {
 
   @Override
   public void end(boolean interrupted) {
-    shooterIntake.stopIntakeMotor();
+    shooterIntake.setIntakeMotorTargetPosition(shooterIntake.getIntakeMotorPositions());
     shooterIntake.setGpLoaded(!interrupted);
   }
 

@@ -62,6 +62,7 @@ public class ShooterIntakeIOReal implements ShooterIntakeIO {
 
     }
     public void setIntakeTargetPosition(double rotation){
+        rotation *= ShooterIntakeConstants.IO_CONSTNATS.INTAKE_MOTOR_GEAR_RATIO;
         this.intakeMotor.getPIDController().setReference(rotation, ControlType.kPosition);
 
     }
@@ -70,7 +71,7 @@ public class ShooterIntakeIOReal implements ShooterIntakeIO {
         // update shooterIntake variables
         //intake motor
         inputs.intakeMotorCurrent = this.intakeMotor.getOutputCurrent();
-        inputs.intakeMotorPosition = this.intakeMotor.getAbsoluteEncoder().getPosition();
+        inputs.intakeMotorPosition = this.intakeMotor.getEncoder().getPosition() / ShooterIntakeConstants.IO_CONSTNATS.INTAKE_MOTOR_GEAR_RATIO;
         inputs.intakeMotorRPM = this.intakeMotor.getEncoder().getVelocity();
 
         //on pivot shooter motor
