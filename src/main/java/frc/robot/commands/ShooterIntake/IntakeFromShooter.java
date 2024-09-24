@@ -40,15 +40,10 @@ public class IntakeFromShooter extends SequentialCommandGroup {
   private class Step1 extends Command{
     @Override
     public void initialize() {
-      shooterIntake.setTargetRPMShooterMotorOffPivot(ShooterIntakeConstants.ShooterPresetSpeeds.IntakeShooterSpeedHigh.RPM);
-      shooterIntake.setTargetRPMShooterMotorOnPivot(ShooterIntakeConstants.ShooterPresetSpeeds.ShooterSpeedHigh.RPM);
+      shooterIntake.setTargetShooterMotorOffPivotDutyCycle(ShooterIntakeConstants.Shooter_Speeds.INTAKE_POWER.value);
+      shooterIntake.setTargetShooterMotorOnPivotDutyCycle(ShooterIntakeConstants.Shooter_Speeds.INTAKE_POWER.value);
     }
 
-    @Override
-    public void end(boolean interrupted) {
-      shooterIntake.setTargetRPMShooterMotorOffPivot(ShooterIntakeConstants.ShooterPresetSpeeds.IntakeShooterSpeedLow.RPM);
-      shooterIntake.setTargetRPMShooterMotorOnPivot(ShooterIntakeConstants.ShooterPresetSpeeds.ShooterSpeedLow.RPM);
-    }
    @Override
    public boolean isFinished() {
     return shooterIntake.getBeamBreakValue();
@@ -60,7 +55,7 @@ public class IntakeFromShooter extends SequentialCommandGroup {
     @Override
     public void initialize() {
       timer.restart();
-      shooterIntake.setTargetIntakeMotorRPM(ShooterIntakeConstants.IntakePresetSpeeds.IntakeSpeedLow.RPM);
+      shooterIntake.setIntakeMotorDutyCycle(ShooterIntakeConstants.Intake_Speeds.EJECT_SPEED.value);
     }
 
     @Override

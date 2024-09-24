@@ -6,14 +6,13 @@ package frc.robot.commands.ShooterIntake;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Shooter_Intake.ShooterIntake;
 import frc.robot.subsystems.Shooter_Intake.ShooterIntakeConstants;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class IntakeFromIntake extends SequentialCommandGroup {
+public class IntakeFromIntake extends Command {
   ShooterIntake shooterIntake;
   /** Creates a new IntakeFromIntake. */
   private IntakeFromIntake(ShooterIntake shooterIntake) {
@@ -23,48 +22,26 @@ public class IntakeFromIntake extends SequentialCommandGroup {
     this.shooterIntake = shooterIntake;
 
     addRequirements(shooterIntake);
-
-    addCommands(
-      new Step1(),
-      new Step2()
-    );
   }
 
   public ConditionalCommand getCommand(ShooterIntake shooterIntake){
     return new IntakeFromIntake(shooterIntake).onlyIf(() -> !shooterIntake.isGpLoaded());
   }
 
-  private class Step1 extends Command{
-
-    @Override
-    public void initialize() {
-      shooterIntake.setTargetIntakeMotorRPM(ShooterIntakeConstants.IntakePresetSpeeds.IntakeSpeedHigh.RPM);
-    }
-
-   @Override
-    public boolean isFinished() {
-      return shooterIntake.isIntakeMotorsUnderLoad();
-    }
-
+  @Override
+  public void initialize() {
+    shooterIntake.setIntakeMotorDutyCycle(ShooterIntakeConstants.Intake_Speeds.INTAKE_SPEED.value);
   }
 
-  private class Step2 extends Command{
+  @Override
+  public void end(boolean interrupted) {
+    shooterIntake.stopIntakeMotor();
+    shooterIntake.setGpLoaded(!interrupted);
+  }
 
-    @Override
-    public void initialize() {
-      shooterIntake.setTargetIntakeMotorRPM(ShooterIntakeConstants.IntakePresetSpeeds.IntakeSpeedLow.RPM);
-    }
-
-    @Override
-    public void end(boolean interrupted) {
-      shooterIntake.stopIntakeMotor();
-      shooterIntake.setGpLoaded(!interrupted);
-    }
   @Override
   public boolean isFinished() {
     return shooterIntake.getBeamBreakValue();
-  }
-
   }
   
 }

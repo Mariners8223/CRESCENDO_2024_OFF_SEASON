@@ -13,9 +13,6 @@ import frc.robot.subsystems.Shooter_Intake.ShooterIntakeConstants;
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-
-
-
 public class ShootToAmp extends Command {
   ShooterIntake shooterIntake;
       
@@ -39,12 +36,12 @@ public class ShootToAmp extends Command {
   @Override
   public void initialize() {
     timer.restart();
-    shooterIntake.setTargetIntakeMotorRPM(ShooterIntakeConstants.IntakePresetSpeeds.ShootAmpSpeed.RPM);
+    shooterIntake.setIntakeMotorDutyCycle(ShooterIntakeConstants.Intake_Speeds.EJECT_SPEED.value);
   }
 
   @Override
   public void end(boolean interrupted) {
-    shooterIntake. stopIntakeMotor();
+    shooterIntake.stopIntakeMotor();
     shooterIntake.setGpLoaded(false);
   }
 

@@ -45,26 +45,40 @@ public class ShooterIntake extends SubsystemBase {
 
   public void setTargetRPMShooterMotorOnPivot(double speed){
     this.onPivotShooterSetSpeed = speed;
+
     Logger.recordOutput("Shooter/ On Pivot Motor /Set speed", speed);
+
     io.setTargetShooterMotorOnPivotRPM(speed);
   }
+
   public void setTargetRPMShooterMotorOffPivot(double speed){
     this.offPivotShooterSetSpeed = speed;
+
     Logger.recordOutput("Shooter/ Off Pivot Motor /Set speed", speed);
+
     io.setTargetShooterMotorOffPivotRPM(speed);
   }
-  public void setTargetIntakeMotorRPM(double dutyCycle){
+
+  public void setIntakeMotorDutyCycle(double dutyCycle){
+
     Logger.recordOutput("Shooter/ Intake Motor /Set speed", dutyCycle);
+
     io.setTargetIntakeMotorDutyCycle(dutyCycle);
   }
+
   public void setTargetShooterMotorOnPivotDutyCycle(double dutyCycle){
     this.onPivotShooterSetSpeed = dutyCycle;
+
     Logger.recordOutput("Shooter/ On Pivot Motor /Set speed", dutyCycle);
+
     io.setTargetShooterMotorOnPivotRPM(dutyCycle);
   }
+
   public void setTargetShooterMotorOffPivotDutyCycle(double dutyCycle){
     this.onPivotShooterSetSpeed = dutyCycle;
+
     Logger.recordOutput("Shooter/ On Pivot Motor /Set speed", dutyCycle);
+
     io.setTargetShooterMotorOffPivotRPM(dutyCycle);
   }
   

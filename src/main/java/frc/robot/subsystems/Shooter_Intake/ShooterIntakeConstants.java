@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems.Shooter_Intake;
 
-import edu.wpi.first.wpilibj.DutyCycle;
 import frc.util.PIDFGains;
 
 /** Add your docs here. */
@@ -28,54 +27,27 @@ public class ShooterIntakeConstants {
       this.sec = sec;
     }
   }
-  double speed = DezzNuts.PivotShooterSpeed.getArpm();
 
-  public enum DezzNuts {
+  public enum Shooter_Speeds{
+    SHOOT_SPEED(3000),
+    INTAKE_POWER(-0.175);
 
-    PivotShooterSpeed(1000.0),  // Example RPM values
-    IntakeIntakeSpeed(800.0),
-    IntakeShooterSpeed(1200.0),
-    OutIntakeSpeed(900.0);
+    public final double value;
 
-    public final double Arpm;
-
-    private DezzNuts(double Arpm) {
-        this.Arpm = Arpm;
+    Shooter_Speeds(double value){
+      this.value = value;
     }
-
-    public double getArpm() {
-        return Arpm;
-    }
-}
-
-
-
-  public enum ShooterPresetSpeeds{
-    
-    ShooterSpeedHigh(2000),
-    ShooterSpeedLow(1000),
-    IntakeShooterSpeedHigh(-2000),
-    IntakeShooterSpeedLow(-1000);
-
-    public final double RPM;
-    
-    private ShooterPresetSpeeds(double RPM){
-      this.RPM = RPM;
-    }
-
-//IntakeShooterIntake speed should be 0.175 
   }
-  public enum IntakePresetSpeeds{
-    ShootAmpSpeed( -500),
-    IntakeSpeedHigh(2000),
-    IntakeSpeedLow(1000),
-    IntakeGetOutSpeed( -100),
-    IntakeShooterIntake( 500);
 
-    public final double RPM;
-    
-    private IntakePresetSpeeds(double RPM){
-      this.RPM = RPM;
+  public enum Intake_Speeds{
+    EJECT_SPEED(-0.3),
+    SHOOT_POWER(0.5),
+    INTAKE_SPEED(0.35);
+
+    public final double value;
+
+    Intake_Speeds(double value){
+      this.value = value;
     }
   }
 

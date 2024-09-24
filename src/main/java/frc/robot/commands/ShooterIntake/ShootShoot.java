@@ -60,7 +60,7 @@ public class ShootShoot extends SequentialCommandGroup {
     @Override
     public void initialize() {
       timer.restart();
-      shooterIntake.setTargetIntakeMotorRPM(ShooterIntakeConstants.ShooterPresetSpeeds.IntakeShooterSpeedLow.RPM);
+      shooterIntake.setIntakeMotorDutyCycle(ShooterIntakeConstants.Intake_Speeds.SHOOT_POWER.value);
     }
 
     @Override
