@@ -6,12 +6,16 @@ package frc.robot.commands.ShooterIntake;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import frc.robot.subsystems.Shooter_Intake.ShooterIntake;
 import frc.robot.subsystems.Shooter_Intake.ShooterIntakeConstants;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
+
+
+
 public class ShootToAmp extends Command {
   ShooterIntake shooterIntake;
       
@@ -24,6 +28,10 @@ public class ShootToAmp extends Command {
     this.shooterIntake = shooterIntake;
 
     addRequirements(shooterIntake);
+  }
+
+  public ConditionalCommand getCommand(ShooterIntake shooterIntake){
+    return new ShootToAmp(shooterIntake).onlyIf(() -> shooterIntake.isGpLoaded());
   }
   
   private Timer timer = new Timer(); 

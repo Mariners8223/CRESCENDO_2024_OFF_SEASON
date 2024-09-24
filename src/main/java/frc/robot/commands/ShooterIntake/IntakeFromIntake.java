@@ -5,6 +5,7 @@
 package frc.robot.commands.ShooterIntake;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Shooter_Intake.ShooterIntake;
 import frc.robot.subsystems.Shooter_Intake.ShooterIntakeConstants;
@@ -15,7 +16,7 @@ import frc.robot.subsystems.Shooter_Intake.ShooterIntakeConstants;
 public class IntakeFromIntake extends SequentialCommandGroup {
   ShooterIntake shooterIntake;
   /** Creates a new IntakeFromIntake. */
-  public IntakeFromIntake(ShooterIntake shooterIntake) {
+  private IntakeFromIntake(ShooterIntake shooterIntake) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());\
 
@@ -27,6 +28,10 @@ public class IntakeFromIntake extends SequentialCommandGroup {
       new Step1(),
       new Step2()
     );
+  }
+
+  public ConditionalCommand getCommand(ShooterIntake shooterIntake){
+    return new IntakeFromIntake(shooterIntake).onlyIf(() -> !shooterIntake.isGpLoaded());
   }
 
   private class Step1 extends Command{
@@ -63,3 +68,4 @@ public class IntakeFromIntake extends SequentialCommandGroup {
   }
   
 }
+

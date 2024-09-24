@@ -6,6 +6,7 @@ package frc.robot.commands.ShooterIntake;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Shooter_Intake.ShooterIntake;
 import frc.robot.subsystems.Shooter_Intake.ShooterIntakeConstants;
@@ -27,6 +28,10 @@ public class ShootShoot extends SequentialCommandGroup {
       new Step1(),
       new Step2()
     );
+  }
+
+  public ConditionalCommand getCommand(ShooterIntake shooterIntake){
+    return new ShootShoot(rpm, shooterIntake).onlyIf(() -> shooterIntake.isGpLoaded());
   }
   
   private class Step1 extends Command{
