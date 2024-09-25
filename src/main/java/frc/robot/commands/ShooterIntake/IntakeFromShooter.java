@@ -32,8 +32,12 @@ public class IntakeFromShooter extends SequentialCommandGroup {
   }
 
 
-  public ConditionalCommand getCommand(ShooterIntake shooterIntake){
-    return new IntakeFromShooter(shooterIntake).onlyIf(() -> !shooterIntake.isGpLoaded());
+  public static ConditionalCommand getCommand(ShooterIntake shooterIntake){
+    ConditionalCommand command = new IntakeFromShooter(shooterIntake).onlyIf(() -> !shooterIntake.isGpLoaded());
+
+    command.setName("Intake from Shooter");
+
+    return command;
   }
   
 
@@ -42,6 +46,7 @@ public class IntakeFromShooter extends SequentialCommandGroup {
     public void initialize() {
       shooterIntake.setTargetShooterMotorOffPivotDutyCycle(ShooterIntakeConstants.Shooter_Speeds.INTAKE_POWER.value);
       shooterIntake.setTargetShooterMotorOnPivotDutyCycle(ShooterIntakeConstants.Shooter_Speeds.INTAKE_POWER.value);
+      shooterIntake.setIntakeMotorDutyCycle(ShooterIntakeConstants.Intake_Speeds.TEST.value);
     }
 
    @Override
@@ -55,13 +60,12 @@ public class IntakeFromShooter extends SequentialCommandGroup {
     @Override
     public void initialize() {
       timer.restart();
-      shooterIntake.setIntakeMotorDutyCycle(ShooterIntakeConstants.Intake_Speeds.EJECT_SPEED.value);
     }
 
     @Override
     public void end(boolean interrupted) {
       shooterIntake.stopMotorOffPivot();
-      shooterIntake.stopIntakeMotor();
+      shooterIntake.setIntakeMotorTargetPosition(shooterIntake.getIntakeMotorPositions() - 1.5000);
       shooterIntake.StopMotorOnPivot();
       shooterIntake.setGpLoaded(!interrupted);
     }

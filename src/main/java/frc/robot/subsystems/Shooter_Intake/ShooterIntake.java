@@ -25,11 +25,18 @@ public class ShooterIntake extends SubsystemBase {
     io.update(inputs);
     // This method will be called once per scheduler run
     Logger.processInputs("Shooter Intake", inputs);
+
+    String currentCommandName = getCurrentCommand() != null ? getCurrentCommand().getName() : "none";
+
+    Logger.recordOutput("Shooter/current command", currentCommandName);
   }
   public boolean isGpLoaded(){
     return isGpLoaded;
   }
   public void setGpLoaded(boolean gpLoaded){
+
+    Logger.recordOutput("Shooter/is gp loaded", gpLoaded);
+
     this.isGpLoaded = gpLoaded;
   }
 
@@ -73,7 +80,7 @@ public class ShooterIntake extends SubsystemBase {
 
     Logger.recordOutput("Shooter/ On Pivot Motor /Set speed", dutyCycle);
 
-    io.setTargetShooterMotorOnPivotRPM(dutyCycle);
+    io.setTargetShooterMotorOnPivotDutyCycle(dutyCycle);
   }
 
   public void setTargetShooterMotorOffPivotDutyCycle(double dutyCycle){
@@ -81,7 +88,7 @@ public class ShooterIntake extends SubsystemBase {
 
     Logger.recordOutput("Shooter/ On Pivot Motor /Set speed", dutyCycle);
 
-    io.setTargetShooterMotorOffPivotRPM(dutyCycle);
+    io.setTargetShooterMotorOffPivotDutyCycle(dutyCycle);
   }
   
   
@@ -89,15 +96,15 @@ public class ShooterIntake extends SubsystemBase {
     return inputs.BeamBreakValue;
   }
   public void StopMotorOnPivot(){
-    Logger.recordOutput("Shooter/ On Pivot Motor /Set speed",0);
+    Logger.recordOutput("Shooter/ On Pivot Motor /Set speed",0.0);
     io.StopMotorOnPivot();
   }
    public void stopMotorOffPivot(){
-    Logger.recordOutput("Shooter/ Off Pivot Motor /Set speed",0);
+    Logger.recordOutput("Shooter/ Off Pivot Motor /Set speed",0.0);
     io.StopMotorOffPivot();
   }
   public void stopIntakeMotor(){
-    Logger.recordOutput("Shooter/ Intake Motor /Set speed", 0);
+    Logger.recordOutput("Shooter/ Intake Motor /Set speed", 0.0);
     io.stopIntakeMotor();
   }
   public double getIntakeMotorRPM(){
@@ -115,8 +122,8 @@ public class ShooterIntake extends SubsystemBase {
   }
 
   public boolean isShooterMotorsAtSetSpeed(){
-    return Math.abs(inputs.onPivotShooterMotorRPM - onPivotShooterSetSpeed)<= (ShooterIntakeConstants.SHOOTERSPEED) &&
-    Math.abs(inputs.offPivotShooterMotorRPM - offPivotShooterSetSpeed)<= (ShooterIntakeConstants.SHOOTERSPEED);
+    return Math.abs(inputs.onPivotShooterMotorRPM - onPivotShooterSetSpeed)<= (ShooterIntakeConstants.SHOOTER_SPEED_TOLRANCE) &&
+    Math.abs(inputs.offPivotShooterMotorRPM - offPivotShooterSetSpeed)<= (ShooterIntakeConstants.SHOOTER_SPEED_TOLRANCE);
   }
 
 }

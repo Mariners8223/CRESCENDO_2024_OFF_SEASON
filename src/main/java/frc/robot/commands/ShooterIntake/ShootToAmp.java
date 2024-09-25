@@ -6,7 +6,6 @@ package frc.robot.commands.ShooterIntake;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import frc.robot.subsystems.Shooter_Intake.ShooterIntake;
 import frc.robot.subsystems.Shooter_Intake.ShooterIntakeConstants;
 
@@ -27,8 +26,8 @@ public class ShootToAmp extends Command {
     addRequirements(shooterIntake);
   }
 
-  public static ConditionalCommand getCommand(ShooterIntake shooterIntake){
-    return new ShootToAmp(shooterIntake).onlyIf(() -> shooterIntake.isGpLoaded());
+  public static Command getCommand(ShooterIntake shooterIntake){
+    return new ShootToAmp(shooterIntake);
   }
   
   private Timer timer = new Timer(); 
@@ -42,7 +41,8 @@ public class ShootToAmp extends Command {
   @Override
   public void end(boolean interrupted) {
     shooterIntake.stopIntakeMotor();
-    shooterIntake.setGpLoaded(false);
+    if(interrupted) shooterIntake.setGpLoaded(shooterIntake.isGpLoaded());
+    else shooterIntake.setGpLoaded(false);
   }
 
   @Override

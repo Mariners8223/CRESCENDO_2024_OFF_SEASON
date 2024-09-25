@@ -11,19 +11,19 @@ public class ShooterIntakeConstants {
 
   public static final double INTAKE_MOTOR_UNDER_LOAD_CURRENT = 15;
   public static final double SHOOTER_MOTOR_UNDER_LOAD_CURRENT = 15;
-  public static final double SHOOTERSPEED = 10;
+  public static final double SHOOTER_SPEED_TOLRANCE = 100;
 
 
   //TODO change times
   public enum AccelarationTime{
-    SHOOTSHOOTTIME(5),
+    SHOOTSHOOTTIME(0.5),
     SHOOTAMPTIME(1),
-    INTAKESHOOTERTIME(5),
+    INTAKESHOOTERTIME(0.069),
     INTAKEINTAKETIME(5);
 
-    public final int sec;
+    public final double sec;
 
-    private AccelarationTime(int sec){
+    private AccelarationTime(double sec){
       this.sec = sec;
     }
   }
@@ -40,9 +40,11 @@ public class ShooterIntakeConstants {
   }
 
   public enum Intake_Speeds{
-    EJECT_SPEED(-0.3),
+    EJECT_SPEED(-0.12),
     SHOOT_POWER(0.5),
-    INTAKE_SPEED(0.4);
+    INTAKE_SPEED(0.4),
+    TEST(-0.2001);
+
 
     public final double value;
 

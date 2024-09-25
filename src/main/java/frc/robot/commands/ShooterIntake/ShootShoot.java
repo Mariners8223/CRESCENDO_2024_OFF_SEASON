@@ -24,8 +24,10 @@ public class ShootShoot extends SequentialCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     this.shooterIntake = shooterIntake;
+
     addRequirements(shooterIntake);
     this.rpmSupplier = rpmSupplier;
+
     addCommands(
       new Step1(),
       new Step2()
@@ -33,7 +35,10 @@ public class ShootShoot extends SequentialCommandGroup {
   }
 
   public static ConditionalCommand getCommand(ShooterIntake shooterIntake,Supplier<Double> rpmSupplier){
-    return new ShootShoot(rpmSupplier, shooterIntake).onlyIf(() -> shooterIntake.isGpLoaded());
+    ConditionalCommand command = new ShootShoot(rpmSupplier, shooterIntake).onlyIf(() -> shooterIntake.isGpLoaded());
+    command.setName("Shoot Shoot");
+
+    return command;
   }
   
   private class Step1 extends Command{

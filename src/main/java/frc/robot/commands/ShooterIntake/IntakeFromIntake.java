@@ -35,7 +35,7 @@ public class IntakeFromIntake extends Command {
 
   @Override
   public void end(boolean interrupted) {
-    shooterIntake.setIntakeMotorTargetPosition(shooterIntake.getIntakeMotorPositions());
+    shooterIntake.setIntakeMotorTargetPosition(shooterIntake.getIntakeMotorPositions() - 1);
     shooterIntake.setGpLoaded(!interrupted);
   }
 
