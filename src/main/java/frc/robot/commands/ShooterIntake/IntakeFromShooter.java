@@ -53,7 +53,6 @@ public class IntakeFromShooter extends SequentialCommandGroup {
     public void end(boolean interrupted) {
       shooterIntake.stopMotorOffPivot();
       shooterIntake.StopMotorOnPivot();
-      shooterIntake.setIntakeMotorTargetPosition(shooterIntake.getIntakeMotorPositions() - 0.98);
 
     }
 
@@ -72,11 +71,13 @@ public class IntakeFromShooter extends SequentialCommandGroup {
 
     @Override
     public void end(boolean interrupted) {
-      shooterIntake.setGpLoaded(false);
+      shooterIntake.setGpLoaded(true);
+      shooterIntake.setIntakeMotorTargetPosition(shooterIntake.getIntakeMotorPositions() - 0.98);
+
     }
    @Override
     public boolean isFinished() {
-     return  timer.get() >= ShooterIntakeConstants.AccelarationTime.INTAKESHOOTERTIME.sec && !shooterIntake.isIntakeMotorsUnderLoad();
+     return shooterIntake.isIntakeMotorsUnderLoad() && timer.get() >= 0.04;
     }
   }
 }

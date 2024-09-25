@@ -45,6 +45,9 @@ public class ShooterIntake extends SubsystemBase {
    * @ param rotation num of rotations or part of rotation to turn, sign denotes direction of turn 
    */ 
   public void setIntakeMotorTargetPosition(double rotation){
+
+    Logger.recordOutput("Intake Motor /Set rotation", rotation);
+
     io.setIntakeTargetPosition(rotation);
   }
 
@@ -112,7 +115,7 @@ public class ShooterIntake extends SubsystemBase {
   }
   
   public boolean isIntakeMotorsUnderLoad(){
-    return inputs.intakeMotorCurrent >= ShooterIntakeConstants.INTAKE_MOTOR_UNDER_LOAD_CURRENT;
+    return inputs.intakeMotorCurrent > ShooterIntakeConstants.INTAKE_MOTOR_UNDER_LOAD_CURRENT;
     
   }
 

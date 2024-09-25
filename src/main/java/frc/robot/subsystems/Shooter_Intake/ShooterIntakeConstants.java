@@ -9,7 +9,7 @@ import frc.util.PIDFGains;
 /** Add your docs here. */
 public class ShooterIntakeConstants {
 
-  public static final double INTAKE_MOTOR_UNDER_LOAD_CURRENT = 15;
+  public static final double INTAKE_MOTOR_UNDER_LOAD_CURRENT = 20;
   public static final double SHOOTER_MOTOR_UNDER_LOAD_CURRENT = 15;
   public static final double SHOOTER_SPEED_TOLRANCE = 100;
 
@@ -29,8 +29,8 @@ public class ShooterIntakeConstants {
   }
 
   public enum Shooter_Speeds{
-    SHOOT_SPEED(3000),
-    INTAKE_POWER(-0.175);
+    SHOOT_SPEED(800),
+    INTAKE_POWER(-0.3);
 
     public final double value;
 
