@@ -41,8 +41,8 @@ public class ShootToAmp extends Command {
   @Override
   public void end(boolean interrupted) {
     shooterIntake.stopIntakeMotor();
-    if(interrupted) shooterIntake.setGpLoaded(shooterIntake.isGpLoaded());
-    else shooterIntake.setGpLoaded(false);
+    //if(interrupted) shooterIntake.setGpLoaded(shooterIntake.isGpLoaded());
+    shooterIntake.setGpLoaded(false);
   }
 
   @Override

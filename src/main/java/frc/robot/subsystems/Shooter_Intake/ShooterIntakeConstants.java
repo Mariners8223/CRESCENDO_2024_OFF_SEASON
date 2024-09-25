@@ -18,7 +18,7 @@ public class ShooterIntakeConstants {
   public enum AccelarationTime{
     SHOOTSHOOTTIME(0.5),
     SHOOTAMPTIME(1),
-    INTAKESHOOTERTIME(0.069),
+    INTAKESHOOTERTIME(0.05),
     INTAKEINTAKETIME(5);
 
     public final double sec;
@@ -43,7 +43,7 @@ public class ShooterIntakeConstants {
     EJECT_SPEED(-0.12),
     SHOOT_POWER(0.5),
     INTAKE_SPEED(0.4),
-    TEST(-0.2001);
+    TEST(-0.2);
 
 
     public final double value;

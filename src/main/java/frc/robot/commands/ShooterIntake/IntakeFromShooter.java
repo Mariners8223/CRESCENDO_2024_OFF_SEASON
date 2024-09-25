@@ -44,9 +44,17 @@ public class IntakeFromShooter extends SequentialCommandGroup {
   private class Step1 extends Command{
     @Override
     public void initialize() {
+      //TODO maybe restart timer?
       shooterIntake.setTargetShooterMotorOffPivotDutyCycle(ShooterIntakeConstants.Shooter_Speeds.INTAKE_POWER.value);
       shooterIntake.setTargetShooterMotorOnPivotDutyCycle(ShooterIntakeConstants.Shooter_Speeds.INTAKE_POWER.value);
       shooterIntake.setIntakeMotorDutyCycle(ShooterIntakeConstants.Intake_Speeds.TEST.value);
+    }
+    @Override
+    public void end(boolean interrupted) {
+      shooterIntake.stopMotorOffPivot();
+      shooterIntake.StopMotorOnPivot();
+      shooterIntake.setIntakeMotorTargetPosition(shooterIntake.getIntakeMotorPositions() - 0.98);
+
     }
 
    @Override
@@ -64,14 +72,11 @@ public class IntakeFromShooter extends SequentialCommandGroup {
 
     @Override
     public void end(boolean interrupted) {
-      shooterIntake.stopMotorOffPivot();
-      shooterIntake.setIntakeMotorTargetPosition(shooterIntake.getIntakeMotorPositions() - 1.5000);
-      shooterIntake.StopMotorOnPivot();
-      shooterIntake.setGpLoaded(!interrupted);
+      shooterIntake.setGpLoaded(false);
     }
    @Override
     public boolean isFinished() {
-     return  timer.get() >= ShooterIntakeConstants.AccelarationTime.INTAKESHOOTERTIME.sec && shooterIntake.getBeamBreakValue();
+     return  timer.get() >= ShooterIntakeConstants.AccelarationTime.INTAKESHOOTERTIME.sec && !shooterIntake.isIntakeMotorsUnderLoad();
     }
   }
 }
