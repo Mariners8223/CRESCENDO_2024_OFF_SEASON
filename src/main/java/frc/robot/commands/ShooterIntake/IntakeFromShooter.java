@@ -64,9 +64,16 @@ public class IntakeFromShooter extends SequentialCommandGroup {
 
   private class Step2 extends Command{
     Timer timer = new Timer();
+    int counter;
     @Override
     public void initialize() {
       timer.restart();
+      counter = 0;
+    }
+
+    @Override
+    public void execute(){
+      counter++;
     }
 
     @Override
@@ -77,7 +84,7 @@ public class IntakeFromShooter extends SequentialCommandGroup {
     }
    @Override
     public boolean isFinished() {
-     return shooterIntake.isIntakeMotorUnderLoad() && timer.get() >= 0.04;
+     return counter >= 8;
     }
   }
 }

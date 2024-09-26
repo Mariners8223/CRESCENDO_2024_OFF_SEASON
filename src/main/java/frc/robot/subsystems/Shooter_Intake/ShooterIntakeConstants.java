@@ -17,7 +17,7 @@ public class ShooterIntakeConstants {
   //TODO change times
   public enum AccelarationTime{
     SHOOTSHOOTTIME(0.5),
-    SHOOTAMPTIME(1),
+    SHOOTAMPTIME(0.6),
     INTAKESHOOTERTIME(0.05),
     INTAKEINTAKETIME(5);
 
@@ -30,7 +30,7 @@ public class ShooterIntakeConstants {
 
   public enum Shooter_Speeds{
     SHOOT_SPEED(800),
-    INTAKE_POWER(-0.3);
+    INTAKE_POWER(-0.175);
 
     public final double value;
 
@@ -41,10 +41,10 @@ public class ShooterIntakeConstants {
 
   public enum Intake_Speeds{
     AMP_POWER(-0.2),
-    EJECT_POWER(-0.12),
+    EJECT_POWER(-0.1),
     SHOOT_POWER(0.5),
     INTAKE_POWER(0.4),
-    INTAKE_FROM_SHOOTER_POWER(-0.2);
+    INTAKE_FROM_SHOOTER_POWER(-0.3);
 
 
     public final double value;

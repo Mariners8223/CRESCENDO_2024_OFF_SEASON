@@ -47,7 +47,7 @@ public class ShootToAmp extends Command {
 
   @Override
   public boolean isFinished() {
-    return (timer.get() >= ShooterIntakeConstants.AccelarationTime.SHOOTAMPTIME.sec && !shooterIntake.isIntakeMotorUnderLoad()); 
+    return timer.get() >= ShooterIntakeConstants.AccelarationTime.SHOOTAMPTIME.sec; 
   }
 
 }
