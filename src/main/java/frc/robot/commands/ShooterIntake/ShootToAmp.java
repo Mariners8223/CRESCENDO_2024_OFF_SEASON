@@ -35,7 +35,7 @@ public class ShootToAmp extends Command {
   @Override
   public void initialize() {
     timer.restart();
-    shooterIntake.setIntakeMotorDutyCycle(ShooterIntakeConstants.Intake_Speeds.EJECT_SPEED.value);
+    shooterIntake.setIntakeMotorDutyCycle(ShooterIntakeConstants.Intake_Speeds.AMP_POWER.value);
   }
 
   @Override
@@ -47,7 +47,7 @@ public class ShootToAmp extends Command {
 
   @Override
   public boolean isFinished() {
-    return timer.get() >= ShooterIntakeConstants.AccelarationTime.SHOOTAMPTIME.sec; 
+    return (timer.get() >= ShooterIntakeConstants.AccelarationTime.SHOOTAMPTIME.sec && !shooterIntake.isIntakeMotorUnderLoad()); 
   }
 
 }

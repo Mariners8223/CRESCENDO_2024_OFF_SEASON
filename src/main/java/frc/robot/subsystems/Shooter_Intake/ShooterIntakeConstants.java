@@ -40,10 +40,11 @@ public class ShooterIntakeConstants {
   }
 
   public enum Intake_Speeds{
-    EJECT_SPEED(-0.12),
+    AMP_POWER(-0.2),
+    EJECT_POWER(-0.12),
     SHOOT_POWER(0.5),
-    INTAKE_SPEED(0.4),
-    TEST(-0.2);
+    INTAKE_POWER(0.4),
+    INTAKE_FROM_SHOOTER_POWER(-0.2);
 
 
     public final double value;

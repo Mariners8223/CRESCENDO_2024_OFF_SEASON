@@ -114,9 +114,8 @@ public class ShooterIntake extends SubsystemBase {
     return inputs.intakeMotorRPM;
   }
   
-  public boolean isIntakeMotorsUnderLoad(){
+  public boolean isIntakeMotorUnderLoad(){
     return inputs.intakeMotorCurrent > ShooterIntakeConstants.INTAKE_MOTOR_UNDER_LOAD_CURRENT;
-    
   }
 
   public boolean isShooterMotorsUnderLoad(){

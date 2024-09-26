@@ -47,7 +47,7 @@ public class IntakeFromShooter extends SequentialCommandGroup {
       //TODO maybe restart timer?
       shooterIntake.setTargetShooterMotorOffPivotDutyCycle(ShooterIntakeConstants.Shooter_Speeds.INTAKE_POWER.value);
       shooterIntake.setTargetShooterMotorOnPivotDutyCycle(ShooterIntakeConstants.Shooter_Speeds.INTAKE_POWER.value);
-      shooterIntake.setIntakeMotorDutyCycle(ShooterIntakeConstants.Intake_Speeds.TEST.value);
+      shooterIntake.setIntakeMotorDutyCycle(ShooterIntakeConstants.Intake_Speeds.INTAKE_FROM_SHOOTER_POWER.value);
     }
     @Override
     public void end(boolean interrupted) {
@@ -77,7 +77,7 @@ public class IntakeFromShooter extends SequentialCommandGroup {
     }
    @Override
     public boolean isFinished() {
-     return shooterIntake.isIntakeMotorsUnderLoad() && timer.get() >= 0.04;
+     return shooterIntake.isIntakeMotorUnderLoad() && timer.get() >= 0.04;
     }
   }
 }

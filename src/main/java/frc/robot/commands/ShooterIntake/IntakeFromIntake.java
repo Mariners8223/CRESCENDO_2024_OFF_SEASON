@@ -30,7 +30,7 @@ public class IntakeFromIntake extends Command {
 
   @Override
   public void initialize() {
-    shooterIntake.setIntakeMotorDutyCycle(ShooterIntakeConstants.Intake_Speeds.INTAKE_SPEED.value);
+    shooterIntake.setIntakeMotorDutyCycle(ShooterIntakeConstants.Intake_Speeds.INTAKE_POWER.value);
   }
 
   @Override
