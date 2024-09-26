@@ -12,6 +12,7 @@ public class ShooterIntakeConstants {
   public static final double INTAKE_MOTOR_UNDER_LOAD_CURRENT = 20;
   public static final double SHOOTER_MOTOR_UNDER_LOAD_CURRENT = 15;
   public static final double SHOOTER_SPEED_TOLRANCE = 100;
+  public static final int INTAKE_CYCLE_TIME = 20;
 
 
   //TODO change times

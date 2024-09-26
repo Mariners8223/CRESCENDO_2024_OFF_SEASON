@@ -5,10 +5,8 @@
 package frc.robot.commands.ShooterIntake;
 
 import edu.wpi.first.wpilibj.Notifier;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Shooter_Intake.ShooterIntake;
 import frc.robot.subsystems.Shooter_Intake.ShooterIntakeConstants;
 
@@ -19,6 +17,7 @@ public class IntakeFromShooter extends Command {
   ShooterIntake shooterIntake;
   Notifier beamBreaker;
   int counter;
+
   /** Creates a new IntakeFromShooter. */
   public IntakeFromShooter(ShooterIntake shooterIntake) {
     this.shooterIntake = shooterIntake;
@@ -37,8 +36,8 @@ public class IntakeFromShooter extends Command {
   }
 
   private void periodic(){
-    if (counter == 9) return;
-
+    if (counter == ShooterIntakeConstants.INTAKE_CYCLE_TIME + 2) return;
+    
     if(shooterIntake.getBeamBreakValue() && counter == 0){
       shooterIntake.stopMotorOffPivot();
       shooterIntake.StopMotorOnPivot();
@@ -46,10 +45,10 @@ public class IntakeFromShooter extends Command {
       counter++;
     }
 
-    else if(counter <= 8) counter++; 
+    else if(counter <= ShooterIntakeConstants.INTAKE_CYCLE_TIME && counter != 0) counter++; 
 
-    else{
-      shooterIntake.setIntakeMotorTargetPosition(shooterIntake.getIntakeMotorPositions() - 0.98);
+    else if(counter == ShooterIntakeConstants.INTAKE_CYCLE_TIME + 1){
+      shooterIntake.stopIntakeMotor();
       counter++;
     }
   }
@@ -61,11 +60,16 @@ public class IntakeFromShooter extends Command {
     shooterIntake.setTargetShooterMotorOnPivotDutyCycle(ShooterIntakeConstants.Shooter_Speeds.INTAKE_POWER.value);
     shooterIntake.setIntakeMotorDutyCycle(ShooterIntakeConstants.Intake_Speeds.INTAKE_FROM_SHOOTER_POWER.value);
 
-    beamBreaker.startPeriodic(0.01);
+    beamBreaker.startPeriodic(0.005);
   }
+
 
   @Override
   public void end(boolean interrupted) {
+    shooterIntake.stopMotorOffPivot();
+    shooterIntake.StopMotorOnPivot();
+    shooterIntake.setIntakeMotorTargetPosition(shooterIntake.getIntakeMotorPositions());
+
     shooterIntake.setGpLoaded(true);
     beamBreaker.stop();
     counter = 0;
@@ -73,6 +77,6 @@ public class IntakeFromShooter extends Command {
 
   @Override
   public boolean isFinished() {
-    return counter == 9;
+    return counter == ShooterIntakeConstants.INTAKE_CYCLE_TIME + 2;
   }
 }

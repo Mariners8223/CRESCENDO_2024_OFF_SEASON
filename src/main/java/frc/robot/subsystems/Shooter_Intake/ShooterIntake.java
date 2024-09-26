@@ -6,10 +6,13 @@ package frc.robot.subsystems.Shooter_Intake;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class ShooterIntake extends SubsystemBase {
   private ShooterIntakeIO io;
   private ShooterIntakeInputsAutoLogged inputs = new ShooterIntakeInputsAutoLogged();
+
+  private DigitalInput beamBreak;
 
   private double onPivotShooterSetSpeed;
   private double offPivotShooterSetSpeed;
@@ -18,6 +21,7 @@ public class ShooterIntake extends SubsystemBase {
   /** Creates a new ShooterIntake. */
   public ShooterIntake() {
     io = new ShooterIntakeIOReal();
+    beamBreak = new DigitalInput(ShooterIntakeConstants.IO_CONSTNATS.BEAM_BREAK_PORT);
   }
   
   @Override
@@ -25,6 +29,8 @@ public class ShooterIntake extends SubsystemBase {
     io.update(inputs);
     // This method will be called once per scheduler run
     Logger.processInputs("Shooter Intake", inputs);
+
+    inputs.BeamBreakValue =  ShooterIntakeConstants.IO_CONSTNATS.BEAM_BREAK_INVERTED ? !beamBreak.get() : beamBreak.get();
 
     String currentCommandName = getCurrentCommand() != null ? getCurrentCommand().getName() : "none";
 
@@ -96,7 +102,7 @@ public class ShooterIntake extends SubsystemBase {
   
   
   public boolean getBeamBreakValue(){
-    return inputs.BeamBreakValue;
+    return ShooterIntakeConstants.IO_CONSTNATS.BEAM_BREAK_INVERTED ? !beamBreak.get() : beamBreak.get();
   }
   public void StopMotorOnPivot(){
     Logger.recordOutput("Shooter/ On Pivot Motor /Set speed",0.0);
