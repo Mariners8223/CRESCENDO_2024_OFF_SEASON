@@ -1,0 +1,154 @@
+{
+  "main": {
+    "id": "2d9af8d62b38afde",
+    "type": "split",
+    "children": [
+      {
+        "id": "9eae343484c8ad4c",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "1b480419a6004f1c",
+            "type": "leaf",
+            "state": {
+              "type": "excalidraw",
+              "state": {
+                "file": "true shooting  + pickup flowchart 1.md"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "420bc901f66397c6",
+    "type": "split",
+    "children": [
+      {
+        "id": "319bef04a8141aed",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "a231e496aee3a558",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "30aa45ced32e8481",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "81e07214e9cfbd36",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {}
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "ed58b80d789ab862",
+    "type": "split",
+    "children": [
+      {
+        "id": "2c10cc829f7448c5",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "d79d164f37a26766",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "true shooting  + pickup flowchart 1.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "d533c202aa69543e",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "true shooting  + pickup flowchart 1.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "85b84abd4c9ea403",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              }
+            }
+          },
+          {
+            "id": "f50b2c5900a9763c",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "true shooting  + pickup flowchart 1.md"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "obsidian-excalidraw-plugin:Create new drawing": false
+    }
+  },
+  "active": "a231e496aee3a558",
+  "lastOpenFiles": [
+    "beam breaker check.md",
+    "true shooting  + pickup flowchart 1.md",
+    "true shooting  + pickup flowchart.md"
+  ]
+}
