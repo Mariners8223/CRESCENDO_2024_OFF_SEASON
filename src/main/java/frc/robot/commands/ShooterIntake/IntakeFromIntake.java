@@ -6,7 +6,6 @@ package frc.robot.commands.ShooterIntake;
 
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import frc.robot.subsystems.Shooter_Intake.ShooterIntake;
 import frc.robot.subsystems.Shooter_Intake.ShooterIntakeConstants;
 
@@ -29,7 +28,7 @@ public class IntakeFromIntake extends Command {
     addRequirements(shooterIntake);
   }
 
-  public static ConditionalCommand getCommand(ShooterIntake shooterIntake){
+  public static Command getCommand(ShooterIntake shooterIntake){
     return new IntakeFromIntake(shooterIntake).onlyIf(() -> !shooterIntake.isGpLoaded());
   }
 
