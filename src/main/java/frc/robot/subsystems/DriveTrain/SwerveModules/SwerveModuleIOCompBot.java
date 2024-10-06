@@ -40,6 +40,8 @@ public class SwerveModuleIOCompBot extends SwerveModuleIO {
         inputs.currentState.angle = Rotation2d.fromRotations(absEncoder.get() * absEncoderMultiplier);
         // inputs.currentState.angle = Rotation2d.fromRotations(steerMotor.getEncoder().getPosition() / DevBotConstants.steerGearRatio);
 
+        steerMotor.getEncoder().setPosition(absEncoder.get() * absEncoderMultiplier * constants.STEER_GEAR_RATIO);
+
         inputs.currentState.speedMetersPerSecond =
                 (driveMotor.getVelocity().getValueAsDouble() / constants.DRIVE_GEAR_RATIO) * constants.WHEEL_CIRCUMFERENCE_METERS;
 

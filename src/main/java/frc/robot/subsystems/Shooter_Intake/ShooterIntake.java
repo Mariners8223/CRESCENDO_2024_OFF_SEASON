@@ -34,14 +34,14 @@ public class ShooterIntake extends SubsystemBase {
 
     String currentCommandName = getCurrentCommand() != null ? getCurrentCommand().getName() : "none";
 
-    Logger.recordOutput("Shooter/current command", currentCommandName);
+    Logger.recordOutput("Shooter Intake/current command", currentCommandName);
   }
   public boolean isGpLoaded(){
     return isGpLoaded;
   }
   public void setGpLoaded(boolean gpLoaded){
 
-    Logger.recordOutput("Shooter/is gp loaded", gpLoaded);
+    Logger.recordOutput("Shooter Intake/is gp loaded", gpLoaded);
 
     this.isGpLoaded = gpLoaded;
   }
@@ -52,7 +52,7 @@ public class ShooterIntake extends SubsystemBase {
    */ 
   public void setIntakeMotorTargetPosition(double rotation){
 
-    Logger.recordOutput("Intake Motor /Set rotation", rotation);
+    Logger.recordOutput("Shooter Intake/Intake motor/Set rotation", rotation);
 
     io.setIntakeTargetPosition(rotation);
   }
@@ -64,7 +64,7 @@ public class ShooterIntake extends SubsystemBase {
   public void setTargetRPMShooterMotorOnPivot(double speed){
     this.onPivotShooterSetSpeed = speed;
 
-    Logger.recordOutput("Shooter/ On Pivot Motor /Set speed", speed);
+    Logger.recordOutput("Shooter Intake/On Pivot Motor/Set speed", speed);
 
     io.setTargetShooterMotorOnPivotRPM(speed);
   }
@@ -72,14 +72,14 @@ public class ShooterIntake extends SubsystemBase {
   public void setTargetRPMShooterMotorOffPivot(double speed){
     this.offPivotShooterSetSpeed = speed;
 
-    Logger.recordOutput("Shooter/ Off Pivot Motor /Set speed", speed);
+    Logger.recordOutput("Shooter Intake/Off Pivot Motor/Set speed", speed);
 
     io.setTargetShooterMotorOffPivotRPM(speed);
   }
 
   public void setIntakeMotorDutyCycle(double dutyCycle){
 
-    Logger.recordOutput("Shooter/ Intake Motor /Set speed", dutyCycle);
+    Logger.recordOutput("Shooter Intake/Intake Motor/Set power", dutyCycle);
 
     io.setTargetIntakeMotorDutyCycle(dutyCycle);
   }
@@ -87,7 +87,7 @@ public class ShooterIntake extends SubsystemBase {
   public void setTargetShooterMotorOnPivotDutyCycle(double dutyCycle){
     this.onPivotShooterSetSpeed = dutyCycle;
 
-    Logger.recordOutput("Shooter/ On Pivot Motor /Set speed", dutyCycle);
+    Logger.recordOutput("Shooter Intake/On Pivot Motor/Set speed", dutyCycle);
 
     io.setTargetShooterMotorOnPivotDutyCycle(dutyCycle);
   }
@@ -95,7 +95,7 @@ public class ShooterIntake extends SubsystemBase {
   public void setTargetShooterMotorOffPivotDutyCycle(double dutyCycle){
     this.onPivotShooterSetSpeed = dutyCycle;
 
-    Logger.recordOutput("Shooter/ On Pivot Motor /Set speed", dutyCycle);
+    Logger.recordOutput("Shooter Intake/On Pivot Motor/Set speed", dutyCycle);
 
     io.setTargetShooterMotorOffPivotDutyCycle(dutyCycle);
   }
@@ -105,15 +105,15 @@ public class ShooterIntake extends SubsystemBase {
     return ShooterIntakeConstants.IO_CONSTNATS.BEAM_BREAK_INVERTED ? !beamBreak.get() : beamBreak.get();
   }
   public void StopMotorOnPivot(){
-    Logger.recordOutput("Shooter/ On Pivot Motor /Set speed",0.0);
+    Logger.recordOutput("Shooter Intake/On Pivot Motor/Set speed",0.0);
     io.StopMotorOnPivot();
   }
    public void stopMotorOffPivot(){
-    Logger.recordOutput("Shooter/ Off Pivot Motor /Set speed",0.0);
+    Logger.recordOutput("Shooter Intake/Off Pivot Motor/Set speed",0.0);
     io.StopMotorOffPivot();
   }
   public void stopIntakeMotor(){
-    Logger.recordOutput("Shooter/ Intake Motor /Set speed", 0.0);
+    Logger.recordOutput("Shooter Intake/Intake Motor/Set speed", 0.0);
     io.stopIntakeMotor();
   }
   public double getIntakeMotorRPM(){

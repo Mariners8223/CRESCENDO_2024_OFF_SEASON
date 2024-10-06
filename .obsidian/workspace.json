@@ -1,19 +1,19 @@
 {
   "main": {
-    "id": "c29224a9bef5ef16",
+    "id": "5b99d3ff23e820be",
     "type": "split",
     "children": [
       {
-        "id": "894001178e666766",
+        "id": "76b3416e22ca5e0f",
         "type": "tabs",
         "children": [
           {
-            "id": "2d7c4d5b8b032406",
+            "id": "9df1d01c25823d3c",
             "type": "leaf",
             "state": {
-              "type": "excalidraw",
+              "type": "image",
               "state": {
-                "file": "obsidian_vault/shooter/true shooting  + pickup flowchart 1.md"
+                "file": "obsidian_vault/auto_refrence.png"
               }
             }
           }
@@ -23,15 +23,15 @@
     "direction": "vertical"
   },
   "left": {
-    "id": "0545019967071c09",
+    "id": "06e2f7104712de2f",
     "type": "split",
     "children": [
       {
-        "id": "bc48ff7fcb32abd2",
+        "id": "02a4fbcaa7add46d",
         "type": "tabs",
         "children": [
           {
-            "id": "f0c892470ffb8eea",
+            "id": "4f5db2d0cfc7eefe",
             "type": "leaf",
             "state": {
               "type": "file-explorer",
@@ -41,7 +41,7 @@
             }
           },
           {
-            "id": "a02aec89622db8d6",
+            "id": "968635b8cbe29cf3",
             "type": "leaf",
             "state": {
               "type": "search",
@@ -56,7 +56,7 @@
             }
           },
           {
-            "id": "380edd8e4dfa776f",
+            "id": "fba291fc4aa7e7e4",
             "type": "leaf",
             "state": {
               "type": "bookmarks",
@@ -67,24 +67,23 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "right": {
-    "id": "b7235c394b20ec72",
+    "id": "f40f29d57c53bffa",
     "type": "split",
     "children": [
       {
-        "id": "1a3d61a908213384",
+        "id": "d8f8144d961c7d84",
         "type": "tabs",
         "children": [
           {
-            "id": "8b3891f3cb920d1a",
+            "id": "2184276a0ccf58c5",
             "type": "leaf",
             "state": {
               "type": "backlink",
               "state": {
-                "file": "obsidian_vault/shooter/true shooting  + pickup flowchart 1.md",
+                "file": "obsidian_vault/auto_refrence.png",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -96,19 +95,19 @@
             }
           },
           {
-            "id": "b57639629121cc34",
+            "id": "4b398a2c613c08a2",
             "type": "leaf",
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "obsidian_vault/shooter/true shooting  + pickup flowchart 1.md",
+                "file": "obsidian_vault/auto_refrence.png",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
             }
           },
           {
-            "id": "628afde8827fb729",
+            "id": "ee9f74eda12bcf2e",
             "type": "leaf",
             "state": {
               "type": "tag",
@@ -119,12 +118,12 @@
             }
           },
           {
-            "id": "e23df78dddb5e071",
+            "id": "aa60844b1c6f1e3e",
             "type": "leaf",
             "state": {
               "type": "outline",
               "state": {
-                "file": "obsidian_vault/shooter/true shooting  + pickup flowchart 1.md"
+                "file": "obsidian_vault/auto_refrence.png"
               }
             }
           }
@@ -137,27 +136,28 @@
   },
   "left-ribbon": {
     "hiddenItems": {
+      "obsidian-excalidraw-plugin:Create new drawing": false,
       "switcher:Open quick switcher": false,
       "graph:Open graph view": false,
       "canvas:Create new canvas": false,
       "daily-notes:Open today's daily note": false,
       "templates:Insert template": false,
-      "command-palette:Open command palette": false,
-      "obsidian-excalidraw-plugin:Create new drawing": false
+      "command-palette:Open command palette": false
     }
   },
-  "active": "2d7c4d5b8b032406",
+  "active": "4f5db2d0cfc7eefe",
   "lastOpenFiles": [
-    "bin/main/frc/robot/commands/Time$TimedDrive.class",
-    "bin/main/frc/robot/commands/Time.class",
-    "src/main/java/frc/robot/commands/Time.java",
-    "src/main/java/frc/robot/commands/ReplaceMeCommand.java",
-    "bin/main/frc/robot/commands/ShooterIntake/ShootShoot$Step1.class",
-    "bin/main/frc/robot/commands/ShooterIntake/ShootShoot$Step2.class",
-    "bin/main/frc/robot/commands/ShooterIntake/ShootShoot.class",
-    "src/main/java/frc/robot/commands/ShooterIntake/ShootShoot.java",
-    "bin/main/frc/robot/commands/ShooterIntake/Shoot.class",
-    "src/main/java/frc/robot/commands/ShooterIntake/Shoot.java",
-    "bin/main/frc/robot/commands/ShooterIntake/IntakeFromShooter.class"
+    "build/classes/java/main/frc/robot/subsystems/Shooter_Intake/ShooterIntakeIOReal.class",
+    "build/classes/java/main/frc/util/FastGyros/SimGyroIO.class",
+    "build/classes/java/main/frc/robot/subsystems/DriveTrain/SwerveModules/SwerveModuleIOSIM$SwerveModuleIOReplay.class",
+    "build/classes/java/main/frc/util/PIDFGains.class",
+    "build/classes/java/main/frc/robot/subsystems/DriveTrain/SwerveModules/SwerveModuleConstants.class",
+    "build/classes/java/main/frc/robot/subsystems/Climb/ClimbIOReal.class",
+    "build/classes/java/main/frc/robot/subsystems/Climb/ClimbConstants.class",
+    "build/classes/java/main/frc/robot/subsystems/Climb/ClimbConstants$SimConstants.class",
+    "build/classes/java/main/frc/robot/subsystems/Arm/ArmIOReal.class",
+    "build/classes/java/main/frc/robot/commands/Drive/DriveCommand.class",
+    "build/classes/java/main/frc/robot/subsystems/DriveTrain/SwerveModules/SwerveModuleIODevBot.class",
+    "obsidian_vault/robot controller/autonomous requirements.md"
   ]
 }

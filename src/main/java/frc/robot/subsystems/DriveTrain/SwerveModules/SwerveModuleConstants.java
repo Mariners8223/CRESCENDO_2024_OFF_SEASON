@@ -30,7 +30,7 @@ public enum SwerveModuleConstants {
     COMPBOT(6.75, 12.5, 0.0508, 4.5,
             false, false, false,
 
-            0.59625, 0.9368, 0.226, 0.750,
+            0.59625, 0.9368, 0.226, 0.988,
 
             new PIDFGains[]{
                 new PIDFGains(0.525, 0, 0.0025, 0, 0.2, 0, 1 / SwerveModule.MODULE_THREAD_HZ), //FL

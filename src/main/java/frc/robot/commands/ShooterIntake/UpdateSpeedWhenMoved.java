@@ -13,12 +13,16 @@ public class UpdateSpeedWhenMoved extends Command {
   ShooterIntake shooterIntake;
   private Supplier<Double> rpmSupplier;
   /** Creates a new UpdateSpeedWhenMoved. */
-  public UpdateSpeedWhenMoved(ShooterIntake shooterIntake, Supplier<Double> rpmSupplier) {
+  private UpdateSpeedWhenMoved(ShooterIntake shooterIntake, Supplier<Double> rpmSupplier) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.shooterIntake = shooterIntake;
     this.rpmSupplier = rpmSupplier;
     addRequirements(shooterIntake);
   }
+
+    public static Command getCommand(ShooterIntake shooterIntake, Supplier<Double> rpmSupplier) {
+        return new UpdateSpeedWhenMoved(shooterIntake, rpmSupplier);
+    }
 
   @Override
   public void execute () {
@@ -36,6 +40,6 @@ public class UpdateSpeedWhenMoved extends Command {
 
  @Override
   public boolean isFinished() {
-    return !shooterIntake.isGpLoaded();
+    return false;
   }
 }

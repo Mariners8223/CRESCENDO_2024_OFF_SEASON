@@ -1,10 +1,18 @@
 package frc.robot.commands.Drive;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.DriveTrain.DriveBase;
+
+import java.util.Optional;
+
+import org.littletonrobotics.junction.Logger;
 
 import static frc.robot.subsystems.DriveTrain.SwerveModules.SwerveModule.DISTANCE_BETWEEN_WHEELS;
 
@@ -13,11 +21,38 @@ public class DriveCommand extends Command {
     private final DriveBase driveBase;
     private final CommandPS5Controller controller;
 
-    public DriveCommand(DriveBase driveBase, CommandPS5Controller controller) {
+    private final PIDController thetaController;
+    private final Trigger controlThetaTrigger;
+    private Optional<Rotation2d> targetAngle = Optional.empty();
+
+    public DriveCommand(DriveBase driveBase, CommandPS5Controller controller,
+                        PIDController thetaController, Trigger controlThetaTrigger) {
+
         this.driveBase = driveBase;
         this.controller = controller;
+        this.thetaController = thetaController;
+        this.thetaController.enableContinuousInput(-Math.PI, Math.PI);
+        this.thetaController.setSetpoint(0);
+
+        this.controlThetaTrigger = controlThetaTrigger;
+
         addRequirements(this.driveBase);
         setName("DriveCommand");
+    }
+
+    public void setTargetAngle(Optional<Rotation2d> targetAngle) {
+        this.targetAngle = targetAngle;
+        if(targetAngle.isPresent()){
+            Logger.recordOutput("DriveBase/Target Angle", targetAngle.get().getDegrees());
+        }
+        else Logger.recordOutput("DriveBase/Target Angle", 0);
+    }
+
+    public Command emptyTargetAngle() {
+        return new InstantCommand(() -> {
+                this.targetAngle = Optional.empty();
+                Logger.recordOutput("DriveBase/Target Angle", 0);
+            });
     }
 
     @Override
@@ -40,15 +75,23 @@ public class DriveCommand extends Command {
         Translation2d centerOfRotation = calculateCenterOfRotation((int) povAngle);
 
         //sets the value of the 3 vectors we need (accounting for drift)
-        double leftX = -deadBand(controller.getLeftY());
-        double leftY = -deadBand(controller.getLeftX());
-        double rightX = -deadBand(controller.getRightX());
+        double leftX = -deadBand(controller.getLeftY()) * R2Axis;
+        double leftY = -deadBand(controller.getLeftX()) * R2Axis;
+
+        double rightX;
+
+        if(controlThetaTrigger.getAsBoolean() && targetAngle.isPresent()){
+            double value = -thetaController.calculate(targetAngle.get().getRadians());
+
+            rightX = Math.abs(value) >= 0.2 ? value : 0;
+        }
+        else rightX = -deadBand(controller.getRightX()) * R2Axis;
 
         //drives the robot with the values
         driveBase.drive(
-                leftX * R2Axis,
-                leftY * R2Axis,
-                rightX * R2Axis,
+                leftX,
+                leftY,
+                rightX,
                 centerOfRotation
         );
     }
@@ -148,8 +191,7 @@ public class DriveCommand extends Command {
      */
     private int convertPOVToRobotRelative(double angle) {
         double theta = MathUtil.inputModulus(driveBase.getAngle(), 0, 360);
-        double alpha = angle;
-        double beta = alpha + theta;
+        double beta = angle + theta;
 
         beta = Math.round(beta / 45) * 45;
 

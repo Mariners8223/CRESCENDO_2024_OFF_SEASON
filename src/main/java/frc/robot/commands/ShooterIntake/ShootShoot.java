@@ -50,7 +50,6 @@ public class ShootShoot extends SequentialCommandGroup {
       shooterIntake.setTargetRPMShooterMotorOffPivot(rpm);
       shooterIntake.setTargetRPMShooterMotorOnPivot(rpm);
     }
-  //TODO corret time
     @Override
     public boolean isFinished() {
       return shooterIntake.isShooterMotorsAtSetSpeed()

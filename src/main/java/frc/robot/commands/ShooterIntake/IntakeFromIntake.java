@@ -52,6 +52,7 @@ public class IntakeFromIntake extends Command {
   public void end(boolean interrupted) {
     isEnded = false;
     thread.stop();
+    if(interrupted) shooterIntake.stopIntakeMotor();
     shooterIntake.setGpLoaded(!interrupted);
   }
 

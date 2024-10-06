@@ -109,6 +109,8 @@ public class ShooterIntakeIOReal implements ShooterIntakeIO {
 
         motor.setInverted(isInverted);
 
+        motor.enableVoltageCompensation(12);
+
         motor.getPIDController().setP(gains.getP());
         motor.getPIDController().setI(gains.getI());
         motor.getPIDController().setD(gains.getD());

@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.DriveTrain;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.wpilibj.*;
@@ -160,10 +161,6 @@ public class DriveBase extends SubsystemBase {
             if (!DriverStation.isFMSAttached()) setModulesBrakeMode(false);
         }
         ).ignoringDisable(true));
-
-        new Trigger(RobotState::isTeleop).and(RobotState::isEnabled).whileTrue(new StartEndCommand(() ->
-                this.setDefaultCommand(new DriveCommand(this, RobotContainer.driveController)),
-                this::removeDefaultCommand).ignoringDisable(true));
     }
 
 
@@ -279,6 +276,15 @@ public class DriveBase extends SubsystemBase {
      */
     public void addVisionMeasurement(Pose2d visionPose, double timeStamp) {
         poseEstimator.addVisionMeasurement(visionPose, timeStamp);
+    }
+
+    /**
+     * updates pose Estimator with vision measurements
+     *
+     * @param data the vision measurement data (pose and time stamp)
+     */
+    public void addVisionMeasurement(Pair<Pose2d, Double> data) {
+        poseEstimator.addVisionMeasurement(data.getFirst(), data.getSecond());
     }
 
     /**
@@ -446,7 +452,7 @@ public class DriveBase extends SubsystemBase {
         }
 
         gyro.update();
-        poseEstimator.updateWithTime(Logger.getTimestamp(), gyro.getRotation2d(), positions);
+        poseEstimator.update(gyro.getRotation2d(), positions);
         currentPose = poseEstimator.getEstimatedPosition();
 
         Logger.recordOutput("DriveBase/estimatedPose", currentPose);

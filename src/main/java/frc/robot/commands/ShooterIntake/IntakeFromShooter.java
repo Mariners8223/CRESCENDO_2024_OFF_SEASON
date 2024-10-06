@@ -55,7 +55,6 @@ public class IntakeFromShooter extends Command {
 
   @Override
   public void initialize() {
-    //TODO maybe restart timer?
     shooterIntake.setTargetShooterMotorOffPivotDutyCycle(ShooterIntakeConstants.Shooter_Speeds.INTAKE_POWER.value);
     shooterIntake.setTargetShooterMotorOnPivotDutyCycle(ShooterIntakeConstants.Shooter_Speeds.INTAKE_POWER.value);
     shooterIntake.setIntakeMotorDutyCycle(ShooterIntakeConstants.Intake_Speeds.INTAKE_FROM_SHOOTER_POWER.value);
@@ -68,7 +67,7 @@ public class IntakeFromShooter extends Command {
   public void end(boolean interrupted) {
     shooterIntake.stopMotorOffPivot();
     shooterIntake.StopMotorOnPivot();
-    shooterIntake.setIntakeMotorTargetPosition(shooterIntake.getIntakeMotorPositions());
+    shooterIntake.setIntakeMotorTargetPosition(shooterIntake.getIntakeMotorPositions() - 0.1);
 
     shooterIntake.setGpLoaded(true);
     beamBreaker.stop();

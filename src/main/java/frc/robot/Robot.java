@@ -89,6 +89,10 @@ public class Robot extends LoggedRobot
     public void robotPeriodic()
     {
         CommandScheduler.getInstance().run();
+        // Vision.VisionOutPuts speakerAngle =
+        //             RobotContainer.vision.getAngleToSpeakerFront(-ArmConstants.ALPHA_DISTANCE_FROM_CENTER.getX(),
+        //                     ArmConstants.ALPHA_DISTANCE_FROM_CENTER.getZ(), ShooterIntakeConstants.SPEED_MULTIPLIER);
+
     }
     
     

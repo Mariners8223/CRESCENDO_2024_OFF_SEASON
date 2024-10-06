@@ -13,9 +13,9 @@ public class ShooterIntakeConstants {
   public static final double SHOOTER_MOTOR_UNDER_LOAD_CURRENT = 15;
   public static final double SHOOTER_SPEED_TOLRANCE = 100;
   public static final int INTAKE_CYCLE_TIME = 20;
+  public static final double SPEED_MULTIPLIER = 1400;
 
 
-  //TODO change times
   public enum AccelarationTime{
     SHOOTSHOOTTIME(0.5),
     SHOOTAMPTIME(0.6),
@@ -55,6 +55,8 @@ public class ShooterIntakeConstants {
     }
   }
 
+
+
   public class IO_CONSTNATS{ 
       public static final int INTAKE_MOTOR_ID = 16;
       public static final int ON_PIVOT_SHOOTER_MOTOR_ID = 14;
@@ -71,10 +73,9 @@ public class ShooterIntakeConstants {
       public static final boolean ON_PIVOT_SHOOTER_MOTOR_INVERTED = false;
       public static final boolean OFF_PIVOT_SHOOTER_MOTOR_INVERTED = true;
 
-//משהו משהו שאיל רוצה שנעשה
       public static final PIDFGains ON_PIVOT_SHOOTER_PID = new  PIDFGains(0.0001, 0, 0, 0.00017, 0, 0, 0);
       public static final PIDFGains OFF_PIVOT_SHOOTER_PID = new  PIDFGains(0.00007, 0, 0,0.000165, 0, 0);
-      public static final PIDFGains INTAKE_MOTOR_PID = new  PIDFGains(0.0002, 0, 0,0, 0, 0);
+      public static final PIDFGains INTAKE_MOTOR_PID = new  PIDFGains(0.1, 0, 0,0, 0, 0);
     
     
     }
