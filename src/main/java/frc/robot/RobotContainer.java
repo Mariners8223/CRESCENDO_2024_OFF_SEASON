@@ -133,7 +133,7 @@ public class RobotContainer {
 
         configureArmBindings(alphaTarget, driveCommand, updateSpeedWhenMoved);
         configureIntakeShooterBindings(driveActionButton, driveCommand, updateSpeedWhenMoved);
-        // configureClimbBindings();
+        configureClimbBindings();
     }
 
     private static void configureArmBindings(Supplier<Measure<Angle>> alphaTarget, DriveCommand drive, Command updateSpeedWhenMoved) {
