@@ -50,9 +50,9 @@ public class ArmConstants {
 
         public static final double ABSOLUTE_ENCODER_OFFSET = 0.88;
 
-        public static final double RAMP_RATE = 0.33; //seconds to full throttle
+        public static final double RAMP_RATE = 0.25; //seconds to full throttle
 
-        public static final PIDFGains PID = new PIDFGains(0.1, 0, 0, 0.0033, ArmConstants.ARM_POSITION_TOLERANCE,0);
+        public static final PIDFGains PID = new PIDFGains(0.1, 0, 0.05, 0.0033, ArmConstants.ARM_POSITION_TOLERANCE,0);
         public static final double MIN_OUTPUT_RANGE = -0.2;
         public static final double MAX_OUTPUT_RANGE = 0.35;
         public static final int SMART_CURRENT_LIMIT = 35;

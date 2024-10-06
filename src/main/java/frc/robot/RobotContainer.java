@@ -210,10 +210,17 @@ public class RobotContainer {
         armController.L1().onTrue(ShootToAmp.getCommand(shooterIntake).onlyIf(
                 () -> arm.getCurrentPos() == ArmConstants.ArmPosition.AMP_POSITION)); //Shoot to amp
 
-        armController.R2().onTrue(new SequentialCommandGroup(
-                new InstantCommand(updateSpeedWhenMoved::cancel),
-                ShootShoot.getCommand(shooterIntake, () -> rpm)
-        ));
+
+
+        // armController.R2().onTrue(new SequentialCommandGroup(
+        //         new InstantCommand(updateSpeedWhenMoved::cancel),
+        //         ShootShoot.getCommand(shooterIntake, () -> rpm)));
+
+
+        new Trigger(() -> armController.getR2Axis() >= 0.95).onTrue(
+            new InstantCommand(updateSpeedWhenMoved::cancel)
+            .alongWith(ShootShoot.getCommand(shooterIntake, () -> rpm)).withName("shoot")
+        );
     }
 
     private static void configureClimbBindings() {

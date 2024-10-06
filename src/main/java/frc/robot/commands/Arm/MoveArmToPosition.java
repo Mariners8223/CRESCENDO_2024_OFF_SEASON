@@ -6,6 +6,7 @@ package frc.robot.commands.Arm;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.Arm.Arm;
 import frc.robot.subsystems.Arm.ArmConstants.ArmPosition;
 
@@ -26,7 +27,7 @@ public class MoveArmToPosition extends SequentialCommandGroup {
         currentPosition = arm.getCurrentPos();
 
         return currentPosition == ArmPosition.COLLECT_FLOOR_POSITION || currentPosition == ArmPosition.UNKNOWN;
-      }),
+      }).andThen(new WaitCommand(0.2)),
       new MoveBeta(arm, ArmPosition.FREE_POSITION.getBeta()).onlyIf(() -> currentPosition == ArmPosition.COLLECT_FLOOR_POSITION || currentPosition == ArmPosition.AMP_POSITION || currentPosition == ArmPosition.UNKNOWN),
 
       new MoveAlpha(arm, ArmPosition.FREE_POSITION.getAlpha()).onlyIf(() -> currentPosition != ArmPosition.COLLECT_FLOOR_POSITION && targetPos == ArmPosition.COLLECT_FLOOR_POSITION),
