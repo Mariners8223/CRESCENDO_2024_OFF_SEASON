@@ -231,8 +231,8 @@ public class RobotContainer {
         );
     }
 
-    private static void configureClimbBindings() {
-        armController.povUp().whileTrue(new HookAscend(climb));
+    private static void configureClimbBindings(DriveCommand drive) {
+        armController.povUp().whileTrue(new HookAscend(climb, driveBase::getPose, driveBase::getRotation2d, drive::setTargetAngle));
         armController.povDown().whileTrue(new HookDescend(climb));
     }
 
