@@ -18,4 +18,11 @@ public class ClimbConstants {
         public static final double GEARING = 1;
         public static final double COAST_VELOCITY = 0;
     }
+
+    public class StageConstants{
+        public static final double BLUE_EDGE = 0;
+        public static final double RED_EDGE = 0;
+        public static final double MID_LINE_Y = 0;
+        // TODO: Check actual values of lines
+    }
 }
