@@ -129,19 +129,17 @@ public class RobotContainer {
             return speakerAngle.getPitch();
         };
 
-        Command updateSpeedWhenMoved = UpdateSpeedWhenMoved.getCommand(shooterIntake, () -> rpm);
-
-        configureArmBindings(alphaTarget, driveCommand, updateSpeedWhenMoved);
-        configureIntakeShooterBindings(driveActionButton, driveCommand, updateSpeedWhenMoved);
+        configureArmBindings(alphaTarget, driveCommand);
+        configureIntakeShooterBindings(driveActionButton, driveCommand);
         configureClimbBindings();
     }
 
-    private static void configureArmBindings(Supplier<Measure<Angle>> alphaTarget, DriveCommand drive, Command updateSpeedWhenMoved) {
+    private static void configureArmBindings(Supplier<Measure<Angle>> alphaTarget, DriveCommand drive) {
         Command moveToHome = MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.HOME_POSITION);
 
         Command resetDriveAngle = drive.emptyTargetAngle();
 
-        armController.cross().whileTrue(AlphaAim.getCommand(arm, alphaTarget).alongWith(updateSpeedWhenMoved).withName("AlphaAim + updateSpeedWhenMoved")).whileFalse(moveToHome);
+        armController.cross().whileTrue(AlphaAim.getCommand(arm, alphaTarget)).whileFalse(moveToHome);
 
         armController.cross().onFalse(resetDriveAngle);
 
@@ -178,7 +176,7 @@ public class RobotContainer {
                 .whileFalse(moveToHome).onFalse(resetDriveAngle);
     }
 
-    private static void configureIntakeShooterBindings(Trigger driveActionButton, DriveCommand driveCommand, Command updateSpeedWhenMoved) {
+    private static void configureIntakeShooterBindings(Trigger driveActionButton, DriveCommand driveCommand) {
         Command intakeFromIntake = IntakeFromIntake.getCommand(shooterIntake);
         Command intakeFromShooter = IntakeFromShooter.getCommand(shooterIntake);
 
@@ -211,15 +209,23 @@ public class RobotContainer {
                 () -> arm.getCurrentPos() == ArmConstants.ArmPosition.AMP_POSITION)); //Shoot to amp
 
 
-
         // armController.R2().onTrue(new SequentialCommandGroup(
         //         new InstantCommand(updateSpeedWhenMoved::cancel),
         //         ShootShoot.getCommand(shooterIntake, () -> rpm)));
 
 
-        new Trigger(() -> armController.getR2Axis() >= 0.95).onTrue(
-            new InstantCommand(updateSpeedWhenMoved::cancel)
-            .alongWith(ShootShoot.getCommand(shooterIntake, () -> rpm)).withName("shoot")
+//        new Trigger(() -> armController.getR2Axis() >= 0.95).onTrue(
+//                new InstantCommand(updateSpeedWhenMoved::cancel)
+//                        .alongWith(ShootShoot.getCommand(shooterIntake, () -> rpm)).withName("shoot")
+//        );
+
+        Command updateSpeedWhenMoved = UpdateSpeedWhenMoved.getCommand(shooterIntake, () -> rpm);
+
+        new Trigger(() -> armController.getR2Axis() >= 0.95).whileTrue(
+                updateSpeedWhenMoved
+        ).onFalse(
+                new InstantCommand(updateSpeedWhenMoved::cancel)
+                        .alongWith(ShootShoot.getCommand(shooterIntake, () -> rpm)).withName("shoot")
         );
     }
 
