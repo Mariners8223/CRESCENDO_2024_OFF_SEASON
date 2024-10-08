@@ -19,13 +19,13 @@ public class VisionConstants {
 
     public enum CameraLocation {
         FRONT_RIGHT(
-            new Transform3d(-0.75/2 - 0.03, -0.75/2 + 0.06, -0.095 - DriveBaseConstants.CHASSIS_HEIGHT, new Rotation3d(0, Units.degreesToRadians(-32), Units.degreesToRadians(16))),
+            new Transform3d(0.75/2 + 0.2  , -0.75/2 + 0.06, 0.095 + DriveBaseConstants.CHASSIS_HEIGHT, new Rotation3d(0, Units.degreesToRadians(-8 + 1.15), Units.degreesToRadians(16))),
                 "FrontRight",
                 true
         ),
         BACK_LEFT(
-                new Transform3d(-0.75/2 + 0.05, 0.75/2 - 
-                0.14, -0.09 - DriveBaseConstants.CHASSIS_HEIGHT, new Rotation3d(0, Units.degreesToRadians(-32), Units.degreesToRadians(-180 + 16))),
+                new Transform3d(0.75/2 - 0.1, 0.75/2 - 
+                0.14, -0.09 - DriveBaseConstants.CHASSIS_HEIGHT, new Rotation3d(0, Units.degreesToRadians(-25), Units.degreesToRadians(-180 + 24))),
                 "BackLeft",
                 true
         ),

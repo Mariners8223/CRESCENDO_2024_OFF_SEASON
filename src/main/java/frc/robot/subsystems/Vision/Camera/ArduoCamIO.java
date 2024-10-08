@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 
 import frc.robot.subsystems.Vision.VisionConstants;
 
+import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -65,7 +66,9 @@ public class ArduoCamIO implements CameraIO {
 
         if(estimatedPose.isPresent()){
             inputs.estimatedPose = estimatedPose.get().estimatedPose;
-            inputs.estimatedPose = new Pose3d(inputs.estimatedPose.getX(), inputs.estimatedPose.getY(), 0, inputs.estimatedPose.getRotation());
+
+            // Logger.recordOutput("pitch", inputs.estimatedPose.getRotation().getY());
+            // inputs.estimatedPose = new Pose3d(inputs.estimatedPose.getX(), inputs.estimatedPose.getY(), 0, inputs.estimatedPose.getRotation());
         }
 
 
