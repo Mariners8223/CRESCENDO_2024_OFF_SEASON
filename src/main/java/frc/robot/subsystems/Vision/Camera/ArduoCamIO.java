@@ -67,7 +67,7 @@ public class ArduoCamIO implements CameraIO {
         if(estimatedPose.isPresent()){
             inputs.estimatedPose = estimatedPose.get().estimatedPose;
 
-            // Logger.recordOutput("pitch", inputs.estimatedPose.getRotation().getY());
+            // Logger.recordOutput("pitch", inputs.estimatedPose.getRotation().getZ());
             // inputs.estimatedPose = new Pose3d(inputs.estimatedPose.getX(), inputs.estimatedPose.getY(), 0, inputs.estimatedPose.getRotation());
         }
 
