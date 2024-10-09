@@ -196,8 +196,10 @@ public class Vision extends SubsystemBase {
 
         double distanceToTarget = Math.sqrt(xDist * xDist + yDist * yDist) - offsetX;
 
-        double pitch = Math.atan2(speakerConstants.SPEAKER_TARGET.getZ() - ROBOT_FRAME_HEIGHT - offsetZ,
-                distanceToTarget);
+        // double pitch = Math.atan2(speakerConstants.SPEAKER_TARGET.getZ() - ROBOT_FRAME_HEIGHT - offsetZ,
+        //         distanceToTarget);
+
+        double pitch = Math.atan((speakerConstants.SPEAKER_TARGET.getZ() - ROBOT_FRAME_HEIGHT - offsetZ) / distanceToTarget);
 
         Logger.recordOutput("Speaker Target", new Translation2d(targetX, targetY));
 
