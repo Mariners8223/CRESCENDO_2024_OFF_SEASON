@@ -20,15 +20,22 @@ public class VisionConstants {
     public enum CameraLocation {
         FRONT_RIGHT(
             new Transform3d(0.75 / 2 + 0.15, -0.345, 0.135 + DriveBaseConstants.CHASSIS_HEIGHT, new Rotation3d(Units.degreesToRadians(-2.2), Units.degreesToRadians(-4.65), Units.degreesToRadians(13))),
+
+            new Transform3d(-0.75/2 - 0.03, -0.75/2 + 0.06, -0.095 - DriveBaseConstants.CHASSIS_HEIGHT, new Rotation3d(0, Units.degreesToRadians(-32), Units.degreesToRadians(16))),
                 "FrontRight",
                 true
         ),
         BACK_LEFT(
                 new Transform3d(-0.5, 0.2, 0.09 + DriveBaseConstants.CHASSIS_HEIGHT, new Rotation3d(Units.degreesToRadians(-2.6), Units.degreesToRadians(-4), Units.degreesToRadians(-167.5))),
+
+                new Transform3d(-0.75/2 + 0.05, 0.75/2 - 
+                0.14, -0.09 - DriveBaseConstants.CHASSIS_HEIGHT, new Rotation3d(0, Units.degreesToRadians(-32), Units.degreesToRadians(-180 + 16))),
+
                 "BackLeft",
                 true
         ),
         FRONT(
+                new Transform3d(),
                 new Transform3d(),
                 "FrontCamera",
                 false
@@ -36,12 +43,15 @@ public class VisionConstants {
 
         public final Transform3d ROBOT_TO_CAMERA;
 
+        public final Transform3d CAMERA_TO_ROBOT;
+
         public final String NAME;
 
         public final boolean HAS_POSE_ESTIMATION;
 
-        CameraLocation(Transform3d cameraToRobot, String name, boolean hasPoseEstimation) {
-            ROBOT_TO_CAMERA = cameraToRobot;
+        CameraLocation(Transform3d robotToCamera, Transform3d cameraToRobot, String name, boolean hasPoseEstimation) {
+            ROBOT_TO_CAMERA = robotToCamera;
+            CAMERA_TO_ROBOT = cameraToRobot;
             NAME = name;
             HAS_POSE_ESTIMATION = hasPoseEstimation;
         }
