@@ -23,6 +23,9 @@ public class HookAscend extends Command {
   Supplier<Rotation2d> angleSupplier;
   Consumer<Optional<Rotation2d>> angleConsumer;
 
+  double x;
+  double y; 
+
   public HookAscend(Climb climb, Supplier<Pose2d> poseSupply, Supplier<Rotation2d> angleSupply, Consumer<Optional<Rotation2d>> angleConsumer) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.climb = climb;
@@ -39,8 +42,13 @@ public class HookAscend extends Command {
     climb.startMotor(ClimbConstants.CLIMB_DESCEND_MOTOR_POWER);
 
     Pose2d pos = poseSupplier.get();
-    double x = pos.getX();
-    double y = pos.getY();
+    x = pos.getX();
+    y = pos.getY();
+  }
+
+  // Called every time the scheduler runs while the command is scheduled.
+  @Override
+  public void execute() {
     double robotAngle = Units.radiansToDegrees(MathUtil.angleModulus(angleSupplier.get().getRadians()));
     double targetAngle;
 
@@ -77,11 +85,6 @@ public class HookAscend extends Command {
         angleConsumer.accept(Optional.empty());
         break;
     }
-  }
-
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
   }
 
   // Called once the command ends or is interrupted.
