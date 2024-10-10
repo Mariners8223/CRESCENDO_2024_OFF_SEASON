@@ -3,7 +3,6 @@ package frc.robot.subsystems.Vision.Camera;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 
 import java.util.List;
@@ -12,7 +11,6 @@ import java.util.function.Supplier;
 
 import frc.robot.subsystems.Vision.VisionConstants;
 
-import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -23,6 +21,8 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 public class ArduoCamIO implements CameraIO {
     private final PhotonCamera camera;
     private final PhotonPoseEstimator poseEstimator;
+
+    private int pipelineID = 0;
 
     private final Supplier<Pose2d> referencePose;
 
@@ -46,6 +46,13 @@ public class ArduoCamIO implements CameraIO {
         return poseEstimator;
     }
 
+    @Override
+    public void setPipeline(int pipelineID) {
+        if(this.pipelineID == pipelineID) return;
+
+        camera.setPipelineIndex(pipelineID);
+        this.pipelineID = pipelineID;
+    }
 
     @Override
     public void update(CameraInputsAutoLogged inputs) {
@@ -84,5 +91,6 @@ public class ArduoCamIO implements CameraIO {
             inputs.yAngleDegrees[i] = target.getPitch();
         }
 
+        inputs.pipelineID = this.pipelineID;
     }
 }

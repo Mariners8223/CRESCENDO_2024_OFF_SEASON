@@ -71,6 +71,10 @@ public class Vision extends SubsystemBase {
         }).ignoringDisable(true));
     }
 
+    public void setPipeline(int pipelineID, CameraLocation cameraLocation) {
+        cameras[cameraLocation.ordinal()].setPipeline(pipelineID);
+    }
+
     public VisionOutPuts getAngleToSpeakerFront(double offsetX, double offsetZ, double speedMultiplier) {
         VisionOutPuts result = getAngleToSpeaker(CameraLocation.FRONT_RIGHT, offsetX, offsetZ, true, speedMultiplier);
 

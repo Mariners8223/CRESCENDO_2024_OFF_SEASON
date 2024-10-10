@@ -11,6 +11,8 @@ public interface CameraIO {
         public double timestamp = 0;
         public boolean hasTarget = false;
 
+        public int pipelineID = 0;
+
         public double[] poseAmbiguity = new double[4];
         public int[] targetID = new int[4];
 
@@ -21,5 +23,7 @@ public interface CameraIO {
     }
 
     void update(CameraInputsAutoLogged inputs);
+
+    void setPipeline(int pipelineID);
 
 }
