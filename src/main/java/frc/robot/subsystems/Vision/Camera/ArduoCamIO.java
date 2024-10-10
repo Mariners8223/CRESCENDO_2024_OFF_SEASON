@@ -29,6 +29,8 @@ public class ArduoCamIO implements CameraIO {
     public ArduoCamIO(VisionConstants.CameraLocation cameraLocation, Supplier<Pose2d> referencePose) {
         camera = new PhotonCamera(cameraLocation.NAME);
 
+        camera.setPipelineIndex(0);
+
         this.referencePose = referencePose;
 
         poseEstimator = createPoseEstimator(camera, cameraLocation.ROBOT_TO_CAMERA);

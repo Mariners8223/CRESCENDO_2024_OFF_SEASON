@@ -19,7 +19,8 @@ public class VisionConstants {
 
     public enum CameraLocation {
         FRONT_RIGHT(
-            new Transform3d(0.75 / 2 + 0.15, -0.345, 0.135 + DriveBaseConstants.CHASSIS_HEIGHT, new Rotation3d(Units.degreesToRadians(-2.2), Units.degreesToRadians(-4.65), Units.degreesToRadians(13))),
+            // new Transform3d(-0.75 / 2 + 0.35, -0.45, 0.135 + DriveBaseConstants.CHASSIS_HEIGHT, new Rotation3d(Units.degreesToRadians(-2.2), Units.degreesToRadians(-23), Units.degreesToRadians(13))),
+            new Transform3d(new Translation3d(), new Rotation3d(0,Units.degreesToRadians(-30),0)),
 
             new Transform3d(-0.75/2 - 0.03, -0.75/2 + 0.06, -0.095 - DriveBaseConstants.CHASSIS_HEIGHT, new Rotation3d(0, Units.degreesToRadians(-32), Units.degreesToRadians(16))),
                 "FrontRight",
