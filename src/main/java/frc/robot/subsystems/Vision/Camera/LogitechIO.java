@@ -20,6 +20,11 @@ public class LogitechIO implements CameraIO {
     }
 
     @Override
+    public void setPipeline(int pipelineID) {
+        
+    }
+
+    @Override
     public void update(CameraInputsAutoLogged inputs) {
         PhotonPipelineResult result = camera.getLatestResult();
 
