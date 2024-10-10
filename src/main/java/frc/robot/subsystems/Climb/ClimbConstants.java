@@ -20,9 +20,9 @@ public class ClimbConstants {
     }
 
     public class StageConstants{
-        public static final double BLUE_EDGE = 0;
-        public static final double RED_EDGE = 0;
-        public static final double MID_LINE_Y = 0;
+        public static final double BLUE_EDGE = 5.85;
+        public static final double RED_EDGE = 10.725;
+        public static final double MID_LINE_Y = 4.08;
         // TODO: Check actual values of lines
     }
 }
