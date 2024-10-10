@@ -71,7 +71,7 @@ public class Vision extends SubsystemBase {
         }).ignoringDisable(true));
     }
 
-    public void setPipeline(int pipelineID, CameraLocation cameraLocation) {
+    public void setPipeline(VisionConstants.PipeLineID pipelineID, CameraLocation cameraLocation) {
         cameras[cameraLocation.ordinal()].setPipeline(pipelineID);
     }
 

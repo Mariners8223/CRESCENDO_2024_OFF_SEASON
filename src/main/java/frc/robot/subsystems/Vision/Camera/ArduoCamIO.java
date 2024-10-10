@@ -22,7 +22,7 @@ public class ArduoCamIO implements CameraIO {
     private final PhotonCamera camera;
     private final PhotonPoseEstimator poseEstimator;
 
-    private int pipelineID = 0;
+    private VisionConstants.PipeLineID pipelineID = VisionConstants.PipeLineID.THREE_DIMENSIONAL;
 
     private final Supplier<Pose2d> referencePose;
 
@@ -49,11 +49,11 @@ public class ArduoCamIO implements CameraIO {
     }
 
     @Override
-    public void setPipeline(int pipelineID) {
-        if(this.pipelineID == pipelineID) return;
+    public void setPipeline(VisionConstants.PipeLineID pipeLineID) {
+        if(this.pipelineID == pipeLineID) return;
 
-        camera.setPipelineIndex(pipelineID);
-        this.pipelineID = pipelineID;
+        camera.setPipelineIndex(pipelineID.ordinal());
+        this.pipelineID = pipeLineID;
     }
 
     @Override
@@ -64,10 +64,24 @@ public class ArduoCamIO implements CameraIO {
             inputs.hasTarget = false;
             return;
         }
- 
+
         inputs.hasTarget = true;
         inputs.timestamp = result.getTimestampSeconds();
         inputs.latency = result.getLatencyMillis() / 1000;
+        inputs.pipelineID = this.pipelineID.name();
+
+        switch (pipelineID) {
+            case THREE_DIMENSIONAL:
+                updateThreeDimensional(inputs);
+                break;
+            case TWO_DIMENSIONAL:
+                updateTwoDimensional(inputs, result);
+                break;
+        }
+    }
+
+
+    private void updateThreeDimensional(CameraInputsAutoLogged inputs) {
 
         poseEstimator.setReferencePose(referencePose.get());
 
@@ -79,9 +93,9 @@ public class ArduoCamIO implements CameraIO {
             // Logger.recordOutput("pitch", inputs.estimatedPose.getRotation().getZ());
             // inputs.estimatedPose = new Pose3d(inputs.estimatedPose.getX(), inputs.estimatedPose.getY(), 0, inputs.estimatedPose.getRotation());
         }
+    }
 
-
-
+    private void updateTwoDimensional(CameraInputsAutoLogged inputs, PhotonPipelineResult result) {
         List<PhotonTrackedTarget> targets = result.getTargets();
 
         for (int i = 0; i < 4 && i < targets.size(); i++) {
@@ -93,6 +107,6 @@ public class ArduoCamIO implements CameraIO {
             inputs.yAngleDegrees[i] = target.getPitch();
         }
 
-        inputs.pipelineID = this.pipelineID;
+        inputs.pipelineID = this.pipelineID.name();
     }
 }

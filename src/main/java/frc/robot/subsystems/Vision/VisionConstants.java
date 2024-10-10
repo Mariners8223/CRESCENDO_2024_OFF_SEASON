@@ -58,6 +58,11 @@ public class VisionConstants {
         }
     }
 
+    public enum PipeLineID{
+        THREE_DIMENSIONAL,
+        TWO_DIMENSIONAL
+    }
+
     public enum SpeakerConstants{
         RED(4),
         BLUE(7);

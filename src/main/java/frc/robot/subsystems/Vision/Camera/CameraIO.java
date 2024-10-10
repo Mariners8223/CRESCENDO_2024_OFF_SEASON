@@ -1,6 +1,7 @@
 package frc.robot.subsystems.Vision.Camera;
 
 import edu.wpi.first.math.geometry.Pose3d;
+import frc.robot.subsystems.Vision.VisionConstants;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface CameraIO {
@@ -11,7 +12,7 @@ public interface CameraIO {
         public double timestamp = 0;
         public boolean hasTarget = false;
 
-        public int pipelineID = 0;
+        public String pipelineID = "NONE";
 
         public double[] poseAmbiguity = new double[4];
         public int[] targetID = new int[4];
@@ -24,6 +25,6 @@ public interface CameraIO {
 
     void update(CameraInputsAutoLogged inputs);
 
-    void setPipeline(int pipelineID);
+    void setPipeline(VisionConstants.PipeLineID pipelineID);
 
 }
