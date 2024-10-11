@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import frc.robot.subsystems.Vision.VisionConstants;
+import frc.robot.subsystems.Vision.VisionConstants.PipeLineID;
 
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
@@ -29,7 +30,7 @@ public class ArduoCamIO implements CameraIO {
     public ArduoCamIO(VisionConstants.CameraLocation cameraLocation, Supplier<Pose2d> referencePose) {
         camera = new PhotonCamera(cameraLocation.NAME);
 
-        camera.setPipelineIndex(0);
+        camera.setPipelineIndex(PipeLineID.THREE_DIMENSIONAL.ordinal());
 
         this.referencePose = referencePose;
 
@@ -52,14 +53,24 @@ public class ArduoCamIO implements CameraIO {
     public void setPipeline(VisionConstants.PipeLineID pipeLineID) {
         if(this.pipelineID == pipeLineID) return;
 
-        camera.setPipelineIndex(pipelineID.ordinal());
+        switch (pipeLineID) {
+            case THREE_DIMENSIONAL:
+                camera.setPipelineIndex(0);
+                break;
+
+            case TWO_DIMENSIONAL:
+                camera.setPipelineIndex(1);
+                break;
+        }
         this.pipelineID = pipeLineID;
     }
+
+    private PipeLineID[] pipeLineIDs = PipeLineID.values();
 
     @Override
     public void update(CameraInputsAutoLogged inputs) {
         PhotonPipelineResult result = camera.getLatestResult();
-        inputs.pipelineID = this.pipelineID.name();
+        inputs.pipelineID = pipeLineIDs[camera.getPipelineIndex()].name();
 
         if (!result.hasTargets()) {
             inputs.hasTarget = false;
@@ -71,7 +82,8 @@ public class ArduoCamIO implements CameraIO {
         inputs.latency = result.getLatencyMillis() / 1000;
         switch (pipelineID) {
             case THREE_DIMENSIONAL:
-                updateThreeDimensional(inputs);
+                updateThreeDimensional(inputs, result
+                );
                 break;
             case TWO_DIMENSIONAL:
                 updateTwoDimensional(inputs, result);
@@ -80,23 +92,26 @@ public class ArduoCamIO implements CameraIO {
     }
 
 
-    private void updateThreeDimensional(CameraInputsAutoLogged inputs) {
+    private void updateThreeDimensional(CameraInputsAutoLogged inputs, PhotonPipelineResult result) {
 
         poseEstimator.setReferencePose(referencePose.get());
 
         Optional<EstimatedRobotPose> estimatedPose = poseEstimator.update();
 
+        inputs.hasTarget = false;
+
         if(estimatedPose.isPresent()){
-            inputs.estimatedPose = estimatedPose.get().estimatedPose;
-            inputs.hasPose = true;
-            inputs.hasTarget = false;
+            if(result.getBestTarget().getPoseAmbiguity() <= VisionConstants.tolarance){
+                inputs.estimatedPose = estimatedPose.get().estimatedPose;
+                inputs.hasPose = true;
+            }
+            else inputs.hasPose = false;
 
             // Logger.recordOutput("pitch", inputs.estimatedPose.getRotation().getZ());
             // inputs.estimatedPose = new Pose3d(inputs.estimatedPose.getX(), inputs.estimatedPose.getY(), 0, inputs.estimatedPose.getRotation());
         }
         else {
             inputs.hasPose = false;
-            inputs.hasTarget = false;
         }
     }
 

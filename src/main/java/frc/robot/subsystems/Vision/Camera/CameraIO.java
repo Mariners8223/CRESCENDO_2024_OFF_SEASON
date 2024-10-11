@@ -13,7 +13,7 @@ public interface CameraIO {
         public boolean hasTarget = false;
         public boolean hasPose = false;
 
-        public String pipelineID = "NONE";
+        public String pipelineID = "None";
 
         public double[] poseAmbiguity = new double[4];
         public int[] targetID = new int[4];

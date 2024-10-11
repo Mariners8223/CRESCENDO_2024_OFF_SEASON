@@ -138,13 +138,13 @@ public class RobotContainer {
     private static void configureArmBindings(Supplier<Measure<Angle>> alphaTarget, DriveCommand drive) {
         Command moveToHome = MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.HOME_POSITION);
 
-        Command resetDriveAngle = drive.emptyTargetAngle();
+        Command resetDriveAngle = drive.emptyTargetAngle().andThen(new InstantCommand(() -> vision.setPipeline(VisionConstants.PipeLineID.THREE_DIMENSIONAL, VisionConstants.CameraLocation.FRONT_RIGHT)));
 
         armController.cross().onTrue(new InstantCommand(() -> vision.setPipeline(VisionConstants.PipeLineID.TWO_DIMENSIONAL, VisionConstants.CameraLocation.FRONT_RIGHT)));
 
         armController.cross().whileTrue(AlphaAim.getCommand(arm, alphaTarget)).whileFalse(moveToHome);
 
-        armController.cross().onFalse(resetDriveAngle.alongWith(new InstantCommand(() -> vision.setPipeline(VisionConstants.PipeLineID.THREE_DIMENSIONAL, VisionConstants.CameraLocation.FRONT_RIGHT))));
+        armController.cross().onFalse(resetDriveAngle);
 
         armController.circle().whileTrue(MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.COLLECT_FLOOR_POSITION))
                 .whileFalse(moveToHome);
