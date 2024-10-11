@@ -11,6 +11,7 @@ public interface CameraIO {
         public double latency = 0;
         public double timestamp = 0;
         public boolean hasTarget = false;
+        public boolean hasPose = false;
 
         public String pipelineID = "NONE";
 

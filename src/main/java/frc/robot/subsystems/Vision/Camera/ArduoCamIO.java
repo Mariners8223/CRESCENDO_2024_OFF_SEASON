@@ -59,17 +59,16 @@ public class ArduoCamIO implements CameraIO {
     @Override
     public void update(CameraInputsAutoLogged inputs) {
         PhotonPipelineResult result = camera.getLatestResult();
+        inputs.pipelineID = this.pipelineID.name();
 
         if (!result.hasTargets()) {
             inputs.hasTarget = false;
+            inputs.hasPose = false;
             return;
         }
 
-        inputs.hasTarget = true;
         inputs.timestamp = result.getTimestampSeconds();
         inputs.latency = result.getLatencyMillis() / 1000;
-        inputs.pipelineID = this.pipelineID.name();
-
         switch (pipelineID) {
             case THREE_DIMENSIONAL:
                 updateThreeDimensional(inputs);
@@ -89,9 +88,15 @@ public class ArduoCamIO implements CameraIO {
 
         if(estimatedPose.isPresent()){
             inputs.estimatedPose = estimatedPose.get().estimatedPose;
+            inputs.hasPose = true;
+            inputs.hasTarget = false;
 
             // Logger.recordOutput("pitch", inputs.estimatedPose.getRotation().getZ());
             // inputs.estimatedPose = new Pose3d(inputs.estimatedPose.getX(), inputs.estimatedPose.getY(), 0, inputs.estimatedPose.getRotation());
+        }
+        else {
+            inputs.hasPose = false;
+            inputs.hasTarget = false;
         }
     }
 
@@ -107,6 +112,8 @@ public class ArduoCamIO implements CameraIO {
             inputs.yAngleDegrees[i] = target.getPitch();
         }
 
-        inputs.pipelineID = this.pipelineID.name();
+        inputs.hasTarget = true;
+        inputs.hasPose = false;
+
     }
 }
