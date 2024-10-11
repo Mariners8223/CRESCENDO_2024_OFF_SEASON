@@ -117,7 +117,7 @@ public class Vision extends SubsystemBase {
         if (index == -1)
             return calculateAngleToSpeakerBasedOdemetry(currentPose.get(), offsetX, offsetZ, facingFront, speedMultiplier);
 
-        return calculateAngleToSpeakerBasedVision(camera.ROBOT_TO_CAMERA,
+        return calculateAngleToSpeakerBasedVision(camera.CAMERA_OFFSETS_2D,
                 input.xAngleDegrees[index], input.yAngleDegrees[index], offsetX, offsetZ, speedMultiplier);
     }
 
@@ -135,15 +135,15 @@ public class Vision extends SubsystemBase {
     (Transform3d cameraToRobot, double angleX,
      double angleY, double offsetX, double offsetZ, double speedMultiplier) {
 
-        double angleYToAprilTag = degreesToRadians(angleY) - cameraToRobot.getRotation().getY();
+        double angleYToAprilTag = degreesToRadians(angleY) + Math.abs(cameraToRobot.getRotation().getY());
 
         double xDistCamera =
-                (speakerConstants.SPEAKER_CENTER_APRIL_TAG.getZ() - ROBOT_FRAME_HEIGHT + cameraToRobot.getZ()) /
+                (speakerConstants.SPEAKER_CENTER_APRIL_TAG.getZ() - Math.abs(cameraToRobot.getZ())) /
                         Math.tan(angleYToAprilTag);
 
         double xDistToRobotCenter = xDistCamera + Math.abs(cameraToRobot.getX());
 
-        double yDistRobotCenter = Math.tan(-degreesToRadians(angleX) + cameraToRobot.getRotation().getZ())
+        double yDistRobotCenter = Math.tan(-degreesToRadians(angleX) - cameraToRobot.getRotation().getZ())
                 * xDistCamera - Math.abs(cameraToRobot.getY());
 
 //        double distanceToTarget
