@@ -17,7 +17,7 @@ public class ShooterIntake extends SubsystemBase {
   private double onPivotShooterSetSpeed;
   private double offPivotShooterSetSpeed;
 
-  boolean isGpLoaded = false;
+  boolean isGpLoaded = true;
   /** Creates a new ShooterIntake. */
   public ShooterIntake() {
     io = new ShooterIntakeIOReal();

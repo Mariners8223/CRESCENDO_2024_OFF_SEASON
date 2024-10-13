@@ -51,7 +51,7 @@ public class VisionConstants {
         }
     }
 
-    public static final double tolarance = 0.4;
+    public static final double tolarance = 0.2;
 
     public enum PipeLineID{
         THREE_DIMENSIONAL,
@@ -83,7 +83,7 @@ public class VisionConstants {
                     FIELD_LAYOUT.getTagPose(SPEAKER_CENTER_ID).get().getTranslation();
 
 
-            double TARGET_HEIGHT_ABOVE_APRIL_TAG = 0.8;
+            double TARGET_HEIGHT_ABOVE_APRIL_TAG = 0.72;
 
             SPEAKER_TARGET =
                     new Translation3d(SPEAKER_CENTER_APRIL_TAG.getX(), SPEAKER_CENTER_APRIL_TAG.getY(), SPEAKER_CENTER_APRIL_TAG.getZ() + TARGET_HEIGHT_ABOVE_APRIL_TAG);

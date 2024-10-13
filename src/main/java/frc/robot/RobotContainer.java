@@ -149,8 +149,6 @@ public class RobotContainer {
         armController.circle().whileTrue(MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.COLLECT_FLOOR_POSITION))
                 .whileFalse(moveToHome);
 
-        armController.touchpad().onTrue(CalibrateLimitSwitch.getCommand(arm));
-
         RepeatCommand chassisToAmpAngle = new RepeatCommand(new InstantCommand(() -> {
             Rotation2d angle = Rotation2d.fromRadians(MathUtil.angleModulus(driveBase.getRotation2d().getRadians()));
 
@@ -249,8 +247,8 @@ public class RobotContainer {
         NamedCommands.registerCommand("Move Arm To Collect Floor",
                 MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.COLLECT_FLOOR_POSITION));
 
-        NamedCommands.registerCommand("Move Arm To Sub Woofer Position",
-                MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.SHOOT_SUBWOFFER_POSITION));
+        NamedCommands.registerCommand("Move Arm To SubWoofer Position",
+                MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.SHOOT_SUBWOFFER_POSITION).andThen(new InstantCommand(() -> rpm = 2500)));
 
         NamedCommands.registerCommand("Shoot", ShootShoot.getCommand(shooterIntake,
                 () -> rpm));
@@ -269,6 +267,15 @@ public class RobotContainer {
         };
 
         NamedCommands.registerCommand("Beta Aim", BetaAim.getCommand(arm, supplier));
+        NamedCommands.registerCommand("Collect", IntakeFromIntake.getCommand(shooterIntake));
+        NamedCommands.registerCommand("Collect From Floor",
+        new SequentialCommandGroup(MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.COLLECT_FLOOR_POSITION),
+                                    IntakeFromIntake.getCommand(shooterIntake)));
+        
+        NamedCommands.registerCommand("Shoot to Speaker", new SequentialCommandGroup(
+            BetaAim.getCommand(arm, supplier),
+            ShootShoot.getCommand(shooterIntake, () -> rpm))
+            );
     }
 
 
