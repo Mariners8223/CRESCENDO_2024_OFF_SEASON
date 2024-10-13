@@ -5,8 +5,11 @@
 package frc.robot.subsystems.Climb;
 
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Climb extends SubsystemBase {
@@ -34,6 +37,9 @@ public class Climb extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     io.update(input);
+    Command command = getCurrentCommand();
+    String name = command == null ? "None" : command.getName();
+    Logger.recordOutput("Climb/Current Command", name);
     // Logger.recordOutput("Climb/Is hook on chain", getIsHookOnChain());
   }
 }
