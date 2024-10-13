@@ -3,7 +3,7 @@
     "robotConfiguration": {
         "mass": 60,
         "rotationalInertia": 6,
-        "motorMaxTorque": 1.0949416342412452,
+        "motorMaxTorque": 0.35,
         "motorMaxVelocity": 5104,
         "gearing": 6.75,
         "wheelbase": 0.5778496879611685,
@@ -3026,8 +3026,7 @@
                     "scope": [
                         "first"
                     ],
-                    "type": "StopPoint",
-                    "direction": 0
+                    "type": "StopPoint"
                 },
                 {
                     "scope": [
