@@ -69,7 +69,7 @@ public class IntakeFromShooter extends Command {
     shooterIntake.StopMotorOnPivot();
     shooterIntake.setIntakeMotorTargetPosition(shooterIntake.getIntakeMotorPositions() - 0.1);
 
-    shooterIntake.setGpLoaded(true);
+    shooterIntake.setGpLoaded(!interrupted);
     beamBreaker.stop();
     counter = 0;
   }

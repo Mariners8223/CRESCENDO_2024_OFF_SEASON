@@ -102,6 +102,7 @@ public class RobotContainer {
     }
 
     private static double rpm = 2000;
+    private static Optional<Rotation2d> angleToSpeaker = Optional.empty();
 
     private static void configureBindings() {
         Trigger driveActionButton = driveController.cross();
@@ -125,7 +126,7 @@ public class RobotContainer {
 
             rpm = speakerAngle.getSpeed().in(Units.RPM);
 
-            driveCommand.setTargetAngle(Optional.of(speakerAngle.getYaw()));
+            angleToSpeaker = Optional.of(speakerAngle.getYaw());
 
             return speakerAngle.getPitch();
         };
@@ -135,10 +136,36 @@ public class RobotContainer {
         configureClimbBindings();
     }
 
+    private static void configureDriveBindings(DriveCommand driveCommand) {
+        Command speakerAngle = new InstantCommand(() -> driveCommand.setTargetAngle(angleToSpeaker)).repeatedly();
+        driveController.cross().whileTrue(speakerAngle).onFalse(driveCommand.emptyTargetAngle());
+
+        RepeatCommand chassisToAmpAngle = new InstantCommand(() -> {
+            Rotation2d angle = Rotation2d.fromRadians(MathUtil.angleModulus(driveBase.getRotation2d().getRadians()));
+
+            Rotation2d target = Constants.AmpConstants.AMP_ANGLE.minus(angle);
+
+            driveCommand.setTargetAngle(Optional.of(target));
+        }).repeatedly();
+
+        RepeatCommand chassisToSourceAngle = new InstantCommand(() -> {
+            Rotation2d angle = Rotation2d.fromRadians(MathUtil.angleModulus(driveBase.getRotation2d().getRadians()));
+
+            Rotation2d target = Constants.SourceConstants.SOURCE_ANGLE.minus(angle);
+
+            driveCommand.setTargetAngle(Optional.of(target));
+        }).repeatedly();
+
+        driveController.square().whileTrue(chassisToSourceAngle).onFalse(driveCommand.emptyTargetAngle());
+        driveController.circle().whileTrue(chassisToAmpAngle).onFalse(driveCommand.emptyTargetAngle());
+    }
+
     private static void configureArmBindings(Supplier<Measure<Angle>> alphaTarget, DriveCommand drive) {
         Command moveToHome = MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.HOME_POSITION);
 
-        Command resetDriveAngle = drive.emptyTargetAngle().andThen(new InstantCommand(() -> vision.setPipeline(VisionConstants.PipeLineID.THREE_DIMENSIONAL, VisionConstants.CameraLocation.FRONT_RIGHT)));
+        Command resetDriveAngle = drive.emptyTargetAngle().andThen(
+                new InstantCommand(() -> vision.setPipeline(VisionConstants.PipeLineID.THREE_DIMENSIONAL, VisionConstants.CameraLocation.FRONT_RIGHT)),
+                new InstantCommand(() -> angleToSpeaker = Optional.empty()));
 
         armController.cross().onTrue(new InstantCommand(() -> vision.setPipeline(VisionConstants.PipeLineID.TWO_DIMENSIONAL, VisionConstants.CameraLocation.FRONT_RIGHT)));
 
@@ -149,32 +176,14 @@ public class RobotContainer {
         armController.circle().whileTrue(MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.COLLECT_FLOOR_POSITION))
                 .whileFalse(moveToHome);
 
-        RepeatCommand chassisToAmpAngle = new RepeatCommand(new InstantCommand(() -> {
-            Rotation2d angle = Rotation2d.fromRadians(MathUtil.angleModulus(driveBase.getRotation2d().getRadians()));
-
-            Rotation2d target = Constants.AmpConstants.AMP_ANGLE.minus(angle);
-
-            drive.setTargetAngle(Optional.of(target));
-        }));
-
-        RepeatCommand chassisToSourceAngle = new RepeatCommand(new InstantCommand(() -> {
-            Rotation2d angle = Rotation2d.fromRadians(MathUtil.angleModulus(driveBase.getRotation2d().getRadians()));
-
-            Rotation2d target = Constants.SourceConstants.SOURCE_ANGLE.minus(angle);
-
-            drive.setTargetAngle(Optional.of(target));
-        }));
-
         armController.square().whileTrue(
-                        MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.COLLECT_SOURCE_POSITION)
-                                .alongWith(chassisToSourceAngle))
-                .whileFalse(moveToHome).onFalse(resetDriveAngle);
+                        MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.COLLECT_SOURCE_POSITION))
+                .whileFalse(moveToHome);
 
         armController.square().onTrue(new InstantCommand(() -> rpm = 2000));
 
-        armController.triangle().whileTrue(MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.AMP_POSITION)
-                        .alongWith(chassisToAmpAngle))
-                .whileFalse(moveToHome).onFalse(resetDriveAngle);
+        armController.triangle().whileTrue(MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.AMP_POSITION))
+                .whileFalse(moveToHome);
     }
 
     private static void configureIntakeShooterBindings(Trigger driveActionButton, DriveCommand driveCommand) {
@@ -192,10 +201,10 @@ public class RobotContainer {
                 return;
             }
 
-            ArmPosition currentPostion = arm.getCurrentPos();
+            ArmPosition currentPosition = arm.getCurrentPos();
 
-            if (currentPostion == ArmPosition.COLLECT_FLOOR_POSITION) intakeFromIntake.schedule();
-            else if (currentPostion == ArmPosition.COLLECT_SOURCE_POSITION) intakeFromShooter.schedule();
+            if (currentPosition == ArmPosition.COLLECT_FLOOR_POSITION) intakeFromIntake.schedule();
+            else if (currentPosition == ArmPosition.COLLECT_SOURCE_POSITION) intakeFromShooter.schedule();
         })).debounce(0.1);
 
         driveActionButton.whileTrue(
@@ -203,22 +212,11 @@ public class RobotContainer {
                         driveCommand::setTargetAngle,
                         () -> arm.getCurrentPos() == ArmPosition.COLLECT_FLOOR_POSITION, intakeFromIntake::isScheduled));
 
-        // armController.L1().whileTrue(Eject.getCommand(shooterIntake).onlyIf(
-        //         () -> arm.getCurrentPos() != ArmConstants.ArmPosition.AMP_POSITION)); //Shoot to amp
+        armController.L1().onTrue(
+                new Eject(shooterIntake).onlyIf(() -> arm.getCurrentPos() != ArmPosition.COLLECT_FLOOR_POSITION)
+                        .andThen(ShootToAmp.getCommand(shooterIntake).onlyIf(() -> arm.getCurrentPos() == ArmPosition.AMP_POSITION))
+        ); //Shoot to amp
 
-        armController.L1().onTrue(ShootToAmp.getCommand(shooterIntake).onlyIf(
-                () -> arm.getCurrentPos() == ArmConstants.ArmPosition.AMP_POSITION)); //Shoot to amp
-
-
-        // armController.R2().onTrue(new SequentialCommandGroup(
-        //         new InstantCommand(updateSpeedWhenMoved::cancel),
-        //         ShootShoot.getCommand(shooterIntake, () -> rpm)));
-
-
-//        new Trigger(() -> armController.getR2Axis() >= 0.95).onTrue(
-//                new InstantCommand(updateSpeedWhenMoved::cancel)
-//                        .alongWith(ShootShoot.getCommand(shooterIntake, () -> rpm)).withName("shoot")
-//        );
 
         Command updateSpeedWhenMoved = UpdateSpeedWhenMoved.getCommand(shooterIntake, () -> rpm);
 
