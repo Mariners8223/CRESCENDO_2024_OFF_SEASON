@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.robot.commands.Arm.AlphaAim;
 import frc.robot.commands.Arm.BetaAim;
-import frc.robot.commands.Arm.CalibrateLimitSwitch;
 import frc.robot.commands.Arm.MoveArmToPosition;
 import frc.robot.commands.Climb.HookAscend;
 import frc.robot.commands.Climb.HookDescend;
@@ -34,6 +33,7 @@ import frc.robot.subsystems.Arm.ArmConstants;
 import frc.robot.subsystems.Arm.ArmConstants.ArmPosition;
 import frc.robot.subsystems.DriveTrain.DriveBaseConstants;
 import frc.robot.subsystems.Shooter_Intake.ShooterIntakeConstants;
+import frc.robot.subsystems.Vision.VisionConstants;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -101,14 +101,13 @@ public class RobotContainer {
     }
 
     private static double rpm = 2000;
+    private static Optional<Rotation2d> angleToSpeaker = Optional.empty();
 
     private static void configureBindings() {
-        Trigger driveActionButton = driveController.cross();
 
         DriveCommand driveCommand =
                 new DriveCommand(driveBase, driveController,
-                        DriveBaseConstants.thetaControllerGains.createPIDController(),
-                        driveActionButton);
+                        DriveBaseConstants.thetaControllerGains.createPIDController());
 
         new Trigger(RobotState::isTeleop).and(RobotState::isEnabled).whileTrue(new StartEndCommand(() ->
                 driveBase.setDefaultCommand(driveCommand),
@@ -124,61 +123,78 @@ public class RobotContainer {
 
             rpm = speakerAngle.getSpeed().in(Units.RPM);
 
-            driveCommand.setTargetAngle(Optional.of(speakerAngle.getYaw()));
+            angleToSpeaker = Optional.of(speakerAngle.getYaw());
 
             return speakerAngle.getPitch();
         };
 
-        Command updateSpeedWhenMoved = UpdateSpeedWhenMoved.getCommand(shooterIntake, () -> rpm);
-
-        configureArmBindings(alphaTarget, driveCommand, updateSpeedWhenMoved);
-        configureIntakeShooterBindings(driveActionButton, driveCommand, updateSpeedWhenMoved);
+        configureDriveBindings(driveCommand);
+        configureArmBindings(alphaTarget);
+        configureIntakeShooterBindings();
         configureClimbBindings(driveCommand);
     }
 
-    private static void configureArmBindings(Supplier<Measure<Angle>> alphaTarget, DriveCommand drive, Command updateSpeedWhenMoved) {
+    private static void configureDriveBindings(DriveCommand driveCommand) {
+        Command speakerAngle = new InstantCommand(() -> driveCommand.setTargetAngle(angleToSpeaker)).repeatedly();
+        driveController.cross().whileTrue(speakerAngle).onFalse(driveCommand.emptyTargetAngle());
+
+        RepeatCommand chassisToAmpAngle = new InstantCommand(() -> {
+            Rotation2d angle = Rotation2d.fromRadians(MathUtil.angleModulus(driveBase.getRotation2d().getRadians()));
+
+            Rotation2d target = Constants.AmpConstants.AMP_ANGLE.minus(angle);
+
+            driveCommand.setTargetAngle(Optional.of(target));
+        }).repeatedly();
+
+        RepeatCommand chassisToSourceAngle = new InstantCommand(() -> {
+            Rotation2d angle = Rotation2d.fromRadians(MathUtil.angleModulus(driveBase.getRotation2d().getRadians()));
+
+            Rotation2d target = Constants.SourceConstants.SOURCE_ANGLE.minus(angle);
+
+            driveCommand.setTargetAngle(Optional.of(target));
+        }).repeatedly();
+
+        driveController.square().whileTrue(chassisToSourceAngle).onFalse(driveCommand.emptyTargetAngle());
+        driveController.circle().whileTrue(chassisToAmpAngle).onFalse(driveCommand.emptyTargetAngle());
+
+        BooleanSupplier intakeRunning = () -> shooterIntake.getCurrentCommand().getName().equals("IntakeFromIntake");
+
+        driveController.R1().whileTrue(
+                Auto_IntakeCommand.getCommand(driveBase, vision::getAngleToGP, driveCommand::setTargetAngle, shooterIntake::isGpLoaded, intakeRunning)
+                        .onlyIf(() -> arm.getCurrentPos() == ArmPosition.COLLECT_FLOOR_POSITION
+                                && !shooterIntake.isGpLoaded())
+        ).onFalse(driveCommand.emptyTargetAngle());
+
+        
+    }
+
+    private static void configureArmBindings(Supplier<Measure<Angle>> alphaTarget) {
         Command moveToHome = MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.HOME_POSITION);
 
-        Command resetDriveAngle = drive.emptyTargetAngle();
+        Command resetDriveAngle =
+                new InstantCommand(() -> vision.setPipeline(VisionConstants.PipeLineID.THREE_DIMENSIONAL, VisionConstants.CameraLocation.FRONT_RIGHT))
+                .andThen(new InstantCommand(() -> angleToSpeaker = Optional.empty()));
 
-        armController.cross().whileTrue(AlphaAim.getCommand(arm, alphaTarget).alongWith(updateSpeedWhenMoved).withName("AlphaAim + updateSpeedWhenMoved")).whileFalse(moveToHome);
+        armController.cross().onTrue(new InstantCommand(() -> vision.setPipeline(VisionConstants.PipeLineID.TWO_DIMENSIONAL, VisionConstants.CameraLocation.FRONT_RIGHT)));
+
+        armController.cross().whileTrue(AlphaAim.getCommand(arm, alphaTarget)).whileFalse(moveToHome);
 
         armController.cross().onFalse(resetDriveAngle);
 
         armController.circle().whileTrue(MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.COLLECT_FLOOR_POSITION))
                 .whileFalse(moveToHome);
 
-        armController.touchpad().onTrue(CalibrateLimitSwitch.getCommand(arm));
-
-        RepeatCommand chassisToAmpAngle = new RepeatCommand(new InstantCommand(() -> {
-            Rotation2d angle = Rotation2d.fromRadians(MathUtil.angleModulus(driveBase.getRotation2d().getRadians()));
-
-            Rotation2d target = Constants.AmpConstants.AMP_ANGLE.minus(angle);
-
-            drive.setTargetAngle(Optional.of(target));
-        }));
-
-        RepeatCommand chassisToSourceAngle = new RepeatCommand(new InstantCommand(() -> {
-            Rotation2d angle = Rotation2d.fromRadians(MathUtil.angleModulus(driveBase.getRotation2d().getRadians()));
-
-            Rotation2d target = Constants.SourceConstants.SOURCE_ANGLE.minus(angle);
-
-            drive.setTargetAngle(Optional.of(target));
-        }));
-
         armController.square().whileTrue(
-                        MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.COLLECT_SOURCE_POSITION)
-                                .alongWith(chassisToSourceAngle))
-                .whileFalse(moveToHome).onFalse(resetDriveAngle);
+                        MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.COLLECT_SOURCE_POSITION))
+                .whileFalse(moveToHome);
 
         armController.square().onTrue(new InstantCommand(() -> rpm = 2000));
 
-        armController.triangle().whileTrue(MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.AMP_POSITION)
-                        .alongWith(chassisToAmpAngle))
-                .whileFalse(moveToHome).onFalse(resetDriveAngle);
+        armController.triangle().whileTrue(MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.AMP_POSITION))
+                .whileFalse(moveToHome);
     }
 
-    private static void configureIntakeShooterBindings(Trigger driveActionButton, DriveCommand driveCommand, Command updateSpeedWhenMoved) {
+    private static void configureIntakeShooterBindings() {
         Command intakeFromIntake = IntakeFromIntake.getCommand(shooterIntake);
         Command intakeFromShooter = IntakeFromShooter.getCommand(shooterIntake);
 
@@ -193,33 +209,25 @@ public class RobotContainer {
                 return;
             }
 
-            ArmPosition currentPostion = arm.getCurrentPos();
+            ArmPosition currentPosition = arm.getCurrentPos();
 
-            if (currentPostion == ArmPosition.COLLECT_FLOOR_POSITION) intakeFromIntake.schedule();
-            else if (currentPostion == ArmPosition.COLLECT_SOURCE_POSITION) intakeFromShooter.schedule();
+            if (currentPosition == ArmPosition.COLLECT_FLOOR_POSITION) intakeFromIntake.schedule();
+            else if (currentPosition == ArmPosition.COLLECT_SOURCE_POSITION) intakeFromShooter.schedule();
         })).debounce(0.1);
 
-        driveActionButton.whileTrue(
-                Auto_IntakeCommand.getCommand(driveBase, vision::getAngleToGP, arm, shooterIntake::isGpLoaded,
-                        driveCommand::setTargetAngle,
-                        () -> arm.getCurrentPos() == ArmPosition.COLLECT_FLOOR_POSITION, intakeFromIntake::isScheduled));
-
-        // armController.L1().whileTrue(Eject.getCommand(shooterIntake).onlyIf(
-        //         () -> arm.getCurrentPos() != ArmConstants.ArmPosition.AMP_POSITION)); //Shoot to amp
-
-        armController.L1().onTrue(ShootToAmp.getCommand(shooterIntake).onlyIf(
-                () -> arm.getCurrentPos() == ArmConstants.ArmPosition.AMP_POSITION)); //Shoot to amp
+        armController.L1().onTrue(
+                new Eject(shooterIntake).onlyIf(() -> arm.getCurrentPos() != ArmPosition.COLLECT_FLOOR_POSITION)
+                        .andThen(ShootToAmp.getCommand(shooterIntake).onlyIf(() -> arm.getCurrentPos() == ArmPosition.AMP_POSITION))
+        ); //Shoot to amp
 
 
+        Command updateSpeedWhenMoved = UpdateSpeedWhenMoved.getCommand(shooterIntake, () -> rpm);
 
-        // armController.R2().onTrue(new SequentialCommandGroup(
-        //         new InstantCommand(updateSpeedWhenMoved::cancel),
-        //         ShootShoot.getCommand(shooterIntake, () -> rpm)));
-
-
-        new Trigger(() -> armController.getR2Axis() >= 0.95).onTrue(
-            new InstantCommand(updateSpeedWhenMoved::cancel)
-            .alongWith(ShootShoot.getCommand(shooterIntake, () -> rpm)).withName("shoot")
+        new Trigger(() -> armController.getR2Axis() >= 0.95).whileTrue(
+                updateSpeedWhenMoved
+        ).onFalse(
+                new InstantCommand(updateSpeedWhenMoved::cancel)
+                        .alongWith(ShootShoot.getCommand(shooterIntake, () -> rpm)).withName("shoot")
         );
     }
 
@@ -240,8 +248,8 @@ public class RobotContainer {
         NamedCommands.registerCommand("Move Arm To Collect Floor",
                 MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.COLLECT_FLOOR_POSITION));
 
-        NamedCommands.registerCommand("Move Arm To Sub Woofer Position",
-                MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.SHOOT_SUBWOFFER_POSITION));
+        NamedCommands.registerCommand("Move Arm To SubWoofer Position",
+                MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.SHOOT_SUBWOFFER_POSITION).andThen(new InstantCommand(() -> rpm = 2500)));
 
         NamedCommands.registerCommand("Shoot", ShootShoot.getCommand(shooterIntake,
                 () -> rpm));
@@ -260,6 +268,15 @@ public class RobotContainer {
         };
 
         NamedCommands.registerCommand("Beta Aim", BetaAim.getCommand(arm, supplier));
+        NamedCommands.registerCommand("Collect", IntakeFromIntake.getCommand(shooterIntake));
+        NamedCommands.registerCommand("Collect From Floor",
+        new SequentialCommandGroup(MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.COLLECT_FLOOR_POSITION),
+                                    IntakeFromIntake.getCommand(shooterIntake)));
+        
+        NamedCommands.registerCommand("Shoot to Speaker", new SequentialCommandGroup(
+            BetaAim.getCommand(arm, supplier),
+            ShootShoot.getCommand(shooterIntake, () -> rpm))
+            );
     }
 
 

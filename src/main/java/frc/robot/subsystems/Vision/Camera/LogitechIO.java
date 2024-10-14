@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.Vision.Camera;
 
+import frc.robot.subsystems.Vision.VisionConstants;
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 
@@ -17,6 +18,11 @@ public class LogitechIO implements CameraIO {
 
     public LogitechIO(String name) {
         camera = new PhotonCamera(name);
+    }
+
+    @Override
+    public void setPipeline(VisionConstants.PipeLineID pipelineID) {
+        
     }
 
     @Override

@@ -101,7 +101,7 @@ public abstract class SwerveModuleIO implements Runnable {
      */
     protected DutyCycleEncoder configDutyCycleEncoder(int absEncoderID, double zeroOffset) {
         DutyCycleEncoder encoder = new DutyCycleEncoder(absEncoderID);
-        encoder.reset();
+        //encoder.reset();
         encoder.setPositionOffset(zeroOffset);
 
         return encoder;

@@ -1347,25 +1347,7 @@
   ],
   "eventMarkers": [
     {
-      "timestamp": 0,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": ""
-        }
-      }
-    },
-    {
       "timestamp": 2.344933554709221,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": ""
-        }
-      }
-    },
-    {
-      "timestamp": 3.9967458215506158,
       "command": {
         "type": "named",
         "data": {
