@@ -25,14 +25,17 @@ public class Auto_IntakeCommand extends Command {
     private final Consumer<Optional<Rotation2d>> angleConsumer;
 
     private final BooleanSupplier gpLoaded;
+    private final BooleanSupplier intakeRunning;
 
     PIDController pidController = new PIDController(3, 0, 0);
 
-    private Auto_IntakeCommand(DriveBase driveBase, Supplier<Optional<Measure<Angle>>> angleSupplier, BooleanSupplier gpLoaded, Consumer<Optional<Rotation2d>> angleConsumer) {
+    private Auto_IntakeCommand(DriveBase driveBase, Supplier<Optional<Measure<Angle>>> angleSupplier, BooleanSupplier gpLoaded, Consumer<Optional<Rotation2d>> angleConsumer, BooleanSupplier intakeRunning) {
         this.driveBase = driveBase;
         this.angleSupplier = angleSupplier;
         this.angleConsumer = angleConsumer;
         this.gpLoaded = gpLoaded;
+
+        this.intakeRunning = intakeRunning;
 
         pidController.setSetpoint(0);
         // each subsystem used by the command must be passed into the
@@ -40,18 +43,9 @@ public class Auto_IntakeCommand extends Command {
         addRequirements(this.driveBase);
     }
 
-    public static Command getCommand(DriveBase driveBase, Supplier<Optional<Measure<Angle>>> angleSupplier, Arm arm,
-    BooleanSupplier gpLoaded, Consumer<Optional<Rotation2d>> angleConsumer, BooleanSupplier armInPosition, BooleanSupplier isIntakeRunning) {
-        
-        BooleanSupplier isPresent =
-                () -> angleSupplier.get().isPresent() && arm.getCurrentPos() == ArmConstants.ArmPosition.COLLECT_FLOOR_POSITION
-                && armInPosition.getAsBoolean() && isIntakeRunning.getAsBoolean();
+    public static Command getCommand(DriveBase driveBase, Supplier<Optional<Measure<Angle>>> angleSupplier, Consumer<Optional<Rotation2d>> angleConsumer, BooleanSupplier gpLoaded, BooleanSupplier intakeRunning) {
 
-        Command command = new Auto_IntakeCommand(driveBase, angleSupplier, gpLoaded, angleConsumer).onlyIf(isPresent);
-
-        command.setName("Auto_IntakeCommand");
-
-        return command;
+        return new Auto_IntakeCommand(driveBase, angleSupplier, gpLoaded, angleConsumer, intakeRunning);
     }
 
     @Override
@@ -67,7 +61,7 @@ public class Auto_IntakeCommand extends Command {
 
         double theta = pidController.calculate(radToTarget);
 
-        if(Math.abs(radToTarget) <= 0.35){
+        if(Math.abs(radToTarget) <= 0.35 && intakeRunning.getAsBoolean()){
             xSpeed = Math.cos(theta) * 2;
             ySpeed = Math.sin(theta) * 2;
         }

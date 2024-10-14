@@ -105,12 +105,10 @@ public class RobotContainer {
     private static Optional<Rotation2d> angleToSpeaker = Optional.empty();
 
     private static void configureBindings() {
-        Trigger driveActionButton = driveController.cross();
 
         DriveCommand driveCommand =
                 new DriveCommand(driveBase, driveController,
-                        DriveBaseConstants.thetaControllerGains.createPIDController(),
-                        driveActionButton);
+                        DriveBaseConstants.thetaControllerGains.createPIDController());
 
         new Trigger(RobotState::isTeleop).and(RobotState::isEnabled).whileTrue(new StartEndCommand(() ->
                 driveBase.setDefaultCommand(driveCommand),
@@ -132,8 +130,8 @@ public class RobotContainer {
         };
 
         configureDriveBindings(driveCommand);
-        configureArmBindings(alphaTarget, driveCommand);
-        configureIntakeShooterBindings(driveActionButton, driveCommand);
+        configureArmBindings(alphaTarget);
+        configureIntakeShooterBindings();
         configureClimbBindings();
     }
 
@@ -159,14 +157,22 @@ public class RobotContainer {
 
         driveController.square().whileTrue(chassisToSourceAngle).onFalse(driveCommand.emptyTargetAngle());
         driveController.circle().whileTrue(chassisToAmpAngle).onFalse(driveCommand.emptyTargetAngle());
+
+        BooleanSupplier intakeRunning = () -> shooterIntake.getCurrentCommand().getName().equals("IntakeFromIntake");
+
+        driveController.R1().whileTrue(
+                Auto_IntakeCommand.getCommand(driveBase, vision::getAngleToGP, driveCommand::setTargetAngle, shooterIntake::isGpLoaded, intakeRunning)
+                        .onlyIf(() -> arm.getCurrentPos() == ArmPosition.COLLECT_FLOOR_POSITION
+                                && !shooterIntake.isGpLoaded())
+        ).onFalse(driveCommand.emptyTargetAngle());
     }
 
-    private static void configureArmBindings(Supplier<Measure<Angle>> alphaTarget, DriveCommand drive) {
+    private static void configureArmBindings(Supplier<Measure<Angle>> alphaTarget) {
         Command moveToHome = MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.HOME_POSITION);
 
-        Command resetDriveAngle = drive.emptyTargetAngle().andThen(
-                new InstantCommand(() -> vision.setPipeline(VisionConstants.PipeLineID.THREE_DIMENSIONAL, VisionConstants.CameraLocation.FRONT_RIGHT)),
-                new InstantCommand(() -> angleToSpeaker = Optional.empty()));
+        Command resetDriveAngle =
+                new InstantCommand(() -> vision.setPipeline(VisionConstants.PipeLineID.THREE_DIMENSIONAL, VisionConstants.CameraLocation.FRONT_RIGHT))
+                .andThen(new InstantCommand(() -> angleToSpeaker = Optional.empty()));
 
         armController.cross().onTrue(new InstantCommand(() -> vision.setPipeline(VisionConstants.PipeLineID.TWO_DIMENSIONAL, VisionConstants.CameraLocation.FRONT_RIGHT)));
 
@@ -187,7 +193,7 @@ public class RobotContainer {
                 .whileFalse(moveToHome);
     }
 
-    private static void configureIntakeShooterBindings(Trigger driveActionButton, DriveCommand driveCommand) {
+    private static void configureIntakeShooterBindings() {
         Command intakeFromIntake = IntakeFromIntake.getCommand(shooterIntake);
         Command intakeFromShooter = IntakeFromShooter.getCommand(shooterIntake);
 
@@ -207,11 +213,6 @@ public class RobotContainer {
             if (currentPosition == ArmPosition.COLLECT_FLOOR_POSITION) intakeFromIntake.schedule();
             else if (currentPosition == ArmPosition.COLLECT_SOURCE_POSITION) intakeFromShooter.schedule();
         })).debounce(0.1);
-
-        driveActionButton.whileTrue(
-                Auto_IntakeCommand.getCommand(driveBase, vision::getAngleToGP, arm, shooterIntake::isGpLoaded,
-                        driveCommand::setTargetAngle,
-                        () -> arm.getCurrentPos() == ArmPosition.COLLECT_FLOOR_POSITION, intakeFromIntake::isScheduled));
 
         armController.L1().onTrue(
                 new Eject(shooterIntake).onlyIf(() -> arm.getCurrentPos() != ArmPosition.COLLECT_FLOOR_POSITION)

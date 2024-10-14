@@ -29,7 +29,7 @@ public class IntakeFromIntake extends Command {
   }
 
   public static Command getCommand(ShooterIntake shooterIntake){
-    return new IntakeFromIntake(shooterIntake).onlyIf(() -> !shooterIntake.isGpLoaded());
+    return new IntakeFromIntake(shooterIntake).onlyIf(() -> !shooterIntake.isGpLoaded()).withName("IntakeFromIntake");
   }
 
   @Override

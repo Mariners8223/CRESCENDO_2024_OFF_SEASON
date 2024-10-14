@@ -22,11 +22,10 @@ public class DriveCommand extends Command {
     private final CommandPS5Controller controller;
 
     private final PIDController thetaController;
-    private final Trigger controlThetaTrigger;
     private Optional<Rotation2d> targetAngle = Optional.empty();
 
     public DriveCommand(DriveBase driveBase, CommandPS5Controller controller,
-                        PIDController thetaController, Trigger controlThetaTrigger) {
+                        PIDController thetaController) {
 
         this.driveBase = driveBase;
         this.controller = controller;
@@ -34,7 +33,6 @@ public class DriveCommand extends Command {
         this.thetaController.enableContinuousInput(-Math.PI, Math.PI);
         this.thetaController.setSetpoint(0);
 
-        this.controlThetaTrigger = controlThetaTrigger;
 
         addRequirements(this.driveBase);
         setName("DriveCommand");
@@ -80,7 +78,7 @@ public class DriveCommand extends Command {
 
         double rightX;
 
-        if(controlThetaTrigger.getAsBoolean() && targetAngle.isPresent()){
+        if(targetAngle.isPresent()){
             double value = -thetaController.calculate(targetAngle.get().getRadians());
 
             rightX = Math.abs(value) >= 0.2 ? value : 0;
