@@ -131,7 +131,7 @@ public class RobotContainer {
         configureDriveBindings(driveCommand);
         configureArmBindings(alphaTarget);
         configureIntakeShooterBindings();
-        configureClimbBindings();
+        configureClimbBindings(driveCommand);
     }
 
     private static void configureDriveBindings(DriveCommand driveCommand) {
