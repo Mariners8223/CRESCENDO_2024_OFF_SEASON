@@ -131,6 +131,7 @@ public class RobotContainer {
             return speakerAngle.getPitch();
         };
 
+        configureDriveBindings(driveCommand);
         configureArmBindings(alphaTarget, driveCommand);
         configureIntakeShooterBindings(driveActionButton, driveCommand);
         configureClimbBindings();
