@@ -24,7 +24,7 @@ import frc.robot.commands.Arm.AlphaAim;
 import frc.robot.commands.Arm.BetaAim;
 import frc.robot.commands.Arm.MoveArmToPosition;
 import frc.robot.commands.Climb.HookAscend;
-import frc.robot.commands.Climb.HookDescend;
+import frc.robot.commands.Climb.SnapToStage;
 import frc.robot.commands.Drive.Auto_IntakeCommand;
 import frc.robot.commands.Drive.DriveCommand;
 import frc.robot.commands.ShooterIntake.*;
@@ -46,6 +46,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Climb.Climb;
+import frc.robot.subsystems.Climb.ClimbConstants;
 import frc.robot.subsystems.DriveTrain.DriveBase;
 import frc.robot.subsystems.Shooter_Intake.ShooterIntake;
 import frc.robot.subsystems.Vision.Vision;
@@ -232,8 +233,9 @@ public class RobotContainer {
     }
 
     private static void configureClimbBindings(DriveCommand drive) {
-        armController.povUp().whileTrue(new HookAscend(climb, driveBase::getPose, driveBase::getRotation2d, drive::setTargetAngle));
-        armController.povDown().whileTrue(new HookDescend(climb));
+        armController.povUp().whileTrue(new HookAscend(climb, ClimbConstants.CLIMB_ASCEND_MOTOR_POWER));
+        armController.povDown().whileTrue(new HookAscend(climb, ClimbConstants.CLIMB_DESCEND_MOTOR_POWER));
+        driveController.triangle().whileTrue(new SnapToStage(climb,driveBase::getPose, driveBase::getRotation2d, drive::setTargetAngle)).onFalse(drive.emptyTargetAngle());
     }
 
     public static Command getAutoCommand() {
