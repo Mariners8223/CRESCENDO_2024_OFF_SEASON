@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.robot.commands.Arm.AlphaAim;
 import frc.robot.commands.Arm.BetaAim;
-import frc.robot.commands.Arm.CalibrateLimitSwitch;
 import frc.robot.commands.Arm.MoveArmToPosition;
 import frc.robot.commands.Climb.HookAscend;
 import frc.robot.commands.Climb.HookDescend;
@@ -165,6 +164,8 @@ public class RobotContainer {
                         .onlyIf(() -> arm.getCurrentPos() == ArmPosition.COLLECT_FLOOR_POSITION
                                 && !shooterIntake.isGpLoaded())
         ).onFalse(driveCommand.emptyTargetAngle());
+
+        
     }
 
     private static void configureArmBindings(Supplier<Measure<Angle>> alphaTarget) {
