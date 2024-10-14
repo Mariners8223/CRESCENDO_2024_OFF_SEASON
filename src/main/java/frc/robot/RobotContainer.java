@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.robot.commands.Arm.AlphaAim;
 import frc.robot.commands.Arm.BetaAim;
+import frc.robot.commands.Arm.CalibrateLimitSwitch;
 import frc.robot.commands.Arm.MoveArmToPosition;
 import frc.robot.commands.Climb.HookAscend;
 import frc.robot.commands.Climb.HookDescend;
@@ -136,7 +137,10 @@ public class RobotContainer {
 
     private static void configureDriveBindings(DriveCommand driveCommand) {
         Command speakerAngle = new InstantCommand(() -> driveCommand.setTargetAngle(angleToSpeaker)).repeatedly();
-        driveController.cross().whileTrue(speakerAngle).onFalse(driveCommand.emptyTargetAngle());
+        driveController.cross().whileTrue(speakerAngle).onFalse(new InstantCommand(() -> {
+            angleToSpeaker = Optional.empty();
+            driveCommand.setTargetAngle(angleToSpeaker);
+        }));
 
         RepeatCommand chassisToAmpAngle = new InstantCommand(() -> {
             Rotation2d angle = Rotation2d.fromRadians(MathUtil.angleModulus(driveBase.getRotation2d().getRadians()));
@@ -157,7 +161,8 @@ public class RobotContainer {
         driveController.square().whileTrue(chassisToSourceAngle).onFalse(driveCommand.emptyTargetAngle());
         driveController.circle().whileTrue(chassisToAmpAngle).onFalse(driveCommand.emptyTargetAngle());
 
-        BooleanSupplier intakeRunning = () -> shooterIntake.getCurrentCommand().getName().equals("IntakeFromIntake");
+        BooleanSupplier intakeRunning = () -> "IntakeFromIntake"
+                .equals(shooterIntake.getCurrentCommand() == null ? "None" : shooterIntake.getCurrentCommand().getName());
 
         driveController.R1().whileTrue(
                 Auto_IntakeCommand.getCommand(driveBase, vision::getAngleToGP, driveCommand::setTargetAngle, shooterIntake::isGpLoaded, intakeRunning)
@@ -184,14 +189,16 @@ public class RobotContainer {
         armController.circle().whileTrue(MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.COLLECT_FLOOR_POSITION))
                 .whileFalse(moveToHome);
 
-        armController.square().whileTrue(
+        armController.triangle().whileTrue(
                         MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.COLLECT_SOURCE_POSITION))
                 .whileFalse(moveToHome);
 
-        armController.square().onTrue(new InstantCommand(() -> rpm = 2000));
+        armController.triangle().onTrue(new InstantCommand(() -> rpm = 2000));
 
-        armController.triangle().whileTrue(MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.AMP_POSITION))
+        armController.square().whileTrue(MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.AMP_POSITION))
                 .whileFalse(moveToHome);
+
+        armController.touchpad().onTrue(CalibrateLimitSwitch.getCommand(arm));        
     }
 
     private static void configureIntakeShooterBindings() {
@@ -215,10 +222,10 @@ public class RobotContainer {
             else if (currentPosition == ArmPosition.COLLECT_SOURCE_POSITION) intakeFromShooter.schedule();
         })).debounce(0.1);
 
-        armController.L1().onTrue(
-                new Eject(shooterIntake).onlyIf(() -> arm.getCurrentPos() != ArmPosition.COLLECT_FLOOR_POSITION)
-                        .andThen(ShootToAmp.getCommand(shooterIntake).onlyIf(() -> arm.getCurrentPos() == ArmPosition.AMP_POSITION))
-        ); //Shoot to amp
+        armController.L1().whileTrue(
+            new Eject(shooterIntake).onlyIf(() -> arm.getCurrentPos() != ArmPosition.AMP_POSITION)
+                    .andThen(ShootToAmp.getCommand(shooterIntake).onlyIf(() -> arm.getCurrentPos() == ArmPosition.AMP_POSITION))
+    );
 
 
         Command updateSpeedWhenMoved = UpdateSpeedWhenMoved.getCommand(shooterIntake, () -> rpm);

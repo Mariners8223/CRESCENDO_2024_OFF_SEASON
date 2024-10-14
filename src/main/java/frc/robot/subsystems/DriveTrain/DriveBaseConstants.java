@@ -28,5 +28,5 @@ public class DriveBaseConstants {
 
         public static final double CHASSIS_HEIGHT = 0.15;
 
-        public static final PIDFGains thetaControllerGains = new PIDFGains(3, 0, 0); //the pid gains for the PID Controller of the robot angle, units are radians per second
+        public static final PIDFGains thetaControllerGains = new PIDFGains(6, 0, 0); //the pid gains for the PID Controller of the robot angle, units are radians per second
 }

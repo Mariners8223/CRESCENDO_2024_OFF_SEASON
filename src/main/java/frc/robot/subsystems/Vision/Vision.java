@@ -138,13 +138,16 @@ public class Vision extends SubsystemBase {
         double angleYToAprilTag = degreesToRadians(angleY) + Math.abs(cameraToRobot.getRotation().getY());
 
         double xDistCamera =
-                (speakerConstants.SPEAKER_CENTER_APRIL_TAG.getZ() - Math.abs(cameraToRobot.getZ())) /
+                (speakerConstants.SPEAKER_CENTER_APRIL_TAG.getZ() - Math.abs(cameraToRobot.getZ()) - ROBOT_FRAME_HEIGHT) /
                         Math.tan(angleYToAprilTag);
 
         double xDistToRobotCenter = xDistCamera + Math.abs(cameraToRobot.getX());
 
-        double yDistRobotCenter = Math.tan(-degreesToRadians(angleX) - cameraToRobot.getRotation().getZ())
-                * xDistCamera - Math.abs(cameraToRobot.getY());
+        double yDistRobotCenter = Math.tan(degreesToRadians(angleX) - cameraToRobot.getRotation().getZ())
+                * xDistCamera + Math.abs(cameraToRobot.getY());
+
+        Logger.recordOutput("xdist", xDistToRobotCenter);
+        Logger.recordOutput("ydist", yDistRobotCenter);
 
 //        double distanceToTarget
 //                = Math.sqrt(xDistToRobotCenter * xDistToRobotCenter + yDistRobotCenter * yDistRobotCenter) + offsetX;
@@ -152,10 +155,10 @@ public class Vision extends SubsystemBase {
         double distanceToTarget = Math.hypot(xDistToRobotCenter, yDistRobotCenter) + offsetX;
 
         double pitch =
-                Math.atan2(speakerConstants.SPEAKER_TARGET.getZ() - ROBOT_FRAME_HEIGHT - offsetZ,
+                Math.atan2(speakerConstants.SPEAKER_TARGET.getZ() - offsetZ,
                         distanceToTarget);
 
-        double yaw = Math.atan2(yDistRobotCenter, xDistToRobotCenter);
+        double yaw = -Math.atan2(yDistRobotCenter, xDistToRobotCenter);
 
         return new VisionOutPuts(pitch, yaw, distanceToTarget * speedMultiplier);
     }

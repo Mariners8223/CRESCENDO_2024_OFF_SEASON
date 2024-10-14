@@ -19,7 +19,7 @@ public class VisionConstants {
     public enum CameraLocation {
         FRONT_RIGHT(
              new Transform3d(new Translation3d(0.4  , -0.37, 0.17), new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(-17.3), Units.degreesToRadians(13))),
-            new Transform3d(new Translation3d(0.4  , -0.37, 0.17), new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(-30), Units.degreesToRadians(13))),
+            new Transform3d(new Translation3d(0.4  , -0.37, 0.08), new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(-30), Units.degreesToRadians(11))),
                 "FrontRight",
                 true
         ),
@@ -51,7 +51,7 @@ public class VisionConstants {
         }
     }
 
-    public static final double tolarance = 0.2;
+    public static final double tolarance = 0.4;
 
     public enum PipeLineID{
         THREE_DIMENSIONAL,
@@ -83,7 +83,7 @@ public class VisionConstants {
                     FIELD_LAYOUT.getTagPose(SPEAKER_CENTER_ID).get().getTranslation();
 
 
-            double TARGET_HEIGHT_ABOVE_APRIL_TAG = 0.72;
+            double TARGET_HEIGHT_ABOVE_APRIL_TAG = 0.68;
 
             SPEAKER_TARGET =
                     new Translation3d(SPEAKER_CENTER_APRIL_TAG.getX(), SPEAKER_CENTER_APRIL_TAG.getY(), SPEAKER_CENTER_APRIL_TAG.getZ() + TARGET_HEIGHT_ABOVE_APRIL_TAG);

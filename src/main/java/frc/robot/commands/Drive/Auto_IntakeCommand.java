@@ -7,8 +7,6 @@ import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Arm.Arm;
-import frc.robot.subsystems.Arm.ArmConstants;
 import frc.robot.subsystems.DriveTrain.DriveBase;
 
 import java.util.Optional;
@@ -63,7 +61,7 @@ public class Auto_IntakeCommand extends Command {
 
         if(Math.abs(radToTarget) <= 0.35 && intakeRunning.getAsBoolean()){
             xSpeed = Math.cos(theta) * 2;
-            ySpeed = Math.sin(theta) * 2;
+            // ySpeed = Math.sin(theta);
         }
 
 
