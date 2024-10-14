@@ -5,6 +5,10 @@
 package frc.robot.subsystems.Arm;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.struct.Pose2dStruct;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -129,6 +133,11 @@ public class Arm extends SubsystemBase {
         Logger.processInputs("Arm", inputs);
         Logger.recordOutput("Arm/Current Pose", currentPos);
         Logger.recordOutput("Arm/Mechanism2D", armMechanism);
+
+        Pose3d alphaArmPose3d = new Pose3d(ArmConstants.ALPHA_DISTANCE_FROM_CENTER_CUSTOM_ASSETS, new Rotation3d(0, alpha, 0));
+        Pose3d betaArmPose3d = new Pose3d(alphaArmPose3d.getTranslation(), new Rotation3d(0, (Math.PI - (alphaArmPose3d.getRotation().getY()) - beta), 0));
+        Logger.recordOutput("Arm/Alpha Position", alphaArmPose3d);
+        Logger.recordOutput("Arm/Beta Position", betaArmPose3d);
 
         String currentCommand = getCurrentCommand() != null ? getCurrentCommand().getName() : "None";
         Logger.recordOutput("Arm/Current Command", currentCommand);

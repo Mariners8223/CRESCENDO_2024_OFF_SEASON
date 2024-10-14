@@ -10,6 +10,7 @@ import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import frc.robot.commands.Arm.CalibrateLimitSwitch;
 import frc.util.LocalADStarAK;
 
@@ -76,6 +77,9 @@ public class Robot extends LoggedRobot
         }
 
         Logger.start();
+
+        Logger.recordOutput("Zero 2D", new Pose2d());
+        Logger.recordOutput("Zero 3D", new Pose3d());
 
         Pathfinding.setPathfinder(new LocalADStarAK());
         PathPlannerLogging.setLogActivePathCallback((path) ->
