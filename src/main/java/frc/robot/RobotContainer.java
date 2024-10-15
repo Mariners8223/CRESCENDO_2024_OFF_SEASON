@@ -276,9 +276,6 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("Beta Aim", BetaAim.getCommand(arm, supplier));
         NamedCommands.registerCommand("Collect", IntakeFromIntake.getCommand(shooterIntake));
-        NamedCommands.registerCommand("Collect From Floor",
-        new SequentialCommandGroup(MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.COLLECT_FLOOR_POSITION),
-                                    IntakeFromIntake.getCommand(shooterIntake)));
         
         NamedCommands.registerCommand("Shoot to Speaker", new SequentialCommandGroup(
             BetaAim.getCommand(arm, supplier),

@@ -34071,14 +34071,27 @@
                     "targetTimestamp": 0,
                     "offset": 0,
                     "command": {
-                        "type": "named",
+                        "type": "sequential",
                         "data": {
-                            "name": "Collect From Floor"
+                            "commands": [
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Move Arm To Collect Floor"
+                                    }
+                                },
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Collect"
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
             ],
-            "isTrajectoryStale": true
+            "isTrajectoryStale": false
         },
         "Pose3 to Note3": {
             "waypoints": [
