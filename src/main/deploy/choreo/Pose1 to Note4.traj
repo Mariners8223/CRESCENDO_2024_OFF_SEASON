@@ -1286,9 +1286,22 @@
     {
       "timestamp": 2.4836080224101895,
       "command": {
-        "type": "named",
+        "type": "sequential",
         "data": {
-          "name": ""
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Move Arm To Collect Floor"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Collect"
+              }
+            }
+          ]
         }
       }
     }

@@ -261,7 +261,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("Shoot", ShootShoot.getCommand(shooterIntake,
                 () -> rpm));
 
-        NamedCommands.registerCommand("Intake", IntakeFromIntake.getCommand(shooterIntake));
+        //NamedCommands.registerCommand("Intake", IntakeFromIntake.getCommand(shooterIntake));
 
         Supplier<Measure<Angle>> supplier = () -> {
             Vision.VisionOutPuts speakerAngle =
@@ -276,14 +276,16 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("Beta Aim", BetaAim.getCommand(arm, supplier));
         NamedCommands.registerCommand("Collect", IntakeFromIntake.getCommand(shooterIntake));
-        NamedCommands.registerCommand("Collect From Floor",
-        new SequentialCommandGroup(MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.COLLECT_FLOOR_POSITION),
-                                    IntakeFromIntake.getCommand(shooterIntake)));
+
+        // NamedCommands.registerCommand("Collect From Floor",new SequentialCommandGroup(
+        //     MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.COLLECT_FLOOR_POSITION),
+        //     IntakeFromIntake.getCommand(shooterIntake))
+        //     );
         
-        NamedCommands.registerCommand("Shoot to Speaker", new SequentialCommandGroup(
-            BetaAim.getCommand(arm, supplier),
-            ShootShoot.getCommand(shooterIntake, () -> rpm))
-            );
+        // NamedCommands.registerCommand("Shoot to Speaker", new SequentialCommandGroup(
+        //     BetaAim.getCommand(arm, supplier),
+        //     ShootShoot.getCommand(shooterIntake, () -> rpm))
+        //     );
     }
 
 

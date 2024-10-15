@@ -1391,36 +1391,88 @@
     {
       "timestamp": 0,
       "command": {
-        "type": "named",
+        "type": "sequential",
         "data": {
-          "name": ""
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Beta Aim"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Shoot"
+              }
+            }
+          ]
         }
       }
     },
     {
       "timestamp": 0.47385613903997204,
       "command": {
-        "type": "named",
+        "type": "sequential",
         "data": {
-          "name": ""
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Move Arm To Collect Floor"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": ""
+              }
+            }
+          ]
         }
       }
     },
     {
       "timestamp": 0.8540597399028993,
       "command": {
-        "type": "named",
+        "type": "sequential",
         "data": {
-          "name": ""
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Beta Aim"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Shoot"
+              }
+            }
+          ]
         }
       }
     },
     {
       "timestamp": 2.8227423179815774,
       "command": {
-        "type": "named",
+        "type": "sequential",
         "data": {
-          "name": ""
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Move Arm To Collect Floor"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Collect"
+              }
+            }
+          ]
         }
       }
     }

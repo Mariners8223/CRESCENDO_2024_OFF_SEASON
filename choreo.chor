@@ -1433,9 +1433,22 @@
                     "targetTimestamp": 2.4836080224101895,
                     "offset": 0,
                     "command": {
-                        "type": "named",
+                        "type": "sequential",
                         "data": {
-                            "name": ""
+                            "commands": [
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Move Arm To Collect Floor"
+                                    }
+                                },
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Collect"
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -3135,9 +3148,22 @@
                     "targetTimestamp": 2.522172018687783,
                     "offset": 0,
                     "command": {
-                        "type": "named",
+                        "type": "sequential",
                         "data": {
-                            "name": ""
+                            "commands": [
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Move Arm To Collect Floor"
+                                    }
+                                },
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Collect"
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -5193,9 +5219,22 @@
                     "targetTimestamp": 2.827671722808217,
                     "offset": 0,
                     "command": {
-                        "type": "named",
+                        "type": "sequential",
                         "data": {
-                            "name": ""
+                            "commands": [
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Move Arm To Collect Floor"
+                                    }
+                                },
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Collect"
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -7418,9 +7457,22 @@
                     "targetTimestamp": 2.9470537721859085,
                     "offset": 0,
                     "command": {
-                        "type": "named",
+                        "type": "sequential",
                         "data": {
-                            "name": ""
+                            "commands": [
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Move Arm To Collect Floor"
+                                    }
+                                },
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Collect"
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -9161,9 +9213,22 @@
                     "targetTimestamp": 1.947554115148764,
                     "offset": 0,
                     "command": {
-                        "type": "named",
+                        "type": "sequential",
                         "data": {
-                            "name": ""
+                            "commands": [
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Move Arm To Collect Floor"
+                                    }
+                                },
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Collect"
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -10653,9 +10718,22 @@
                     "targetTimestamp": 2.344933554709221,
                     "offset": 0,
                     "command": {
-                        "type": "named",
+                        "type": "sequential",
                         "data": {
-                            "name": ""
+                            "commands": [
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Move Arm To Collect Floor"
+                                    }
+                                },
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Collect"
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -12354,9 +12432,22 @@
                     "targetTimestamp": 2.36197279347081,
                     "offset": 0,
                     "command": {
-                        "type": "named",
+                        "type": "sequential",
                         "data": {
-                            "name": ""
+                            "commands": [
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Move Arm To Collect Floor"
+                                    }
+                                },
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Collect"
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -14160,9 +14251,22 @@
                     "targetTimestamp": 2.515934890667176,
                     "offset": 0,
                     "command": {
-                        "type": "named",
+                        "type": "sequential",
                         "data": {
-                            "name": ""
+                            "commands": [
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Move Arm To Collect Floor"
+                                    }
+                                },
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Collect"
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -15987,9 +16091,22 @@
                     "targetTimestamp": 2.798762873955882,
                     "offset": 0,
                     "command": {
-                        "type": "named",
+                        "type": "sequential",
                         "data": {
-                            "name": ""
+                            "commands": [
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Move Arm To Collect Floor"
+                                    }
+                                },
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Collect"
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -17981,9 +18098,22 @@
                     "targetTimestamp": 2.7615322070721247,
                     "offset": 0,
                     "command": {
-                        "type": "named",
+                        "type": "sequential",
                         "data": {
-                            "name": ""
+                            "commands": [
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Move Arm To Collect Floor"
+                                    }
+                                },
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Collect"
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -19975,9 +20105,22 @@
                     "targetTimestamp": 2.7824658782588774,
                     "offset": 0,
                     "command": {
-                        "type": "named",
+                        "type": "sequential",
                         "data": {
-                            "name": ""
+                            "commands": [
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Move Arm To Collect Floor"
+                                    }
+                                },
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Collect"
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -22032,9 +22175,22 @@
                     "targetTimestamp": 2.96046758650511,
                     "offset": 0,
                     "command": {
-                        "type": "named",
+                        "type": "sequential",
                         "data": {
-                            "name": ""
+                            "commands": [
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Move Arm To Collect Floor"
+                                    }
+                                },
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Collect"
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -33669,9 +33825,22 @@
                     "targetTimestamp": 0.6436971003848575,
                     "offset": 0,
                     "command": {
-                        "type": "named",
+                        "type": "sequential",
                         "data": {
-                            "name": ""
+                            "commands": [
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Move Arm To Collect Floor"
+                                    }
+                                },
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Collect"
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -34071,9 +34240,22 @@
                     "targetTimestamp": 0,
                     "offset": 0,
                     "command": {
-                        "type": "named",
+                        "type": "sequential",
                         "data": {
-                            "name": "Collect From Floor"
+                            "commands": [
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Move Arm To Collect Floor"
+                                    }
+                                },
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Collect"
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -34599,9 +34781,22 @@
                     "targetTimestamp": null,
                     "offset": 0,
                     "command": {
-                        "type": "named",
+                        "type": "sequential",
                         "data": {
-                            "name": ""
+                            "commands": [
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Move Arm To Collect Floor"
+                                    }
+                                },
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Collect"
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -36373,9 +36568,22 @@
                     "targetTimestamp": 0.6464185419870293,
                     "offset": 0,
                     "command": {
-                        "type": "named",
+                        "type": "sequential",
                         "data": {
-                            "name": ""
+                            "commands": [
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Move Arm To Collect Floor"
+                                    }
+                                },
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Collect"
+                                    }
+                                }
+                            ]
                         }
                     }
                 },
@@ -36386,9 +36594,22 @@
                     "targetTimestamp": 3.1155365072977528,
                     "offset": 0,
                     "command": {
-                        "type": "named",
+                        "type": "sequential",
                         "data": {
-                            "name": ""
+                            "commands": [
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Move Arm To Collect Floor"
+                                    }
+                                },
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Collect"
+                                    }
+                                }
+                            ]
                         }
                     }
                 },
@@ -36399,9 +36620,22 @@
                     "targetTimestamp": 1.2139796482550405,
                     "offset": 0,
                     "command": {
-                        "type": "named",
+                        "type": "sequential",
                         "data": {
-                            "name": ""
+                            "commands": [
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Beta Aim"
+                                    }
+                                },
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Shoot"
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -40716,9 +40950,22 @@
                     "targetTimestamp": 0.6482980435768505,
                     "offset": 0,
                     "command": {
-                        "type": "named",
+                        "type": "sequential",
                         "data": {
-                            "name": ""
+                            "commands": [
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Move Arm To Collect Floor"
+                                    }
+                                },
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Collect"
+                                    }
+                                }
+                            ]
                         }
                     }
                 },
@@ -40729,9 +40976,22 @@
                     "targetTimestamp": 3.603713650850281,
                     "offset": 0,
                     "command": {
-                        "type": "named",
+                        "type": "sequential",
                         "data": {
-                            "name": ""
+                            "commands": [
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Move Arm To Collect Floor"
+                                    }
+                                },
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Collect"
+                                    }
+                                }
+                            ]
                         }
                     }
                 },
@@ -40742,9 +41002,22 @@
                     "targetTimestamp": 1.133789559392075,
                     "offset": 0,
                     "command": {
-                        "type": "named",
+                        "type": "sequential",
                         "data": {
-                            "name": ""
+                            "commands": [
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Beta Aim"
+                                    }
+                                },
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Shoot"
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -42446,9 +42719,22 @@
                     "targetTimestamp": 0.4738561524176445,
                     "offset": 0,
                     "command": {
-                        "type": "named",
+                        "type": "sequential",
                         "data": {
-                            "name": ""
+                            "commands": [
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Move Arm To Collect Floor"
+                                    }
+                                },
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Collect"
+                                    }
+                                }
+                            ]
                         }
                     }
                 },
@@ -42459,9 +42745,22 @@
                     "targetTimestamp": 0.8540598854925414,
                     "offset": 0,
                     "command": {
-                        "type": "named",
+                        "type": "sequential",
                         "data": {
-                            "name": ""
+                            "commands": [
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Beta Aim"
+                                    }
+                                },
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Shoot"
+                                    }
+                                }
+                            ]
                         }
                     }
                 },
@@ -42472,9 +42771,22 @@
                     "targetTimestamp": 2.9060994449594943,
                     "offset": 0,
                     "command": {
-                        "type": "named",
+                        "type": "sequential",
                         "data": {
-                            "name": ""
+                            "commands": [
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Move Arm To Collect Floor"
+                                    }
+                                },
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Collect"
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -44067,14 +44379,27 @@
             "eventMarkers": [
                 {
                     "name": "Shoot to speaker",
-                    "target": "first",
+                    "target": "last",
                     "trajTargetIndex": 0,
                     "targetTimestamp": 0,
                     "offset": 0,
                     "command": {
-                        "type": "named",
+                        "type": "sequential",
                         "data": {
-                            "name": ""
+                            "commands": [
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Beta Aim"
+                                    }
+                                },
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Shoot"
+                                    }
+                                }
+                            ]
                         }
                     }
                 },
@@ -44085,9 +44410,22 @@
                     "targetTimestamp": 0.47385613903997204,
                     "offset": 0,
                     "command": {
-                        "type": "named",
+                        "type": "sequential",
                         "data": {
-                            "name": ""
+                            "commands": [
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Move Arm To Collect Floor"
+                                    }
+                                },
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": ""
+                                    }
+                                }
+                            ]
                         }
                     }
                 },
@@ -44098,9 +44436,22 @@
                     "targetTimestamp": 0.8540597399028993,
                     "offset": 0,
                     "command": {
-                        "type": "named",
+                        "type": "sequential",
                         "data": {
-                            "name": ""
+                            "commands": [
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Beta Aim"
+                                    }
+                                },
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Shoot"
+                                    }
+                                }
+                            ]
                         }
                     }
                 },
@@ -44111,9 +44462,22 @@
                     "targetTimestamp": 2.8227423179815774,
                     "offset": 0,
                     "command": {
-                        "type": "named",
+                        "type": "sequential",
                         "data": {
-                            "name": ""
+                            "commands": [
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Move Arm To Collect Floor"
+                                    }
+                                },
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Collect"
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -45857,9 +46221,22 @@
                     "targetTimestamp": 0.47385636375492174,
                     "offset": 0,
                     "command": {
-                        "type": "named",
+                        "type": "sequential",
                         "data": {
-                            "name": ""
+                            "commands": [
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Move Arm To Collect Floor"
+                                    }
+                                },
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Collect"
+                                    }
+                                }
+                            ]
                         }
                     }
                 },
@@ -45870,9 +46247,22 @@
                     "targetTimestamp": 0.854062185376486,
                     "offset": 0,
                     "command": {
-                        "type": "named",
+                        "type": "sequential",
                         "data": {
-                            "name": ""
+                            "commands": [
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Beta Aim"
+                                    }
+                                },
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Shoot"
+                                    }
+                                }
+                            ]
                         }
                     }
                 },
@@ -45883,9 +46273,22 @@
                     "targetTimestamp": 2.9315169765841516,
                     "offset": 0,
                     "command": {
-                        "type": "named",
+                        "type": "sequential",
                         "data": {
-                            "name": ""
+                            "commands": [
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Move Arm To Collect Floor"
+                                    }
+                                },
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "Collect"
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
