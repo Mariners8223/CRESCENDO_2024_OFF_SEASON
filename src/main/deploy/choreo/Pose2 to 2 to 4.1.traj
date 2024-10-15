@@ -1475,27 +1475,66 @@
     {
       "timestamp": 0.4738561524176445,
       "command": {
-        "type": "named",
+        "type": "sequential",
         "data": {
-          "name": ""
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Move Arm To Collect Floor"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Collect"
+              }
+            }
+          ]
         }
       }
     },
     {
       "timestamp": 0.8540598854925414,
       "command": {
-        "type": "named",
+        "type": "sequential",
         "data": {
-          "name": ""
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Beta Aim"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Shoot"
+              }
+            }
+          ]
         }
       }
     },
     {
       "timestamp": 2.9060994449594943,
       "command": {
-        "type": "named",
+        "type": "sequential",
         "data": {
-          "name": ""
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Move Arm To Collect Floor"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Collect"
+              }
+            }
+          ]
         }
       }
     }

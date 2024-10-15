@@ -36,9 +36,6 @@ import frc.robot.subsystems.Arm.ArmConstants.ArmPosition;
 import frc.robot.subsystems.DriveTrain.DriveBaseConstants;
 import frc.robot.subsystems.Shooter_Intake.ShooterIntakeConstants;
 import frc.robot.subsystems.Vision.VisionConstants;
-import frc.robot.subsystems.Vision.VisionConstants.CameraLocation;
-import frc.robot.subsystems.Vision.VisionConstants.PipeLineID;
-
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -169,7 +166,7 @@ public class RobotContainer {
                 .equals(shooterIntake.getCurrentCommand() == null ? "None" : shooterIntake.getCurrentCommand().getName());
 
         driveController.R1().whileTrue(
-                Auto_IntakeCommand.getCommand(driveBase, vision::getAngleToGP, shooterIntake::isGpLoaded, intakeRunning)
+                Auto_IntakeCommand.getCommand(driveBase, vision::getAngleToGP, driveCommand::setTargetAngle, shooterIntake::isGpLoaded, intakeRunning)
                         .onlyIf(() -> arm.getCurrentPos() == ArmPosition.COLLECT_FLOOR_POSITION
                                 && !shooterIntake.isGpLoaded())
         ).onFalse(driveCommand.emptyTargetAngle());
@@ -265,11 +262,11 @@ public class RobotContainer {
         NamedCommands.registerCommand("Shoot", ShootShoot.getCommand(shooterIntake,
                 () -> rpm));
 
-        NamedCommands.registerCommand("Intake", IntakeFromIntake.getCommand(shooterIntake));
+        //NamedCommands.registerCommand("Intake", IntakeFromIntake.getCommand(shooterIntake));
 
         Supplier<Measure<Angle>> supplier = () -> {
             Vision.VisionOutPuts speakerAngle =
-                    vision.getAngleToSpeakerBack(
+                    vision.getAngleToSpeakerFront(
                             ArmConstants.ALPHA_DISTANCE_FROM_CENTER.getX() + ArmConstants.DISTANCE_BETWEEN_PIVOTS_METERS,
                             ArmConstants.ALPHA_DISTANCE_FROM_CENTER.getZ(), ShooterIntakeConstants.SPEED_MULTIPLIER);
 
@@ -282,14 +279,17 @@ public class RobotContainer {
         Auto_IntakeCommand_Auto.getCommand(driveBase, vision::getAngleToGP, shooterIntake::isGpLoaded, () -> true));
 
         NamedCommands.registerCommand("Beta Aim", BetaAim.getCommand(arm, supplier));
-        NamedCommands.registerCommand("Back Camera 2d", new InstantCommand(() -> {
-            vision.setPipeline(PipeLineID.TWO_DIMENSIONAL, CameraLocation.BACK_LEFT);
-        }));
-        NamedCommands.registerCommand("Back Camera 3d", new InstantCommand(() -> {
-            vision.setPipeline(PipeLineID.THREE_DIMENSIONAL, CameraLocation.BACK_LEFT);
-        }));
         NamedCommands.registerCommand("Collect", IntakeFromIntake.getCommand(shooterIntake));
-    
+
+        // NamedCommands.registerCommand("Collect From Floor",new SequentialCommandGroup(
+        //     MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.COLLECT_FLOOR_POSITION),
+        //     IntakeFromIntake.getCommand(shooterIntake))
+        //     );
+        
+        // NamedCommands.registerCommand("Shoot to Speaker", new SequentialCommandGroup(
+        //     BetaAim.getCommand(arm, supplier),
+        //     ShootShoot.getCommand(shooterIntake, () -> rpm))
+        //     );
     }
 
 

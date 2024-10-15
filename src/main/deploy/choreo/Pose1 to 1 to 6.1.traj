@@ -2126,27 +2126,66 @@
     {
       "timestamp": 0.6482980435768505,
       "command": {
-        "type": "named",
+        "type": "sequential",
         "data": {
-          "name": ""
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Move Arm To Collect Floor"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Collect"
+              }
+            }
+          ]
         }
       }
     },
     {
       "timestamp": 3.603713650850281,
       "command": {
-        "type": "named",
+        "type": "sequential",
         "data": {
-          "name": ""
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Move Arm To Collect Floor"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Collect"
+              }
+            }
+          ]
         }
       }
     },
     {
       "timestamp": 1.133789559392075,
       "command": {
-        "type": "named",
+        "type": "sequential",
         "data": {
-          "name": ""
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Beta Aim"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Shoot"
+              }
+            }
+          ]
         }
       }
     }
