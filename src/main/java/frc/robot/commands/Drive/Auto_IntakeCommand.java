@@ -20,17 +20,14 @@ public class Auto_IntakeCommand extends Command {
 
     private final Supplier<Optional<Measure<Angle>>> angleSupplier;
 
-    private final Consumer<Optional<Rotation2d>> angleConsumer;
-
     private final BooleanSupplier gpLoaded;
     private final BooleanSupplier intakeRunning;
 
     PIDController pidController = new PIDController(3, 0, 0);
 
-    private Auto_IntakeCommand(DriveBase driveBase, Supplier<Optional<Measure<Angle>>> angleSupplier, BooleanSupplier gpLoaded, Consumer<Optional<Rotation2d>> angleConsumer, BooleanSupplier intakeRunning) {
+    private Auto_IntakeCommand(DriveBase driveBase, Supplier<Optional<Measure<Angle>>> angleSupplier, BooleanSupplier gpLoaded, BooleanSupplier intakeRunning) {
         this.driveBase = driveBase;
         this.angleSupplier = angleSupplier;
-        this.angleConsumer = angleConsumer;
         this.gpLoaded = gpLoaded;
 
         this.intakeRunning = intakeRunning;
@@ -41,9 +38,9 @@ public class Auto_IntakeCommand extends Command {
         addRequirements(this.driveBase);
     }
 
-    public static Command getCommand(DriveBase driveBase, Supplier<Optional<Measure<Angle>>> angleSupplier, Consumer<Optional<Rotation2d>> angleConsumer, BooleanSupplier gpLoaded, BooleanSupplier intakeRunning) {
+    public static Command getCommand(DriveBase driveBase, Supplier<Optional<Measure<Angle>>> angleSupplier, BooleanSupplier gpLoaded, BooleanSupplier intakeRunning) {
 
-        return new Auto_IntakeCommand(driveBase, angleSupplier, gpLoaded, angleConsumer, intakeRunning);
+        return new Auto_IntakeCommand(driveBase, angleSupplier, gpLoaded, intakeRunning);
     }
 
     @Override
@@ -82,6 +79,5 @@ public class Auto_IntakeCommand extends Command {
     @Override
     public void end(boolean interrupted) {
         driveBase.drive(chassisSpeeds);
-        angleConsumer.accept(Optional.empty());
     }
 }

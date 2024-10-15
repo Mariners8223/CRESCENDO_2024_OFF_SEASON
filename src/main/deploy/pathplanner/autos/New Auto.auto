@@ -5,7 +5,7 @@
       "x": 1.357284426689148,
       "y": 5.568325042724609
     },
-    "rotation": 1.5228581716535053e-27
+    "rotation": -7.734065012372205e-26
   },
   "command": {
     "type": "sequential",
@@ -24,15 +24,59 @@
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "Pose2 to Note2"
+            "name": "Collect"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Shoot To Speaker"
+            "name": "Auto Intake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Back Camera 2d"
+          }
+        },
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 1.0
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Shoot"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Beta Aim"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Back Camera 3d"
           }
         }
       ]
