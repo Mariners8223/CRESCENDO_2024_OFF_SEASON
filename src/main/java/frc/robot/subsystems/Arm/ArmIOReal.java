@@ -166,5 +166,6 @@ public class ArmIOReal implements ArmIO {
         inputs.alphaAppliedOutput = alphaMotor.getAppliedOutput();
         inputs.betaAppliedOutput = alphaMotor.getAppliedOutput();
         inputs.alphaAppliedCurrent = alphaMotor.getOutputCurrent();
+        inputs.betaMotorCurrent = betaMotor.getOutputCurrent();
     }
 }   

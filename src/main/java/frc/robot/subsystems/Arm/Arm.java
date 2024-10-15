@@ -114,6 +114,8 @@ public class Arm extends SubsystemBase {
         currentPos = ArmPosition.UNKNOWN;
     }
 
+    public double getBetaMotorCurrent(){ return inputs.betaMotorCurrent;}
+
     @Override
     public void periodic() {
         io.update(inputs);

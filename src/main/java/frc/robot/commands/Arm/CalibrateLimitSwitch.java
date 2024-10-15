@@ -4,6 +4,7 @@
 
 package frc.robot.commands.Arm;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Arm.Arm;
 import frc.robot.subsystems.Arm.ArmConstants;
@@ -11,10 +12,12 @@ import frc.robot.subsystems.Arm.ArmConstants;
 public class CalibrateLimitSwitch extends Command {
   /** Creates a new CalibrateLimitSwitch. */
   private final Arm arm;
+  private final Timer timer;
   private CalibrateLimitSwitch(Arm arm) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.arm = arm;
     addRequirements(arm);
+    timer = new Timer();
   }
 
   public static Command getCommand(Arm arm){
@@ -26,6 +29,7 @@ public class CalibrateLimitSwitch extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    timer.restart();
     arm.moveBetaDutyCycle(-0.3);
   }
 
@@ -37,6 +41,7 @@ public class CalibrateLimitSwitch extends Command {
   @Override
   public void end(boolean interrupted) {
     arm.stopBeta();
+    timer.stop();
     if(!interrupted){
       arm.resetBetaEncoder();
       arm.enableBetaSoftLimits();
@@ -47,6 +52,7 @@ public class CalibrateLimitSwitch extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return(arm.getLimitSwitch());
+
+    return(arm.getLimitSwitch()) || (arm.getBetaMotorCurrent() >= 30 && timer.get() >= 1);
   }
 }

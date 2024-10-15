@@ -14,6 +14,8 @@ public interface ArmIO {
         public double alphaAppliedOutput = 0;
         public double betaAppliedOutput = 0;
 
+        public double betaMotorCurrent = 0;
+
         public double alphaAppliedCurrent = 0;
     }
 
