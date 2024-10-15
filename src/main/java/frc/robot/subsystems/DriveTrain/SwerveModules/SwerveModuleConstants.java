@@ -27,7 +27,7 @@ public enum SwerveModuleConstants {
     /**
      * usually the final robot
      */
-    COMPBOT(6.75, 12.5, 0.0508, 4.5,
+    COMPBOT(6.75, 12.5, 0.0508, 2,
             false, false, false,
 
             0.59625, 0.9368, 0.226, 0.988,

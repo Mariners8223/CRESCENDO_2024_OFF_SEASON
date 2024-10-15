@@ -137,9 +137,13 @@ public class Vision extends SubsystemBase {
 
         double angleYToAprilTag = degreesToRadians(angleY) + Math.abs(cameraToRobot.getRotation().getY());
 
+        Logger.recordOutput("angley", angleYToAprilTag);
+
         double xDistCamera =
                 (speakerConstants.SPEAKER_CENTER_APRIL_TAG.getZ() - Math.abs(cameraToRobot.getZ()) - ROBOT_FRAME_HEIGHT) /
                         Math.tan(angleYToAprilTag);
+
+        Logger.recordOutput("xdistcamera", xDistCamera);
 
         double xDistToRobotCenter = xDistCamera + Math.abs(cameraToRobot.getX());
 
@@ -152,11 +156,16 @@ public class Vision extends SubsystemBase {
 //        double distanceToTarget
 //                = Math.sqrt(xDistToRobotCenter * xDistToRobotCenter + yDistRobotCenter * yDistRobotCenter) + offsetX;
 
-        double distanceToTarget = Math.hypot(xDistToRobotCenter, yDistRobotCenter) + offsetX;
+        double distanceToTarget = Math.hypot(xDistToRobotCenter, yDistRobotCenter) + Math.abs(offsetX);
+
+        Logger.recordOutput("distance", distanceToTarget);
+
 
         double pitch =
-                Math.atan2(speakerConstants.SPEAKER_TARGET.getZ() - offsetZ,
+                Math.atan2(speakerConstants.SPEAKER_TARGET.getZ() - offsetZ - ROBOT_FRAME_HEIGHT,
                         distanceToTarget);
+
+
 
         double yaw = -Math.atan2(yDistRobotCenter, xDistToRobotCenter);
 
