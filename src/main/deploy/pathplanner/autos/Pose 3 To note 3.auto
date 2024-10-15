@@ -30,18 +30,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "Collect"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Auto Intake"
-          }
-        },
-        {
           "type": "deadline",
           "data": {
             "commands": [
