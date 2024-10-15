@@ -27,6 +27,7 @@ import frc.robot.commands.Arm.MoveArmToPosition;
 import frc.robot.commands.Climb.HookAscend;
 import frc.robot.commands.Climb.HookDescend;
 import frc.robot.commands.Drive.Auto_IntakeCommand;
+import frc.robot.commands.Drive.Auto_IntakeCommand_Auto;
 import frc.robot.commands.Drive.DriveCommand;
 import frc.robot.commands.ShooterIntake.*;
 import frc.robot.subsystems.Arm.Arm;
@@ -278,7 +279,7 @@ public class RobotContainer {
         };
 
         NamedCommands.registerCommand("Auto Intake",
-        Auto_IntakeCommand.getCommand(driveBase, vision::getAngleToGP, shooterIntake::isGpLoaded, () -> true));
+        Auto_IntakeCommand_Auto.getCommand(driveBase, vision::getAngleToGP, shooterIntake::isGpLoaded, () -> true));
 
         NamedCommands.registerCommand("Beta Aim", BetaAim.getCommand(arm, supplier));
         NamedCommands.registerCommand("Back Camera 2d", new InstantCommand(() -> {
