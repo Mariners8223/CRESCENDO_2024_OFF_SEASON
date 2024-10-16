@@ -19,16 +19,13 @@ public class Auto_IntakeCommand_Auto extends Command {
     private final Supplier<Optional<Measure<Angle>>> angleSupplier;
 
     private final BooleanSupplier gpLoaded;
-    private final BooleanSupplier intakeRunning;
 
     PIDController pidController = new PIDController(3, 0, 0);
 
-    private Auto_IntakeCommand_Auto(DriveBase driveBase, Supplier<Optional<Measure<Angle>>> angleSupplier, BooleanSupplier gpLoaded, BooleanSupplier intakeRunning) {
+    private Auto_IntakeCommand_Auto(DriveBase driveBase, Supplier<Optional<Measure<Angle>>> angleSupplier, BooleanSupplier gpLoaded) {
         this.driveBase = driveBase;
         this.angleSupplier = angleSupplier;
         this.gpLoaded = gpLoaded;
-
-        this.intakeRunning = intakeRunning;
 
         pidController.setSetpoint(0);
         // each subsystem used by the command must be passed into the
@@ -36,9 +33,9 @@ public class Auto_IntakeCommand_Auto extends Command {
 //        addRequirements(this.driveBase);
     }
 
-    public static Command getCommand(DriveBase driveBase, Supplier<Optional<Measure<Angle>>> angleSupplier, BooleanSupplier gpLoaded, BooleanSupplier intakeRunning) {
+    public static Command getCommand(DriveBase driveBase, Supplier<Optional<Measure<Angle>>> angleSupplier, BooleanSupplier gpLoaded) {
 
-        return new Auto_IntakeCommand_Auto(driveBase, angleSupplier, gpLoaded, intakeRunning);
+        return new Auto_IntakeCommand_Auto(driveBase, angleSupplier, gpLoaded);
     }
 
     @Override
@@ -54,7 +51,7 @@ public class Auto_IntakeCommand_Auto extends Command {
 
         double theta = pidController.calculate(radToTarget);
 
-        if(Math.abs(radToTarget) <= 0.35 && intakeRunning.getAsBoolean()){
+        if(Math.abs(radToTarget) <= 0.35){
             xSpeed = Math.cos(theta) * 2;
             // ySpeed = Math.sin(theta);
         }

@@ -102,7 +102,7 @@ public class RobotContainer {
         }).ignoringDisable(true));
     }
 
-    private static double rpm = 2000;
+    private static double rpm = 3000;
     private static Optional<Rotation2d> angleToSpeaker = Optional.empty();
 
     private static void configureBindings() {
@@ -266,7 +266,7 @@ public class RobotContainer {
 
         Supplier<Measure<Angle>> supplier = () -> {
             Vision.VisionOutPuts speakerAngle =
-                    vision.getAngleToSpeakerFront(
+                    vision.getAngleToSpeakerBack(
                             ArmConstants.ALPHA_DISTANCE_FROM_CENTER.getX() + ArmConstants.DISTANCE_BETWEEN_PIVOTS_METERS,
                             ArmConstants.ALPHA_DISTANCE_FROM_CENTER.getZ(), ShooterIntakeConstants.SPEED_MULTIPLIER);
 
@@ -276,7 +276,7 @@ public class RobotContainer {
         };
 
         NamedCommands.registerCommand("Auto Intake",
-        Auto_IntakeCommand_Auto.getCommand(driveBase, vision::getAngleToGP, shooterIntake::isGpLoaded, () -> true));
+        Auto_IntakeCommand_Auto.getCommand(driveBase, vision::getAngleToGP, shooterIntake::isGpLoaded));
 
         NamedCommands.registerCommand("Beta Aim", BetaAim.getCommand(arm, supplier));
         NamedCommands.registerCommand("Collect", IntakeFromIntake.getCommand(shooterIntake));

@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.Arm.Arm;
+import frc.robot.subsystems.Arm.ArmConstants;
 import frc.robot.subsystems.Arm.ArmConstants.ArmPosition;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
@@ -34,7 +35,8 @@ public class MoveArmToPosition extends SequentialCommandGroup {
       new MoveBeta(arm, ArmPosition.COLLECT_FLOOR_POSITION.getBeta()).onlyIf(() -> currentPosition != ArmPosition.COLLECT_FLOOR_POSITION && targetPos == ArmPosition.COLLECT_FLOOR_POSITION),
 
       new MoveAlpha(arm, targetPos.getAlpha()),
-      new MoveBeta(arm, ArmPosition.AMP_POSITION.getBeta()).onlyIf(() -> targetPos == ArmPosition.AMP_POSITION)
+      new MoveBeta(arm, ArmPosition.AMP_POSITION.getBeta()).onlyIf(() -> targetPos == ArmPosition.AMP_POSITION),
+      new MoveBeta(arm, ArmConstants.LIMIT_SWITCH_OFFSET).onlyIf(() -> targetPos == ArmPosition.HOME_POSITION)
     );
 
   }
