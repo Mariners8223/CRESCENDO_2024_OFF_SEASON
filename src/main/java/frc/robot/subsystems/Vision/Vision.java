@@ -135,41 +135,30 @@ public class Vision extends SubsystemBase {
     (Transform3d cameraToRobot, double angleX,
      double angleY, double offsetX, double offsetZ, double speedMultiplier) {
 
-        double angleYToAprilTag = degreesToRadians(angleY) + Math.abs(cameraToRobot.getRotation().getY());
-
-        Logger.recordOutput("angley", angleYToAprilTag);
+        double angleYToAprilTag = degreesToRadians(angleY) - cameraToRobot.getRotation().getY();
 
         double xDistCamera =
-                (speakerConstants.SPEAKER_CENTER_APRIL_TAG.getZ() - Math.abs(cameraToRobot.getZ()) - ROBOT_FRAME_HEIGHT) /
+                (speakerConstants.SPEAKER_CENTER_APRIL_TAG.getZ() - ROBOT_FRAME_HEIGHT + cameraToRobot.getZ()) /
                         Math.tan(angleYToAprilTag);
-
-        Logger.recordOutput("xdistcamera", xDistCamera);
 
         double xDistToRobotCenter = xDistCamera + Math.abs(cameraToRobot.getX());
 
-        double yDistRobotCenter = Math.tan(degreesToRadians(angleX) - cameraToRobot.getRotation().getZ())
-                * xDistCamera + Math.abs(cameraToRobot.getY());
-
-        Logger.recordOutput("xdist", xDistToRobotCenter);
-        Logger.recordOutput("ydist", yDistRobotCenter);
+        double yDistRobotCenter = Math.tan(-degreesToRadians(angleX) + cameraToRobot.getRotation().getZ())
+                * xDistCamera - Math.abs(cameraToRobot.getY());
 
 //        double distanceToTarget
 //                = Math.sqrt(xDistToRobotCenter * xDistToRobotCenter + yDistRobotCenter * yDistRobotCenter) + offsetX;
 
-        double distanceToTarget = Math.hypot(xDistToRobotCenter, yDistRobotCenter) + Math.abs(offsetX);
-
-        Logger.recordOutput("distance", distanceToTarget);
-
+        double distanceToTarget = Math.hypot(xDistToRobotCenter, yDistRobotCenter) + offsetX;
 
         double pitch =
-                Math.atan2(speakerConstants.SPEAKER_TARGET.getZ() - offsetZ - ROBOT_FRAME_HEIGHT,
+                Math.atan2(speakerConstants.SPEAKER_TARGET.getZ() - ROBOT_FRAME_HEIGHT - offsetZ,
                         distanceToTarget);
 
-
-
-        double yaw = -Math.atan2(yDistRobotCenter, xDistToRobotCenter);
+        double yaw = Math.atan2(yDistRobotCenter, xDistToRobotCenter);
 
         return new VisionOutPuts(pitch, yaw, distanceToTarget * speedMultiplier);
+
     }
 
     private double degreesToRadians(double degrees){
