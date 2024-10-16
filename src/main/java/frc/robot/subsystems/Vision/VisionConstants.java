@@ -85,7 +85,7 @@ public class VisionConstants {
 
 
                     
-            double TARGET_HEIGHT_ABOVE_APRIL_TAG = 0.6; //0.72
+            double TARGET_HEIGHT_ABOVE_APRIL_TAG = 0.72; //0.72
 
             SPEAKER_TARGET =
                     new Translation3d(SPEAKER_CENTER_APRIL_TAG.getX(), SPEAKER_CENTER_APRIL_TAG.getY(), SPEAKER_CENTER_APRIL_TAG.getZ() + TARGET_HEIGHT_ABOVE_APRIL_TAG);

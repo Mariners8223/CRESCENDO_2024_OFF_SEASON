@@ -199,7 +199,9 @@ public class RobotContainer {
         armController.square().whileTrue(MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.AMP_POSITION))
                 .whileFalse(moveToHome);
 
-        armController.touchpad().onTrue(CalibrateLimitSwitch.getCommand(arm));        
+        armController.touchpad().onTrue(CalibrateLimitSwitch.getCommand(arm));
+        
+        armController.options().whileTrue(MoveArmToPosition.getCommand(arm, ArmPosition.SHOOT_MID_POSITION)).onFalse(moveToHome);
     }
 
     private static void configureIntakeShooterBindings() {

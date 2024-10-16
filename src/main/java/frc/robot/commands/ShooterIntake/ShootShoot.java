@@ -76,7 +76,7 @@ public class ShootShoot extends SequentialCommandGroup {
     }
     @Override
     public boolean isFinished() {
-      return timer.get() >= ShooterIntakeConstants.AccelarationTime.SHOOTSHOOTTIME.sec;
+      return timer.get() >= 0.5;
     
   }
 

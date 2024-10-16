@@ -115,6 +115,9 @@ public class ShooterIntakeIOReal implements ShooterIntakeIO {
         motor.getPIDController().setI(gains.getI());
         motor.getPIDController().setD(gains.getD());
         motor.getPIDController().setFF(gains.getF());
+
+        motor.setSmartCurrentLimit(40);
+
         return motor;
     }
 }

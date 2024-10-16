@@ -17,7 +17,7 @@ public class ShooterIntakeConstants {
 
 
   public enum AccelarationTime{
-    SHOOTSHOOTTIME(0.5),
+    SHOOTSHOOTTIME(2),
     SHOOTAMPTIME(0.6),
     INTAKESHOOTERTIME(0.05),
     INTAKEINTAKETIME(5);

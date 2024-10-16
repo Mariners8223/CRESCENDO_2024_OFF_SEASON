@@ -36,7 +36,9 @@ public class MoveArmToPosition extends SequentialCommandGroup {
 
       new MoveAlpha(arm, targetPos.getAlpha()),
       new MoveBeta(arm, ArmPosition.AMP_POSITION.getBeta()).onlyIf(() -> targetPos == ArmPosition.AMP_POSITION),
-      new MoveBeta(arm, ArmConstants.LIMIT_SWITCH_OFFSET).onlyIf(() -> targetPos == ArmPosition.HOME_POSITION)
+      new MoveBeta(arm, ArmConstants.LIMIT_SWITCH_OFFSET).onlyIf(() -> targetPos == ArmPosition.HOME_POSITION),
+      new MoveBeta(arm, ArmPosition.COLLECT_SOURCE_POSITION.getBeta()).onlyIf(() -> targetPos.getBeta() == ArmPosition.COLLECT_SOURCE_POSITION.getBeta())
+
     );
 
   }
