@@ -15,9 +15,9 @@ public class ArmConstants {
         SHOOT_MID_POSITION(0.08,0.04),
         FREE_POSITION(0.137, 0.04),
         AIM_POSITION(0,LIMIT_SWITCH_OFFSET),
-        AMP_POSITION(0.188,0.27),
+        AMP_POSITION(0.19,0.28),
         UNKNOWN(100, 100);
-
+        
         private final double alpha;
         private final double beta;
         ArmPosition(double alpha, double beta){
