@@ -27,6 +27,13 @@ public class LogitechIO implements CameraIO {
 
     @Override
     public void update(CameraInputsAutoLogged inputs) {
+        inputs.isConnected = camera.isConnected();
+
+        if (!inputs.isConnected) {
+            inputs.hasTarget = false;
+            return;
+        }
+
         PhotonPipelineResult result = camera.getLatestResult();
 
         if (!result.hasTargets()) {
