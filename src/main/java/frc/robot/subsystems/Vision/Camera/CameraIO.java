@@ -8,6 +8,8 @@ public interface CameraIO {
 
     @AutoLog
     class CameraInputs {
+        public boolean isConnected = false;
+
         public double latency = 0;
         public double timestamp = 0;
         public boolean hasTarget = false;

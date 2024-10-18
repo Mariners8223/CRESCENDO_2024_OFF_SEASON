@@ -69,6 +69,15 @@ public class ArduoCamIO implements CameraIO {
 
     @Override
     public void update(CameraInputsAutoLogged inputs) {
+
+        inputs.isConnected = camera.isConnected();
+
+        if(!inputs.isConnected){
+            inputs.hasTarget = false;
+            inputs.hasPose = false;
+            return;
+        }
+
         PhotonPipelineResult result = camera.getLatestResult();
         inputs.pipelineID = pipeLineIDs[camera.getPipelineIndex()].name();
 
