@@ -8,12 +8,10 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.geometry.struct.Pose2dStruct;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 
@@ -46,9 +44,6 @@ public class Arm extends SubsystemBase {
         root = armMechanism.getRoot("Arm Root", 0.3, 0);
         alpha2d = root.append(new MechanismLigament2d("Alpha Arm", 0.43, 0, 6, new Color8Bit(Color.kBlue)));
         beta2d = alpha2d.append(new MechanismLigament2d("Beta Arm", 0.36, 0, 4, new Color8Bit(Color.kLightBlue)));
-
-        SmartDashboard.putNumber("Arm/Alpha", 0);
-        SmartDashboard.putNumber("Arm/Beta", 0);
     }
 
     public void moveAlpha(double alphaTarget) {
