@@ -13,6 +13,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 
@@ -45,6 +46,9 @@ public class Arm extends SubsystemBase {
         root = armMechanism.getRoot("Arm Root", 0.3, 0);
         alpha2d = root.append(new MechanismLigament2d("Alpha Arm", 0.43, 0, 6, new Color8Bit(Color.kBlue)));
         beta2d = alpha2d.append(new MechanismLigament2d("Beta Arm", 0.36, 0, 4, new Color8Bit(Color.kLightBlue)));
+
+        SmartDashboard.putNumber("Arm/Alpha", 0);
+        SmartDashboard.putNumber("Arm/Beta", 0);
     }
 
     public void moveAlpha(double alphaTarget) {
@@ -125,17 +129,25 @@ public class Arm extends SubsystemBase {
         double alpha = getAlphaPosition();
         double beta = getBetaPosition();
 
+        currentPos = findArmPosition(alpha, beta);
+
         alpha2d.setAngle(Units.rotationsToDegrees(inputs.motorAlphaPosition));
         beta2d.setAngle(Units.rotationsToDegrees(inputs.motorBetaPosition));
-
-        currentPos = findArmPosition(alpha, beta);
 
         Logger.processInputs("Arm", inputs);
         Logger.recordOutput("Arm/Current Pose", currentPos);
         Logger.recordOutput("Arm/Mechanism2D", armMechanism);
 
-        Pose3d alphaArmPose3d = new Pose3d(ArmConstants.ALPHA_DISTANCE_FROM_CENTER_CUSTOM_ASSETS, new Rotation3d(0, alpha, 0));
-        Pose3d betaArmPose3d = new Pose3d(alphaArmPose3d.getTranslation(), new Rotation3d(0, (Math.PI - (alphaArmPose3d.getRotation().getY()) - beta), 0));
+        double alphaRadians = -1*Units.rotationsToRadians(alpha);
+        double betaRadians = -1*Units.rotationsToRadians(beta);
+
+        Pose3d alphaArmPose3d = new Pose3d(ArmConstants.ALPHA_DISTANCE_FROM_CENTER_CUSTOM_ASSETS, new Rotation3d(0, alphaRadians, 0));
+
+        double x = Math.cos(-alphaRadians) * ArmConstants.DISTANCE_BETWEEN_PIVOTS_METERS + alphaArmPose3d.getX();
+        double y = -0.125;
+        double z = Math.sin(-alphaRadians) * ArmConstants.DISTANCE_BETWEEN_PIVOTS_METERS + alphaArmPose3d.getZ();
+
+        Pose3d betaArmPose3d = new Pose3d(new Translation3d(x, y, z), new Rotation3d(0, Math.PI + (alphaRadians + betaRadians), 0));
         Logger.recordOutput("Arm/Alpha Position", alphaArmPose3d);
         Logger.recordOutput("Arm/Beta Position", betaArmPose3d);
 
