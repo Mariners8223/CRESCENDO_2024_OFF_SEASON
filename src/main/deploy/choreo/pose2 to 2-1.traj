@@ -1454,27 +1454,56 @@
     {
       "timestamp": 0,
       "command": {
-        "type": "named",
+        "type": "sequential",
         "data": {
-          "name": "Collect"
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Collect"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "spin up"
+              }
+            }
+          ]
         }
       }
     },
     {
-      "timestamp": 2.617636002423817,
+      "timestamp": 2.3176360024238174,
       "command": {
-        "type": "named",
+        "type": "sequential",
         "data": {
-          "name": "Shoot"
-        }
-      }
-    },
-    {
-      "timestamp": 3.117636002423817,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "Collect"
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Shoot"
+              }
+            },
+            {
+              "type": "wait",
+              "data": {
+                "waitTime": 0.5
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Collect"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "spin up"
+              }
+            }
+          ]
         }
       }
     }

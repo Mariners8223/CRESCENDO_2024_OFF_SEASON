@@ -201,7 +201,7 @@ public class RobotContainer {
 
         armController.touchpad().onTrue(CalibrateLimitSwitch.getCommand(arm));
         
-        armController.options().whileTrue(MoveArmToPosition.getCommand(arm, ArmPosition.SHOOT_MID_POSITION)).onFalse(moveToHome);
+        armController.options().whileTrue(MoveArmToPosition.getCommand(arm, ArmPosition.SHOOT_MID_POSITION).alongWith(new InstantCommand(() -> rpm = 3500))).onFalse(moveToHome);
     }
 
     private static void configureIntakeShooterBindings() {
@@ -252,6 +252,7 @@ public class RobotContainer {
 
 
     public static void configNamedCommands() {
+        Command spinUp = UpdateSpeedWhenMoved.getCommand(shooterIntake, () -> 2500.0);
         NamedCommands.registerCommand("Move Arm To Home",
                 MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.HOME_POSITION));
 
@@ -261,8 +262,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("Move Arm To SubWoofer Position",
                 MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.SHOOT_SUBWOFFER_POSITION).andThen(new InstantCommand(() -> rpm = 2500)));
 
-        NamedCommands.registerCommand("Shoot", ShootShoot.getCommand(shooterIntake,
-                () -> 2500.0));
+        NamedCommands.registerCommand("Shoot", new InstantCommand(() -> spinUp.cancel()).andThen(ShootShoot.getCommand(shooterIntake, () -> 2500.0)));
 
         //NamedCommands.registerCommand("Intake", IntakeFromIntake.getCommand(shooterIntake));
 
@@ -277,8 +277,7 @@ public class RobotContainer {
             return speakerAngle.getPitch();
         };
 
-        NamedCommands.registerCommand("Auto Intake",
-        Auto_IntakeCommand_Auto.getCommand(driveBase, vision::getAngleToGP, shooterIntake::isGpLoaded));
+        NamedCommands.registerCommand("spin up", spinUp);
 
         NamedCommands.registerCommand("Beta Aim", BetaAim.getCommand(arm, supplier));
         NamedCommands.registerCommand("Collect", IntakeFromIntake.getCommand(shooterIntake));

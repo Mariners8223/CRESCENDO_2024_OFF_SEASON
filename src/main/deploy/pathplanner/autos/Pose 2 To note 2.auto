@@ -5,16 +5,29 @@
       "x": 1.357284426689148,
       "y": 5.568325042724609
     },
-    "rotation": 1.8525709320028206e-26
+    "rotation": 1.0129837811157609e-27
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "deadline",
           "data": {
-            "name": "Move Arm To Collect Floor"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Move Arm To Collect Floor"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "spin up"
+                }
+              }
+            ]
           }
         },
         {

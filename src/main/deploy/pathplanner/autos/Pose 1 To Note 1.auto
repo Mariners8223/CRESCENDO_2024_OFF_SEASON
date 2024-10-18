@@ -2,8 +2,8 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.6947038173675537,
-      "y": 6.7277960777282715
+      "x": 0.8624660372734071,
+      "y": 6.61448335647583
     },
     "rotation": 58.17253269959665
   },
@@ -12,9 +12,22 @@
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "deadline",
           "data": {
-            "name": "Move Arm To Collect Floor"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Move Arm To Collect Floor"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "spin up"
+                }
+              }
+            ]
           }
         },
         {

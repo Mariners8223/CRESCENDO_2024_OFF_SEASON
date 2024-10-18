@@ -2,19 +2,32 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.3875831365585327,
-      "y": 5.564249038696289
+      "x": 1.357284426689148,
+      "y": 5.568325042724609
     },
-    "rotation": 3.0852564517958157e-16
+    "rotation": 1.0129837811157609e-27
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "deadline",
           "data": {
-            "name": "Move Arm To Collect Floor"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Move Arm To Collect Floor"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "spin up"
+                }
+              }
+            ]
           }
         },
         {
@@ -26,7 +39,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "pose2 to 2-1"
+            "pathName": "Pose2 to Note2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "pose2 to note 1"
           }
         },
         {

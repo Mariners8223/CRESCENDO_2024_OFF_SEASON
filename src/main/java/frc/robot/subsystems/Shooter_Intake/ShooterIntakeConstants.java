@@ -73,8 +73,8 @@ public class ShooterIntakeConstants {
       public static final boolean ON_PIVOT_SHOOTER_MOTOR_INVERTED = false;
       public static final boolean OFF_PIVOT_SHOOTER_MOTOR_INVERTED = true;
 
-      public static final PIDFGains ON_PIVOT_SHOOTER_PID = new  PIDFGains(0.0001, 0, 0, 0.00017, 0, 0, 0);
-      public static final PIDFGains OFF_PIVOT_SHOOTER_PID = new  PIDFGains(0.00007, 0, 0,0.000165, 0, 0);
+      public static final PIDFGains ON_PIVOT_SHOOTER_PID = new  PIDFGains(0.0001, 0, 0, 0.00015, 0, 0, 0);
+      public static final PIDFGains OFF_PIVOT_SHOOTER_PID = new  PIDFGains(0.00007, 0, 0,0.00015, 0, 0);
       public static final PIDFGains INTAKE_MOTOR_PID = new  PIDFGains(0.1, 0, 0,0, 0, 0);
     
     

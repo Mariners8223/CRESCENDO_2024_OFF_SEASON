@@ -2,6 +2,7 @@ package frc.robot.subsystems.Shooter_Intake;
 
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkBase.ControlType;
+import com.revrobotics.CANSparkBase.IdleMode;
 
 import edu.wpi.first.math.MathUtil;
 import frc.util.PIDFGains;
@@ -118,6 +119,13 @@ public class ShooterIntakeIOReal implements ShooterIntakeIO {
 
         motor.setSmartCurrentLimit(50);
 
+        motor.setClosedLoopRampRate(0);
+
+        motor.setIdleMode(IdleMode.kBrake);
+
+        motor.getPIDController().setOutputRange(-1, 1);
+
         return motor;
     }
 }
+
