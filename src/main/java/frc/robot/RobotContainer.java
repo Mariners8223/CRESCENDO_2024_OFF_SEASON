@@ -262,7 +262,7 @@ public class RobotContainer {
                 MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.SHOOT_SUBWOFFER_POSITION).andThen(new InstantCommand(() -> rpm = 2500)));
 
         NamedCommands.registerCommand("Shoot", ShootShoot.getCommand(shooterIntake,
-                () -> rpm));
+                () -> 2500.0));
 
         //NamedCommands.registerCommand("Intake", IntakeFromIntake.getCommand(shooterIntake));
 

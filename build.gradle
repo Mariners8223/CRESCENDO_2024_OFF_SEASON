@@ -17,6 +17,8 @@ def ROBOT_MAIN_CLASS = "frc.robot.Main"
 deploy {
     targets {
         roborio(getTargetTypeClass('RoboRIO')) {
+
+            
             // Team number is loaded either from the .wpilib/wpilib_preferences.json
             // or from command line. If not found an exception will be thrown.
             // You can use getTeamOrDefault(team) instead of getTeamNumber if you
@@ -38,8 +40,11 @@ deploy {
                 //    jvmArgs.add("-Djava.rmi.server.hostname=10.82.23.2") // Replace TE.AM with team number
                 }
 
+                
+
                 // Static files artifact
                 frcStaticFileDeploy(getArtifactTypeClass('FileTreeArtifact')) {
+                    predeploy << { execute 'rm -rf /home/lvuser/deploy' } // << Add this line
                     files = project.fileTree('src/main/deploy')
                     directory = '/home/lvuser/deploy'
                 }

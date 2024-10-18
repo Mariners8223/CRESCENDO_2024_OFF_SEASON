@@ -198,7 +198,7 @@ public class DriveBase extends SubsystemBase {
         SwerveModulePosition[] positions = new SwerveModulePosition[4];
         for (int i = 0; i < 4; i++) positions[i] = modules[i].modulePeriodic();
 
-        poseEstimator.resetPosition(new Rotation2d(), positions, newPose);
+        poseEstimator.resetPosition(newPose.getRotation(), positions, newPose);
 
         gyro.reset(newPose);
         currentPose = newPose;
