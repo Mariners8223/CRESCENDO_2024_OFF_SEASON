@@ -235,8 +235,8 @@ public class Vision extends SubsystemBase {
             cameras[i].update(inputs[i]);
 
             if (cameraLocations[i].HAS_POSE_ESTIMATION && inputs[i].hasPose) {
-                poseConsumer.accept(
-                        new Pair<>(inputs[i].estimatedPose.toPose2d(), inputs[i].timestamp));
+                // poseConsumer.accept(
+                //         new Pair<>(inputs[i].estimatedPose.toPose2d(), inputs[i].timestamp));
             }
 
             Logger.processInputs("Vision/" + cameraLocations[i].NAME, inputs[i]);

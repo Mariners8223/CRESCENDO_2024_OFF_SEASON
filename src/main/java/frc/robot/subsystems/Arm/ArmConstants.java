@@ -13,7 +13,7 @@ public class ArmConstants {
         COLLECT_SOURCE_POSITION(0.135, 0.04),
         SHOOT_SUBWOFFER_POSITION(0.135, 0.04),
         SHOOT_MID_POSITION_ALPHA(0.08,0.04),
-        SHOOT_MID_POSITION_BETA(0,0.43),
+        SHOOT_MID_POSITION_BETA(0,0.423),
         SHOOT_LONG_POSITION(0.055,0.04),
         FREE_POSITION(0.137, 0.04),
         AIM_POSITION(0,LIMIT_SWITCH_OFFSET),
@@ -37,7 +37,7 @@ public class ArmConstants {
 
     }
 
-    public static final double ARM_POSITION_TOLERANCE = 0.02;
+    public static final double ARM_POSITION_TOLERANCE = 0.01;
 
 
     public static final Translation3d ALPHA_DISTANCE_FROM_CENTER = new Translation3d(-0.125, 0, 0.25);

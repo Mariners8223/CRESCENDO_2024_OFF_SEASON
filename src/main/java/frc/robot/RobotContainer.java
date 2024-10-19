@@ -199,7 +199,13 @@ public class RobotContainer {
 
         armController.touchpad().onTrue(CalibrateLimitSwitch.getCommand(arm));
 
-        armController.options().whileTrue(MoveArmToPosition.getCommand(arm, ArmPosition.SHOOT_MID_POSITION_BETA).alongWith(new InstantCommand(() -> rpm = 3500))).onFalse(moveToHome);
+        armController.options().whileTrue(MoveArmToPosition.getCommand(arm, ArmPosition.SHOOT_MID_POSITION_ALPHA).alongWith(new InstantCommand(() -> rpm = 3500))).onFalse(moveToHome);
+
+        // armController.PS().whileTrue(MoveArmToPosition.getCommand(arm, ArmPosition.COLLECT_FLOOR_POSITION).andThen(
+        //     new MoveAlpha(arm, ArmPosition.SHOOT_MID_POSITION_BETA.getAlpha()),
+        //     new MoveBeta(arm, ArmPosition.SHOOT_MID_POSITION_BETA.getBeta()),
+        //     new InstantCommand(() -> rpm = 3500)
+        // ));
     }
 
     private static void configureIntakeShooterBindings() {
@@ -255,20 +261,20 @@ public class RobotContainer {
                 MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.HOME_POSITION));
 
         NamedCommands.registerCommand("Move Arm To Collect Floor",
-                MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.COLLECT_FLOOR_POSITION));
+                MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.COLLECT_FLOOR_POSITION).andThen(new InstantCommand(() -> rpm = 2500)));
 
         NamedCommands.registerCommand("Move Arm To SubWoofer Position",
                 MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.SHOOT_SUBWOFFER_POSITION).andThen(new InstantCommand(() -> rpm = 2500)));
 
         Command moveArmToShootMidRange = MoveArmToPosition.getCommand(arm, ArmPosition.COLLECT_FLOOR_POSITION).andThen(
-                new InstantCommand(() -> rpm = 3500),
-                new MoveAlpha(arm, ArmPosition.SHOOT_MID_POSITION_ALPHA.getAlpha()),
-                new MoveBeta(arm, ArmPosition.SHOOT_MID_POSITION_ALPHA.getBeta())).withName("Move Arm to midRange");
+            new MoveAlpha(arm, ArmPosition.SHOOT_MID_POSITION_BETA.getAlpha()),
+            new MoveBeta(arm, ArmPosition.SHOOT_MID_POSITION_BETA.getBeta()),
+            new InstantCommand(() -> rpm = 3500)).withName("Move Arm to midRange");
 
         NamedCommands.registerCommand("Move Arm to midRange", moveArmToShootMidRange);
 
 
-        NamedCommands.registerCommand("Shoot", new InstantCommand(spinUp::cancel).andThen(ShootShoot.getCommand(shooterIntake, () -> 2500.0)));
+        NamedCommands.registerCommand("Shoot", new InstantCommand(spinUp::cancel).andThen(ShootShoot.getCommand(shooterIntake, () -> rpm)));
 
         Supplier<Measure<Angle>> supplier = () -> {
             Vision.VisionOutPuts speakerAngle =
