@@ -20,10 +20,7 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
-import frc.robot.commands.Arm.AlphaAim;
-import frc.robot.commands.Arm.BetaAim;
-import frc.robot.commands.Arm.CalibrateLimitSwitch;
-import frc.robot.commands.Arm.MoveArmToPosition;
+import frc.robot.commands.Arm.*;
 import frc.robot.commands.Climb.HookAscend;
 import frc.robot.commands.Climb.HookDescend;
 import frc.robot.commands.Drive.Auto_IntakeCommand;
@@ -170,7 +167,7 @@ public class RobotContainer {
                                 && !shooterIntake.isGpLoaded())
         ).onFalse(driveCommand.emptyTargetAngle());
 
-        
+
     }
 
     private static void configureArmBindings(Supplier<Measure<Angle>> alphaTarget) {
@@ -178,7 +175,7 @@ public class RobotContainer {
 
         Command resetDriveAngle =
                 new InstantCommand(() -> vision.setPipeline(VisionConstants.PipeLineID.THREE_DIMENSIONAL, VisionConstants.CameraLocation.FRONT_RIGHT))
-                .andThen(new InstantCommand(() -> angleToSpeaker = Optional.empty()));
+                        .andThen(new InstantCommand(() -> angleToSpeaker = Optional.empty()));
 
         armController.cross().onTrue(new InstantCommand(() -> vision.setPipeline(VisionConstants.PipeLineID.TWO_DIMENSIONAL, VisionConstants.CameraLocation.FRONT_RIGHT)));
 
@@ -199,8 +196,8 @@ public class RobotContainer {
                 .whileFalse(moveToHome);
 
         armController.touchpad().onTrue(CalibrateLimitSwitch.getCommand(arm));
-        
-        armController.options().whileTrue(MoveArmToPosition.getCommand(arm, ArmPosition.SHOOT_MID_POSITION).alongWith(new InstantCommand(() -> rpm = 3500))).onFalse(moveToHome);
+
+        armController.options().whileTrue(MoveArmToPosition.getCommand(arm, ArmPosition.SHOOT_MID_POSITION_BETA).alongWith(new InstantCommand(() -> rpm = 3500))).onFalse(moveToHome);
     }
 
     private static void configureIntakeShooterBindings() {
@@ -225,9 +222,9 @@ public class RobotContainer {
         })).debounce(0.1);
 
         armController.L1().whileTrue(
-            new Eject(shooterIntake).onlyIf(() -> arm.getCurrentPos() != ArmPosition.AMP_POSITION)
-                    .andThen(ShootToAmp.getCommand(shooterIntake).onlyIf(() -> arm.getCurrentPos() == ArmPosition.AMP_POSITION))
-    );
+                new Eject(shooterIntake).onlyIf(() -> arm.getCurrentPos() != ArmPosition.AMP_POSITION)
+                        .andThen(ShootToAmp.getCommand(shooterIntake).onlyIf(() -> arm.getCurrentPos() == ArmPosition.AMP_POSITION))
+        );
 
 
         Command updateSpeedWhenMoved = UpdateSpeedWhenMoved.getCommand(shooterIntake, () -> rpm);
@@ -261,11 +258,15 @@ public class RobotContainer {
         NamedCommands.registerCommand("Move Arm To SubWoofer Position",
                 MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.SHOOT_SUBWOFFER_POSITION).andThen(new InstantCommand(() -> rpm = 2500)));
 
-        NamedCommands.registerCommand("Move Arm to midRange", 
-            MoveArmToPosition.getCommand(arm, ArmPosition.SHOOT_MID_POSITION).alongWith(new InstantCommand(() -> rpm = 3500)));
-        
+        Command moveArmToShootMidRange = MoveArmToPosition.getCommand(arm, ArmPosition.COLLECT_FLOOR_POSITION).andThen(
+                new InstantCommand(() -> rpm = 3500),
+                new MoveAlpha(arm, ArmPosition.SHOOT_MID_POSITION_ALPHA.getAlpha()),
+                new MoveBeta(arm, ArmPosition.SHOOT_MID_POSITION_ALPHA.getBeta())).withName("Move Arm to midRange");
 
-        NamedCommands.registerCommand("Shoot", new InstantCommand(() -> spinUp.cancel()).andThen(ShootShoot.getCommand(shooterIntake, () -> 2500.0)));
+        NamedCommands.registerCommand("Move Arm to midRange", moveArmToShootMidRange);
+
+
+        NamedCommands.registerCommand("Shoot", new InstantCommand(spinUp::cancel).andThen(ShootShoot.getCommand(shooterIntake, () -> 2500.0)));
 
         Supplier<Measure<Angle>> supplier = () -> {
             Vision.VisionOutPuts speakerAngle =
