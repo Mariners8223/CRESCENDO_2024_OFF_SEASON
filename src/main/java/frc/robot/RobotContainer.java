@@ -27,7 +27,6 @@ import frc.robot.commands.Arm.MoveArmToPosition;
 import frc.robot.commands.Climb.HookAscend;
 import frc.robot.commands.Climb.HookDescend;
 import frc.robot.commands.Drive.Auto_IntakeCommand;
-import frc.robot.commands.Drive.Auto_IntakeCommand_Auto;
 import frc.robot.commands.Drive.DriveCommand;
 import frc.robot.commands.ShooterIntake.*;
 import frc.robot.subsystems.Arm.Arm;
@@ -262,9 +261,11 @@ public class RobotContainer {
         NamedCommands.registerCommand("Move Arm To SubWoofer Position",
                 MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.SHOOT_SUBWOFFER_POSITION).andThen(new InstantCommand(() -> rpm = 2500)));
 
-        NamedCommands.registerCommand("Shoot", new InstantCommand(() -> spinUp.cancel()).andThen(ShootShoot.getCommand(shooterIntake, () -> 2500.0)));
+        NamedCommands.registerCommand("Move Arm to midRange", 
+            MoveArmToPosition.getCommand(arm, ArmPosition.SHOOT_MID_POSITION).alongWith(new InstantCommand(() -> rpm = 3500)));
+        
 
-        //NamedCommands.registerCommand("Intake", IntakeFromIntake.getCommand(shooterIntake));
+        NamedCommands.registerCommand("Shoot", new InstantCommand(() -> spinUp.cancel()).andThen(ShootShoot.getCommand(shooterIntake, () -> 2500.0)));
 
         Supplier<Measure<Angle>> supplier = () -> {
             Vision.VisionOutPuts speakerAngle =
@@ -281,16 +282,6 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("Beta Aim", BetaAim.getCommand(arm, supplier));
         NamedCommands.registerCommand("Collect", IntakeFromIntake.getCommand(shooterIntake));
-
-        // NamedCommands.registerCommand("Collect From Floor",new SequentialCommandGroup(
-        //     MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.COLLECT_FLOOR_POSITION),
-        //     IntakeFromIntake.getCommand(shooterIntake))
-        //     );
-        
-        // NamedCommands.registerCommand("Shoot to Speaker", new SequentialCommandGroup(
-        //     BetaAim.getCommand(arm, supplier),
-        //     ShootShoot.getCommand(shooterIntake, () -> rpm))
-        //     );
     }
 
 
