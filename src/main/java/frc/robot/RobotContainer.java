@@ -177,9 +177,11 @@ public class RobotContainer {
                 new InstantCommand(() -> vision.setPipeline(VisionConstants.PipeLineID.THREE_DIMENSIONAL, VisionConstants.CameraLocation.FRONT_RIGHT))
                         .andThen(new InstantCommand(() -> angleToSpeaker = Optional.empty()));
 
-        armController.cross().onTrue(new InstantCommand(() -> vision.setPipeline(VisionConstants.PipeLineID.TWO_DIMENSIONAL, VisionConstants.CameraLocation.FRONT_RIGHT)));
+        //armController.cross().onTrue(new InstantCommand(() -> vision.setPipeline(VisionConstants.PipeLineID.TWO_DIMENSIONAL, VisionConstants.CameraLocation.FRONT_RIGHT)));
+        //armController.cross().whileTrue(AlphaAim.getCommand(arm, alphaTarget)).whileFalse(moveToHome);
 
-        armController.cross().whileTrue(AlphaAim.getCommand(arm, alphaTarget)).whileFalse(moveToHome);
+        armController.cross().whileTrue(MoveArmToPosition.getCommand(arm, ArmPosition.SHOOT_LONG_POSITION).alongWith(new InstantCommand(() -> rpm = 3800)))
+                .whileFalse(moveToHome);
 
         armController.cross().onFalse(resetDriveAngle);
 
