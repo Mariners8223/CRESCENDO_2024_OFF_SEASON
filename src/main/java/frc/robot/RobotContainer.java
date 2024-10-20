@@ -180,7 +180,7 @@ public class RobotContainer {
         //armController.cross().onTrue(new InstantCommand(() -> vision.setPipeline(VisionConstants.PipeLineID.TWO_DIMENSIONAL, VisionConstants.CameraLocation.FRONT_RIGHT)));
         //armController.cross().whileTrue(AlphaAim.getCommand(arm, alphaTarget)).whileFalse(moveToHome);
 
-        armController.options().whileTrue(MoveArmToPosition.getCommand(arm, ArmPosition.SHOOT_MID_POSITION_ALPHA).alongWith(new InstantCommand(() -> rpm = 3500)))
+        armController.cross().whileTrue(MoveArmToPosition.getCommand(arm, ArmPosition.SHOOT_MID_POSITION_ALPHA).alongWith(new InstantCommand(() -> rpm = 3500)))
                .whileFalse(moveToHome);
 
         //armController.cross().onFalse(resetDriveAngle);
