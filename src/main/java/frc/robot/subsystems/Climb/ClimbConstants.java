@@ -5,8 +5,8 @@
 package frc.robot.subsystems.Climb;
 /** Add your docs here. */
 public class ClimbConstants {
-    public static final double CLIMB_ASCEND_MOTOR_POWER = 0.5;
-    public static final double CLIMB_DESCEND_MOTOR_POWER = 0.5;
+    public static final double CLIMB_ASCEND_MOTOR_POWER = 0.75;
+    public static final double CLIMB_DESCEND_MOTOR_POWER = 0.75;
 
     public static final int MOTOR_ID = 11;
     public static final boolean MOTOR_INVERTED = false;

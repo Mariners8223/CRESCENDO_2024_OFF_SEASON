@@ -180,8 +180,9 @@ public class RobotContainer {
         //armController.cross().onTrue(new InstantCommand(() -> vision.setPipeline(VisionConstants.PipeLineID.TWO_DIMENSIONAL, VisionConstants.CameraLocation.FRONT_RIGHT)));
         //armController.cross().whileTrue(AlphaAim.getCommand(arm, alphaTarget)).whileFalse(moveToHome);
 
-        armController.cross().whileTrue(MoveArmToPosition.getCommand(arm, ArmPosition.SHOOT_MID_POSITION_ALPHA).alongWith(new InstantCommand(() -> rpm = 3500)))
-               .whileFalse(moveToHome);
+        armController.cross().whileTrue(MoveArmToPosition.getCommand(arm, ArmPosition.SHOOT_MID_POSITION_ALPHA)).whileFalse(moveToHome);
+
+        armController.cross().onTrue(new InstantCommand(() -> rpm = 3500));
 
         //armController.cross().onFalse(resetDriveAngle);
 
@@ -199,7 +200,9 @@ public class RobotContainer {
 
         armController.touchpad().onTrue(CalibrateLimitSwitch.getCommand(arm));
 
-        armController.options().whileTrue(MoveArmToPosition.getCommand(arm, ArmPosition.SHOOT_LONG_POSITION).alongWith(new InstantCommand(() -> rpm = 3800))).onFalse(moveToHome);
+        armController.options().whileTrue(MoveArmToPosition.getCommand(arm, ArmPosition.SHOOT_LONG_POSITION)).onFalse(moveToHome);
+
+        armController.options().onTrue(new InstantCommand(() -> rpm = 3800));
 
         // armController.PS().whileTrue(MoveArmToPosition.getCommand(arm, ArmPosition.COLLECT_FLOOR_POSITION).andThen(
         //     new MoveAlpha(arm, ArmPosition.SHOOT_MID_POSITION_BETA.getAlpha()),
@@ -272,7 +275,6 @@ public class RobotContainer {
             new InstantCommand(() -> rpm = 3500)).withName("Move Arm to midRange");
 
         NamedCommands.registerCommand("Move Arm to midRange", moveArmToShootMidRange);
-
 
         NamedCommands.registerCommand("Shoot", new InstantCommand(spinUp::cancel).andThen(ShootShoot.getCommand(shooterIntake, () -> rpm)));
 

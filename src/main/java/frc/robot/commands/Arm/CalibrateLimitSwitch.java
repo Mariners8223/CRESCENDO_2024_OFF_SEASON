@@ -53,6 +53,6 @@ public class CalibrateLimitSwitch extends Command {
   @Override
   public boolean isFinished() {
 
-    return(arm.getLimitSwitch()) || (arm.getBetaMotorCurrent() >= 30 && timer.get() >= 10);
+    return(arm.getLimitSwitch()) || (arm.getBetaMotorCurrent() >= 30 && timer.get() >= 1);
   }
 }

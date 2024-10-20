@@ -29,6 +29,7 @@ public class MoveArmToPosition extends SequentialCommandGroup {
 
         return currentPosition == ArmPosition.COLLECT_FLOOR_POSITION || currentPosition == ArmPosition.UNKNOWN || (currentPosition == ArmPosition.SHOOT_MID_POSITION_BETA && targetPos != ArmPosition.COLLECT_FLOOR_POSITION);
       }).andThen(new WaitCommand(0.2)),
+      
       new MoveBeta(arm, ArmPosition.FREE_POSITION.getBeta()).onlyIf(() -> currentPosition == ArmPosition.COLLECT_FLOOR_POSITION || currentPosition == ArmPosition.AMP_POSITION || currentPosition == ArmPosition.UNKNOWN || (currentPosition == ArmPosition.SHOOT_MID_POSITION_BETA && targetPos != ArmPosition.COLLECT_FLOOR_POSITION)),
 
       new MoveAlpha(arm, ArmPosition.FREE_POSITION.getAlpha()).onlyIf(() -> (currentPosition != ArmPosition.COLLECT_FLOOR_POSITION && currentPosition != ArmPosition.SHOOT_MID_POSITION_BETA) && targetPos == ArmPosition.COLLECT_FLOOR_POSITION),
@@ -40,6 +41,7 @@ public class MoveArmToPosition extends SequentialCommandGroup {
       new MoveBeta(arm, ArmConstants.LIMIT_SWITCH_OFFSET).onlyIf(() -> targetPos == ArmPosition.HOME_POSITION),
       new MoveBeta(arm, ArmPosition.COLLECT_SOURCE_POSITION.getBeta()).onlyIf(() -> targetPos == ArmPosition.COLLECT_SOURCE_POSITION),
       new MoveBeta(arm, ArmPosition.SHOOT_MID_POSITION_BETA.getBeta()).onlyIf(() -> targetPos == ArmPosition.SHOOT_MID_POSITION_BETA),
+      new MoveBeta(arm, ArmPosition.SHOOT_MID_POSITION_ALPHA.getBeta()).onlyIf(() -> targetPos == ArmPosition.SHOOT_MID_POSITION_ALPHA),
 
       new MoveAlpha(arm, ArmPosition.COLLECT_FLOOR_POSITION.getAlpha()).andThen(
         new MoveBeta(arm, ArmPosition.COLLECT_FLOOR_POSITION.getBeta())

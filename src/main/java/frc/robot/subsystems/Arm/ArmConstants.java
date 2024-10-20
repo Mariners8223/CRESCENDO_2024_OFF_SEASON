@@ -12,7 +12,7 @@ public class ArmConstants {
         COLLECT_FLOOR_POSITION(-0.025, 0.395),
         COLLECT_SOURCE_POSITION(0.135, 0.04),
         SHOOT_SUBWOFFER_POSITION(0.135, 0.04),
-        SHOOT_MID_POSITION_ALPHA(0.08,0.04),
+        SHOOT_MID_POSITION_ALPHA(0.055,0.04),
         SHOOT_MID_POSITION_BETA(0,0.423),
         SHOOT_LONG_POSITION(0.055,0.04),
         FREE_POSITION(0.137, 0.04),
@@ -60,6 +60,7 @@ public class ArmConstants {
         public static final double MAX_OUTPUT_RANGE = 0.35;
         public static final int SMART_CURRENT_LIMIT = 35;
         public static final double SECONDARY_CURRENT_LIMIT = 50;
+
         public static final double FORWARD_SOFT_LIMIT = 0.25;
         public static final double REVERSE_SOFT_LIMIT = 0.04;
         public static final double GEAR_RATIO = 9 * 5 * 2; 

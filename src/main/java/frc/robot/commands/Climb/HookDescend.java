@@ -10,7 +10,7 @@ import frc.robot.subsystems.Climb.ClimbConstants;
 
 public class HookDescend extends Command {
   /** Creates a new HookDescend. */
-  Climb climb ;
+  Climb climb;
 
   public HookDescend(Climb climb) {
     // Use addRequirements() here to declare subsystem dependencies.
