@@ -61,25 +61,45 @@
           }
         },
         {
-          "type": "deadline",
+          "type": "race",
           "data": {
             "commands": [
               {
-                "type": "path",
+                "type": "sequential",
                 "data": {
-                  "pathName": "Note 1 to Note 4 without Return.1"
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "Note 1 to Note 4 without Return"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 1.0
+                      }
+                    }
+                  ]
                 }
               },
               {
-                "type": "named",
+                "type": "sequential",
                 "data": {
-                  "name": "Move Arm To Collect Floor"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Collect"
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Move Arm To Collect Floor"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Collect"
+                      }
+                    }
+                  ]
                 }
               }
             ]
