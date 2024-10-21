@@ -41,6 +41,7 @@ public class ArmConstants {
 
 
     public static final Translation3d ALPHA_DISTANCE_FROM_CENTER = new Translation3d(-0.125, 0, 0.25);
+    public static final Translation3d ALPHA_DISTANCE_FROM_CENTER_CUSTOM_ASSETS = new Translation3d(-0.09, -0.205, 0.39);
     public static final double DISTANCE_BETWEEN_PIVOTS_METERS = 0.43;
 
     public static final Translation3d BETA_AIMING_LOCATION =

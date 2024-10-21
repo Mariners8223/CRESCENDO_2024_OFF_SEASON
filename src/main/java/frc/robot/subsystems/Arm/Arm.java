@@ -5,6 +5,9 @@
 package frc.robot.subsystems.Arm;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -123,14 +126,27 @@ public class Arm extends SubsystemBase {
         double alpha = getAlphaPosition();
         double beta = getBetaPosition();
 
+        currentPos = findArmPosition(alpha, beta);
+
         alpha2d.setAngle(Units.rotationsToDegrees(inputs.motorAlphaPosition));
         beta2d.setAngle(Units.rotationsToDegrees(inputs.motorBetaPosition));
-
-        currentPos = findArmPosition(alpha, beta);
 
         Logger.processInputs("Arm", inputs);
         Logger.recordOutput("Arm/Current Pose", currentPos);
         Logger.recordOutput("Arm/Mechanism2D", armMechanism);
+
+        double alphaRadians = -1*Units.rotationsToRadians(alpha);
+        double betaRadians = -1*Units.rotationsToRadians(beta);
+
+        Pose3d alphaArmPose3d = new Pose3d(ArmConstants.ALPHA_DISTANCE_FROM_CENTER_CUSTOM_ASSETS, new Rotation3d(0, alphaRadians, 0));
+
+        double x = Math.cos(-alphaRadians) * ArmConstants.DISTANCE_BETWEEN_PIVOTS_METERS + alphaArmPose3d.getX();
+        double y = -0.125;
+        double z = Math.sin(-alphaRadians) * ArmConstants.DISTANCE_BETWEEN_PIVOTS_METERS + alphaArmPose3d.getZ();
+
+        Pose3d betaArmPose3d = new Pose3d(new Translation3d(x, y, z), new Rotation3d(0, Math.PI + (alphaRadians + betaRadians), 0));
+        Logger.recordOutput("Arm/Alpha Position", alphaArmPose3d);
+        Logger.recordOutput("Arm/Beta Position", betaArmPose3d);
 
         String currentCommand = getCurrentCommand() != null ? getCurrentCommand().getName() : "None";
         Logger.recordOutput("Arm/Current Command", currentCommand);
