@@ -94,6 +94,8 @@ public class DriveBase extends SubsystemBase {
      */
     private Pose2d currentPose = new Pose2d();
 
+    public DriverStation.Alliance currentAllince = Alliance.Blue;
+
 
     @AutoLog
     public static class DriveBaseInputs {
@@ -118,7 +120,7 @@ public class DriveBase extends SubsystemBase {
         modules[3] = new SwerveModule(SwerveModule.ModuleName.Back_Right);
 
         if (RobotBase.isReal()) {
-            gyro = new NavxIO(Constants.ROBOT_TYPE == RobotType.DEVELOPMENT);
+            gyro = new NavxIO(false);
             gyro.reset(new Pose2d());
         } else gyro = new SimGyroIO(() -> driveTrainKinematics.toTwist2d(moduleDeltas), this::getChassisSpeeds);
 
@@ -295,8 +297,14 @@ public class DriveBase extends SubsystemBase {
      * @param rotationSpeed the rotation of the robot (left is positive) rad/s
      */
     public void drive(double Xspeed, double Yspeed, double rotationSpeed, Translation2d centerOfRotation) {
+        Rotation2d gyroAngle = switch(currentAllince){
+            case Blue -> getRotation2d();
+            case Red -> getRotation2d().plus(Rotation2d.fromDegrees(180));
+        };
+
+        
         ChassisSpeeds fieldRelativeSpeeds =
-                ChassisSpeeds.fromFieldRelativeSpeeds(Xspeed, Yspeed, rotationSpeed, getRotation2d());
+                ChassisSpeeds.fromFieldRelativeSpeeds(Xspeed, Yspeed, rotationSpeed, gyroAngle);
 
         targetStates = driveTrainKinematics.toSwerveModuleStates(fieldRelativeSpeeds, centerOfRotation);
         SwerveDriveKinematics.desaturateWheelSpeeds(targetStates, MAX_FREE_WHEEL_SPEED);

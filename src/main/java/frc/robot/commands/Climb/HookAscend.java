@@ -20,7 +20,7 @@ public class HookAscend extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    climb.startMotor(ClimbConstants.CLIMB_DESCEND_MOTOR_POWER);
+    climb.startMotor(ClimbConstants.CLIMB_ASCEND_MOTOR_POWER);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

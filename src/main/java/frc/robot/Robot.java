@@ -18,6 +18,7 @@ import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -60,7 +61,7 @@ public class Robot extends LoggedRobot
         if(isReal()){
             Logger.addDataReceiver(new WPILOGWriter("/U/logs/AdvantageKit"));
             // if(Constants.robotType == RobotType.DEVELOPMENT) Logger.addDataReceiver(new NT4Publisher());
-//            Logger.addDataReceiver(new NT4Publisher());
+        //    Logger.addDataReceiver(new NT4Publisher());
 
             DataLogManager.start("U/logs/dataLogManager");
             SignalLogger.setPath("U/logs/signalLogger");
@@ -122,6 +123,8 @@ public class Robot extends LoggedRobot
     public void autonomousInit()
     {
         autonomousCommand = RobotContainer.getAutoCommand();
+
+        RobotContainer.driveBase.currentAllince = DriverStation.getAlliance().get();
 
         CalibrateLimitSwitch.getCommand(RobotContainer.arm).schedule();
     }

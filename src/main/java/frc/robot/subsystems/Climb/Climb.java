@@ -5,6 +5,8 @@
 package frc.robot.subsystems.Climb;
 
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -22,7 +24,7 @@ public class Climb extends SubsystemBase {
   }
 
   public void startMotor(double power){
-    power = MathUtil.clamp(power, 0, 1);
+    // power = MathUtil.clamp(power, -1, 1);
     io.setMotorDutyCycle(power);
   }
 
@@ -35,5 +37,9 @@ public class Climb extends SubsystemBase {
     // This method will be called once per scheduler run
     io.update(input);
     // Logger.recordOutput("Climb/Is hook on chain", getIsHookOnChain());
+    String ClimbCommand = getCurrentCommand() != null ? getCurrentCommand().getName() : "None";
+
+    Logger.recordOutput("Climb/Current Command", ClimbCommand);
+    Logger.recordOutput("Climb/Motor Power", input.motorAppliedOutput);
   }
 }

@@ -178,8 +178,8 @@ public abstract class SwerveModuleIO implements Runnable {
                 InvertedValue.CounterClockwise_Positive : InvertedValue.Clockwise_Positive; //sets the inverted value
 
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
-        config.CurrentLimits.SupplyCurrentLimit = 50;
-        config.CurrentLimits.SupplyCurrentThreshold = 60;
+        config.CurrentLimits.SupplyCurrentLimit = 40;
+        config.CurrentLimits.SupplyCurrentThreshold = 80;
         config.CurrentLimits.SupplyTimeThreshold = 0.1;
 
         config.MotorOutput.NeutralMode = NeutralModeValue.Coast; //sets it to coast (changed when the robot is enabled)
@@ -193,7 +193,7 @@ public abstract class SwerveModuleIO implements Runnable {
         config.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = 0.3;
 
         config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor; //just in case sets the built-in sensor
-        config.Feedback.SensorToMechanismRatio = 1; //changes the units to m/s
+        config.Feedback.SensorToMechanismRatio = 1; //changes the units to m/sg
 
         return config; //returns the new config
     }
