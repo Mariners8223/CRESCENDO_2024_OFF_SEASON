@@ -60,7 +60,7 @@ public class Robot extends LoggedRobot
         if(isReal()){
             Logger.addDataReceiver(new WPILOGWriter("/U/logs/AdvantageKit"));
             // if(Constants.robotType == RobotType.DEVELOPMENT) Logger.addDataReceiver(new NT4Publisher());
-            Logger.addDataReceiver(new NT4Publisher());
+//            Logger.addDataReceiver(new NT4Publisher());
 
             DataLogManager.start("U/logs/dataLogManager");
             SignalLogger.setPath("U/logs/signalLogger");
