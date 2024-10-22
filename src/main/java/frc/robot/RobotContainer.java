@@ -171,7 +171,7 @@ public class RobotContainer {
     }
 
     private static void configureArmBindings(Supplier<Measure<Angle>> alphaTarget) {
-        Command moveToHome = MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.HOME_POSITION).andThen(new InstantCommand(() -> rpm = 3700));
+        Command moveToHome = MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.HOME_POSITION).andThen(new InstantCommand(() -> rpm = 4000));
 
         Command resetDriveAngle =
                 new InstantCommand(() -> vision.setPipeline(VisionConstants.PipeLineID.THREE_DIMENSIONAL, VisionConstants.CameraLocation.FRONT_RIGHT))
