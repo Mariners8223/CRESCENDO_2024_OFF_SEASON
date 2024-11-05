@@ -34,8 +34,8 @@ public class UpdateSpeedWhenMoved extends Command {
   
   @Override
   public void end(boolean interrupted) {
-    // shooterIntake.StopMotorOnPivot();
-    // shooterIntake.stopMotorOffPivot();
+    shooterIntake.StopMotorOnPivot();
+    shooterIntake.stopMotorOffPivot();
   }
 
  @Override

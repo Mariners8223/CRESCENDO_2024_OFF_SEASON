@@ -31,7 +31,7 @@ public class ShooterIntakeConstants {
 
   public enum Shooter_Speeds{
     SHOOT_SPEED(800),
-    INTAKE_POWER(-0.175);
+    INTAKE_POWER(-0.25);
 
     public final double value;
 
