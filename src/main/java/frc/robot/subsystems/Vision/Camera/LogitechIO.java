@@ -6,7 +6,6 @@ package frc.robot.subsystems.Vision.Camera;
 
 import frc.robot.subsystems.Vision.VisionConstants;
 import org.photonvision.PhotonCamera;
-import org.photonvision.targeting.PhotonPipelineResult;
 
 /**
  * Add your docs here.
@@ -34,8 +33,9 @@ public class LogitechIO implements CameraIO {
             return;
         }
 
-        PhotonPipelineResult result = camera.getLatestResult();
-
+        // PhotonPipelineResult result = camera.getLatestResult();
+        var results = camera.getAllUnreadResults();
+        var result = results.get(results.size() - 1);
         if (!result.hasTargets()) {
             inputs.hasTarget = false;
             return;
@@ -43,7 +43,7 @@ public class LogitechIO implements CameraIO {
 
         inputs.hasTarget = true;
         inputs.timestamp = result.getTimestampSeconds();
-        inputs.latency = result.getLatencyMillis() / 1000;
+        // inputs.latency = result.getLatencyMillis() / 1000;
 
         inputs.xAngleDegrees[0] = result.getBestTarget().getYaw();
         inputs.yAngleDegrees[0] = result.getBestTarget().getPitch();

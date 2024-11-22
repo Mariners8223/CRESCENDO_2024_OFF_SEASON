@@ -42,8 +42,8 @@ public class ArduoCamIO implements CameraIO {
 
         AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo);
 
-        PhotonPoseEstimator poseEstimator = new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, camera, robotToCamera);
-
+        // PhotonPoseEstimator poseEstimator = new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, camera, robotToCamera);
+        PhotonPoseEstimator poseEstimator = new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCamera);
         poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.CLOSEST_TO_REFERENCE_POSE);
 
         return poseEstimator;
@@ -78,7 +78,8 @@ public class ArduoCamIO implements CameraIO {
             return;
         }
 
-        PhotonPipelineResult result = camera.getLatestResult();
+        var results = camera.getAllUnreadResults();
+        var result = results.get(results.size() - 1);
         inputs.pipelineID = pipeLineIDs[camera.getPipelineIndex()].name();
 
         if (!result.hasTargets()) {
@@ -88,7 +89,7 @@ public class ArduoCamIO implements CameraIO {
         }
 
         inputs.timestamp = result.getTimestampSeconds();
-        inputs.latency = result.getLatencyMillis() / 1000;
+        // inputs.latency = result.getLatencyMillis() / 1000;
         switch (pipelineID) {
             case THREE_DIMENSIONAL:
                 updateThreeDimensional(inputs, result
@@ -104,8 +105,7 @@ public class ArduoCamIO implements CameraIO {
     private void updateThreeDimensional(CameraInputsAutoLogged inputs, PhotonPipelineResult result) {
 
         poseEstimator.setReferencePose(referencePose.get());
-
-        Optional<EstimatedRobotPose> estimatedPose = poseEstimator.update();
+        Optional<EstimatedRobotPose> estimatedPose = poseEstimator.update(result);
 
         inputs.hasTarget = false;
 

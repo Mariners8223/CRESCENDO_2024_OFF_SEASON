@@ -49,6 +49,13 @@ public class Vision extends SubsystemBase {
             cameras[i] = cameraLocations[i].HAS_POSE_ESTIMATION ?
                     new ArduoCamIO(cameraLocations[i], referencePose) :
                     new LogitechIO(cameraLocations[i].NAME);
+
+            // if(cameraLocations[i].HAS_POSE_ESTIMATION) {
+                // cameras[i] = new ArduoCamIO(cameraLocations[i], referencePose);
+            // }
+            // else {
+                // cameras[i] = new LogitechIO(cameraLocations[i].NAME);
+            // }
         }
 
         for (int i = 0; i < inputs.length; i++) {

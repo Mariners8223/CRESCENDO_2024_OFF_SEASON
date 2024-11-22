@@ -31,7 +31,6 @@ import frc.robot.subsystems.Arm.ArmConstants;
 import frc.robot.subsystems.Arm.ArmConstants.ArmPosition;
 import frc.robot.subsystems.DriveTrain.DriveBaseConstants;
 import frc.robot.subsystems.Shooter_Intake.ShooterIntakeConstants;
-import frc.robot.subsystems.Vision.VisionConstants;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -172,10 +171,6 @@ public class RobotContainer {
 
     private static void configureArmBindings(Supplier<Measure<Angle>> alphaTarget) {
         Command moveToHome = MoveArmToPosition.getCommand(arm, ArmConstants.ArmPosition.HOME_POSITION).andThen(new InstantCommand(() -> rpm = 4000));
-
-        Command resetDriveAngle =
-                new InstantCommand(() -> vision.setPipeline(VisionConstants.PipeLineID.THREE_DIMENSIONAL, VisionConstants.CameraLocation.FRONT_RIGHT))
-                        .andThen(new InstantCommand(() -> angleToSpeaker = Optional.empty()));
 
         //armController.cross().onTrue(new InstantCommand(() -> vision.setPipeline(VisionConstants.PipeLineID.TWO_DIMENSIONAL, VisionConstants.CameraLocation.FRONT_RIGHT)));
         //armController.cross().whileTrue(AlphaAim.getCommand(arm, alphaTarget)).whileFalse(moveToHome);
