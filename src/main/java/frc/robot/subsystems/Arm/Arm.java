@@ -122,6 +122,7 @@ public class Arm extends SubsystemBase {
     @Override
     public void periodic() {
         io.update(inputs);
+        Logger.processInputs("Arm", inputs);
 
         double alpha = getAlphaPosition();
         double beta = getBetaPosition();
@@ -130,8 +131,6 @@ public class Arm extends SubsystemBase {
 
         alpha2d.setAngle(Units.rotationsToDegrees(inputs.motorAlphaPosition));
         beta2d.setAngle(Units.rotationsToDegrees(inputs.motorBetaPosition));
-
-        Logger.processInputs("Arm", inputs);
         Logger.recordOutput("Arm/Current Pose", currentPos);
         Logger.recordOutput("Arm/Mechanism2D", armMechanism);
 
